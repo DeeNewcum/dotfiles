@@ -28,4 +28,6 @@ There are a [[http://paperlined.org/apps/git/dotfiles/other_peoples_setup.html|T
 
 == License
 
-Unless otherwise noted (particularly files authored by other folks), files here are available under the [[http://en.wikipedia.org/wiki/Do_What_The_Fuck_You_Want_To|Do What The Fuck You Want To Public License]].
+Unless otherwise noted, files here are available under the [[http://creativecommons.org/publicdomain/zero/1.0/|CC0 1.0]] license.
+
+Some files (particularly ones authored by other folks) may have their own licensing information at the top of the file.  Those notices supercede this one.
