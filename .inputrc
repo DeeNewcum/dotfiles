@@ -1,1 +1,5 @@
 C-L: clear-screen
+
+# Extraneous noises/beeps really bother me.
+#     http://paperlined.org/apps/unix/stop_beeping.html
+set bell-style none

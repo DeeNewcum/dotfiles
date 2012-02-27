@@ -1,8 +1,8 @@
 == My home directory
 
-These are some configuration files I store in my home directory.
+Some configuration files I store in my home directory.  I often work in Ubuntu, RHEL, and Solaris, but ocassionally have to work in other un*xes.
 
-To use this, clone, and then
+To use this:
 
 {{{
 ./setup.pl
@@ -25,3 +25,7 @@ There are a [[http://paperlined.org/apps/git/dotfiles/other_peoples_setup.html|T
 * [[https://github.com/zan5hin/dotfiles|zan5hin]]
 * [[https://github.com/nelstrom/dotfiles|nelstrom]]
 * [[https://github.com/rtomayko/dotfiles|rtomayko]]
+
+== License
+
+Unless otherwise noted (particularly files authored by other folks), files here are available under the [[http://en.wikipedia.org/wiki/Do_What_The_Fuck_You_Want_To|Do What The Fuck You Want To Public License]].
