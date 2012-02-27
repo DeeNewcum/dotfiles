@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+
+# A safer "rm -rf", in that the user gets to review the list of files that are going to be deleted, before deletion actually occurs.
+
+	BEGIN{$^W=1}
+	use strict;
+
+	use Data::Dumper;
+
+
+my (@files) = @ARGV;
+
+if (@files == 0) {
+    print STDERR "rmrf:  View the files you'll delete first, as an extra safety check.\n\n";
+    print STDERR "Please specify one or more file or directories to delete.\n";
+    exit(1);
+}
+
+### Get the list of files and directories to delete
+my @deletelist = split /[\n\r]+/,
+		quoted_readpipe("find", @files, "-depth", "-print");
+
+### First display the list to the user, then ask them if they really want to delete
+my $answer = 'relist';
+
+my $done = 0;
+while (! $done) {
+    if ($answer =~ /^\s*r(e(l(i(s(t)?)?)?)?)?\s*$/i) {
+        open POUT, "|less"  or die "$!";
+        print POUT join("\n", @deletelist);
+        close POUT;
+    } elsif ($answer =~ /^\s*yes\s*$/i) {
+        my $space_freed = 0;
+        foreach my $f (@deletelist) {
+            if (! -l $f && ! -d $f) {
+                $space_freed += -s $f;
+            }
+            if (-d $f && ! -l $f) {
+                print "Removing directory $f...\n";
+                system("rmdir", $f) == 0
+                    or die "'rmdir $f' failed: $!\n";
+            } else {
+                print "Deleting $f...\n";
+                system("rm", "-f", $f) == 0
+                        or die "'rm -f $f' failed: $!\n";
+            }
+        }
+        print "Space Freed: ", commify($space_freed), "\n";
+        $done = 1;
+    } elsif ($answer =~ /^\s*n/i) {
+        $done = 1;
+    }
+
+    ### Ask if they really want to delete it
+    if (!$done) {
+        print "Do you want to delete all " . scalar(@deletelist) . " files?  (yes, no, relist)\n";
+        $answer = <STDIN>;
+    }
+}
+
+
+sub commify {
+    my $text = reverse $_[0];
+    $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+    return scalar reverse $text;
+}
+
+# like the stock readpipe(), but it allows for arguments to be passed unquoted, but properly handled
+sub quoted_readpipe {
+    my @cmd = @_;
+    open(my $pin, "-|", @cmd)   or die $!;
+    my $output = do {local $/=undef; <$pin>};
+    close $pin;
+    return $output;
+}

@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+# Perl-scratchpad
+#
+# Creates a temporary file in a specific directory, chmod +x's it, adds the perl she-bang at the top,
+# and opens it up with ${EDITOR}.
+#
+# Doesn't delete the file afterwards, as these are small, and may contain insights that I want to revisit.
+#
+# Tip: really should be used with an editor's ability to execute the current script in a sub-shell, so that the
+#       random filename never has to be messed with.
+#
+# TODO: add a "-l" flag to edit the most recently-created (NOT modified) perl script
+#
+# Actually, a fair bit of this functionality can be done within Vim itself:
+#       (scratch this, it got moved)  http://www.vim.org/tips/tip.php?tip_id=709
+#       http://vim.wikia.com/wiki/VimTip709
+
+sub TEMP_DIR {"$ENV{HOME}/tmp/pl/"}
+
+#$ENV{EDITOR} = "vi" unless $ENV{EDITOR};
+$ENV{EDITOR} = q{vim -X +999 -c startinsert};
+
+
+use File::Temp;
+use Text::ParseWords;
+
+# Create random filename
+system "mkdir -p " . TEMP_DIR;
+my ($fh, $filename) = File::Temp::tempfile( DIR => TEMP_DIR );
+
+# Write out the perl template
+my $my_shebang = do {open FIN, $0 or die; <FIN>};
+$my_shebang =~ /^#!/ or die "The first line of '$0' doesn't contain a she-bang.\n";
+print $fh $my_shebang, <DATA>;
+chmod 0755, $filename;
+close $fh;
+
+# Fire up the editor
+my @cmd = Text::ParseWords::shellwords($ENV{EDITOR}) or die "Unable to parse \$EDITOR\n";
+push(@cmd, $filename);
+exec @cmd;
+print "Unable to run \"", join('" "', @cmd), "\": $!\n";
+
+__DATA__
+
+   use strict;
+   use warnings;
+
+   use Data::Dumper;
+
+

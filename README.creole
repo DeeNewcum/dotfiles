@@ -1,0 +1,27 @@
+== My home directory
+
+These are some configuration files I store in my home directory.
+
+To use this, clone, and then
+
+{{{
+./setup.pl
+}}}
+
+
+== Similar projects
+
+There are a [[http://paperlined.org/apps/git/dotfiles/other_peoples_setup.html|TON of other people]] who store their dotfiles on github.  Ones that stand out for me:
+
+* [[https://github.com/aspiers/shell-env|aspiers]]
+* [[https://github.com/claytron/dotfiles|claytron]]
+* [[https://github.com/sjbach/env|sjbach]]
+* [[https://github.com/mathiasbynens/dotfiles/|mathiasbynens]]
+* [[https://github.com/yuzuemon/dotfiles|yuzuemon]]
+* [[https://github.com/skwp/dotfiles|skwp]]
+* [[https://github.com/ryanb/dotfiles|ryanb]]
+* [[https://github.com/blueyed/dotfiles|blueyed]]
+* [[https://github.com/phleet/dotfiles|phleet]]
+* [[https://github.com/zan5hin/dotfiles|zan5hin]]
+* [[https://github.com/nelstrom/dotfiles|nelstrom]]
+* [[https://github.com/rtomayko/dotfiles|rtomayko]]

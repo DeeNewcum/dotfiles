@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+# pass this script a filename, and it displays it in a form that can be given to scp from another computer
+#
+# "scpp" = "scp path"
+#
+#
+#       computer that file is being copied from:
+#               ~/tmp/some/deep/directory/ $   scpp my_file.tar.gz
+#
+#       computer that file is being copied to:
+#               $ scp <output_of_scpp> .
+
+    use strict;
+    use warnings;
+
+    use File::Spec;
+
+@ARGV or die "Please specify a file\n";
+
+my $host;
+if (qx|uname| =~ /^SunOS$/) {
+    ($host = qx[hostname]) =~ s/\s//g;
+} else {
+    ($host = qx[hostname --long]) =~ s/\s//g;
+}
+
+if (-e "$ENV{HOME}/.hostname_override") {               # 'hostname' doesn't always return the correct name/address for other computers to be able to contact it
+    open FIN, "$ENV{HOME}/.hostname_override";
+    ($host = do {local $/=undef;<FIN>}) =~ s/[\n\r]$//s;
+    close FIN;
+}
+
+foreach my $file (@ARGV) {
+    -e $file            or warn "Specified file '$file' not found\n";
+
+    my $abs = File::Spec->rel2abs($file);
+    $abs .= "/" if -d $file;
+
+    my $user = (getpwuid $<)[0];
+
+    if (exists $ENV{CLEARCASE_ROOT} && $abs =~ m#^/vobs/#) {
+        print "$user\@$host:$ENV{CLEARCASE_ROOT}$abs\n";
+    } else {
+        print "$user\@$host:$abs\n";
+    }
+}

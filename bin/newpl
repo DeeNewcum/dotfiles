@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+# When starting a new perl script, I usually have to open vim twice to be able to get a new script
+# going.  (step 1: create file, step 2: chmod +x, step 3: open editor a second time, and create script)
+#
+# To avoid this, this script drops a minimal file down, chmod's it, and runs your editor.
+#
+# (though vim is flexible enough that I'm sure there's a way to do this in-editor)
+
+    use strict;
+    use warnings;
+
+    use File::Spec;
+
+@ARGV or die "Please specify a script filename to create.\n";
+
+foreach my $f (@ARGV) {
+    if (-e $f) {
+        print STDERR "File '$f' already exists.  Skipping.\n";
+        next;
+    }
+
+    my $fullpath = File::Spec->rel2abs( $f );
+
+    open my $fh, ">$f" or die;
+    my @whole_script = <DATA>;
+    if ($fullpath =~ m#/cgi-bin/#i) {
+        # remove >> from the front of lines that have it, but keep those lines
+        @whole_script = map {s/^>>//; $_} @whole_script;
+    } else {
+        # remove lines that have >> in them
+        @whole_script = grep {!/^>>/} @whole_script;
+    }
+    print $fh @whole_script;
+
+    my $perm = (stat $fh)[2] & 07777;
+    close $fh;
+
+    $perm |= 0111;
+    chmod($perm | 0111, $f);
+    printf "\tchmod: %04o\n", $perm;
+}
+
+
+# now edit the new file(s)
+exec { "vim" } "vim", @ARGV;
+
+
+        ####################################################################
+        ## below is the body of the new script
+        ## ">>" indicates lines that should only be included for CGI scripts
+        ####################################################################
+
+__DATA__
+#!/usr/bin/perl
+
+# <short description of program>
+
+    use strict;
+    use warnings;
+>>    use CGI::Carp qw(fatalsToBrowser);
+>>    BEGIN {\$ENV{HOME} ||= (getpwuid(\$<))[7]}       # in case \$HOME isn't set
+>>    BEGIN {require "\$ENV{HOME}/.cgiEnvVars.pm"}
+
+>>    use CGI;
+    use Data::Dumper;
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+>>print "Content-Type: text/html; charset=utf-8\\n\\n";
+>>print "<h3>Hello world</h3>\\n";
+
+
+
+
+>>sub cgidmp {print "<pre>", CGI::escapeHTML(join("", Dumper(\@_))), "</pre>"}
