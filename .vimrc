@@ -6,9 +6,10 @@ set ruler                                                       " display row/co
 syntax on
 command W w                                                     " accomodate stuck-shift keys
 command Q q
-set clipboard=unnamed
+set clipboard=unnamed                                           " default to the * clipboard when yanking/pasting
 
 filetype plugin on                                              " http://vim.wikia.com/wiki/Keep_your_vimrc_file_clean
+set wildmenu wildmode=list:longest,full                         " http://paperlined.org/apps/vim/wildmenu.html
 
 
 

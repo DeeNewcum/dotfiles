@@ -27,3 +27,10 @@ endfunction
 
 setlocal foldexpr=GetPerlFold()
 setlocal foldmethod=expr
+
+
+
+" Allow 'quickfix' to work for perl.  To use, type :make
+set makeprg=perl\ $VIMRUNTIME/tools/efm_perl.pl\ -c\ %\ $*
+set errorformat=%f:%l:%m
+set autowrite
