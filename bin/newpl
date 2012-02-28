@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # When starting a new perl script, I usually have to open vim twice to be able to get a new script
 # going.  (step 1: create file, step 2: chmod +x, step 3: open editor a second time, and create script)
