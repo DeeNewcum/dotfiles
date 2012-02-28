@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+
+    use strict;
+    use warnings;
+
+    use List::Util qw[max];
+    use Data::Dumper;
+
+@ARGV or die "Please specify a filename.\n";
+
+my ($name_order, %names) = ordered_hash(
+    filename => "File name",
+    dev      => "Device num",
+    ino      => "Inode",
+    mode     => "File mode",
+    nlink    => "Num hardlinks",
+    uid      => "UserID",
+    gid      => "GroupID",
+    rdev     => "Device ID",
+    size     => "Size",
+    atime    => "Access time",
+    mtime    => "Modification time",
+    ctime    => "Inode change time",
+    blksize  => "Block size",
+    blocks   => "Num blocks allocated",
+);
+
+my $descrlen = max(map{length($_)} values %names) + 1;
+
+my $first = 1;
+foreach my $file (@ARGV) {
+    if (!-e $file) {
+        print STDERR "File not found: $file\n";
+        next;
+    }
+
+    $first or print "\n";
+    $first = 0;
+    #(@ARGV > 1) and print $file, "\n", "-"x length($file), "\n";
+
+    my %s;
+    @s{qw[ dev ino mode nlink uid gid rdev size atime mtime ctime blksize blocks ]} = stat($file);
+    $s{filename} = $file;
+
+    $s{mtime} = localtime( $s{mtime} ) . " (local time)";
+    $s{atime} = localtime( $s{atime} ) . " (local time)";
+    $s{ctime} = localtime( $s{ctime} ) . " (local time)";
+     
+    #print "############### ", format_mode($s{mode}), "\n";
+    my $mode_str = format_mode($s{mode});
+    $s{mode} = sprintf("%06o     %s", $s{mode}, $mode_str);
+
+    $s{uid} .= " (" . getpwuid($s{uid}) . ")";
+    $s{gid} .= " (" . getgrgid($s{gid}) . ")";
+
+    $s{size} = commify($s{size}) . " bytes";
+
+    #print Dumper \%s;
+    foreach my $name (@$name_order) {
+        printf "\%${descrlen}s  %s\n",
+            ($names{$name} || $name) . ":",
+            $s{$name};
+    }
+}
+
+
+
+
+
+# from Stat::lsMode, written by M-J. Dominus (mjd-perl-lsmode@plover.com)
+#
+# licensed under the Artistic License
+BEGIN {
+    my @perms = qw(--- --x -w- -wx r-- r-x rw- rwx);
+    my @ftype = qw(. p c ? d ? b ? - ? l ? s ? ? ?);
+    $ftype[0] = '';
+    sub format_mode {
+      die "format_mode requires a mode as an argument" unless @_ >= 1;
+      my $mode = shift;
+      my %opts = @_;
+
+      unless (defined $mode) {
+        return wantarray() ? () : undef;
+      }
+
+      my $setids = ($mode & 07000)>>9;
+      my @permstrs = @perms[($mode&0700)>>6, ($mode&0070)>>3, $mode&0007];
+      my $ftype = $ftype[($mode & 0170000)>>12];
+      my @ftype = $opts{no_ftype} ? () : ($ftype);
+      
+      if ($setids) {
+        if ($setids & 01) {     # Sticky bit
+          $permstrs[2] =~ s/([-x])$/$1 eq 'x' ? 't' : 'T'/e;
+        }
+        if ($setids & 04) {     # Setuid bit
+          $permstrs[0] =~ s/([-x])$/$1 eq 'x' ? 's' : 'S'/e;
+        }
+        if ($setids & 02) {     # Setgid bit
+          $permstrs[1] =~ s/([-x])$/$1 eq 'x' ? 's' : 'S'/e;
+        }
+      }
+
+      if (wantarray) {
+        (@ftype, @permstrs);
+      } else {
+        join '', @ftype, @permstrs;
+      }
+    }
+}
+
+
+
+sub ordered_hash { my $n; my @order = grep {!($n++ % 2)} @_; return (\@order, @_) }
+
+# add commas to a number
+sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}
