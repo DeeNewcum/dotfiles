@@ -1,15 +1,6 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
-# pass this script a filename, and it displays it in a form that can be given to scp from another computer
-#
-# "scpp" = "scp path"
-#
-#
-#       computer that file is being copied from:
-#               ~/tmp/some/deep/directory/ $   scpp my_file.tar.gz
-#
-#       computer that file is being copied to:
-#               $ scp <output_of_scpp> .
+# displays the path to the specified file, in the form that's useful to scp from another computer
 
     use strict;
     use warnings;
@@ -18,17 +9,25 @@
 
 @ARGV or die "Please specify a file\n";
 
+############### hostname ################
 my $host;
 if (qx|uname| =~ /^SunOS$/) {
     ($host = qx[hostname]) =~ s/\s//g;
 } else {
     ($host = qx[hostname --long]) =~ s/\s//g;
 }
-
 if (-e "$ENV{HOME}/.hostname_override") {               # 'hostname' doesn't always return the correct name/address for other computers to be able to contact it
-    open FIN, "$ENV{HOME}/.hostname_override";
-    ($host = do {local $/=undef;<FIN>}) =~ s/[\n\r]$//s;
-    close FIN;
+        open FIN, "$ENV{HOME}/.hostname_override";
+        ($host = do {local $/=undef;<FIN>}) =~ s/[\n\r]$//s;
+        close FIN;
+}
+
+############### username ################
+my $username = (getpwuid $<)[0];
+if (-e "$ENV{HOME}/.username_override") {               # sometimes we want to override the username (if we 'sudo' a lot, for instance)
+        open FIN, "$ENV{HOME}/.username_override";
+        ($username = do {local $/=undef;<FIN>}) =~ s/[\n\r]$//s;
+        close FIN;
 }
 
 foreach my $file (@ARGV) {
@@ -37,11 +36,10 @@ foreach my $file (@ARGV) {
     my $abs = File::Spec->rel2abs($file);
     $abs .= "/" if -d $file;
 
-    my $user = (getpwuid $<)[0];
 
     if (exists $ENV{CLEARCASE_ROOT} && $abs =~ m#^/vobs/#) {
-        print "$user\@$host:$ENV{CLEARCASE_ROOT}$abs\n";
+        print "$username\@$host:$ENV{CLEARCASE_ROOT}$abs\n";
     } else {
-        print "$user\@$host:$abs\n";
+        print "$username\@$host:$abs\n";
     }
 }
