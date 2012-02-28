@@ -121,7 +121,7 @@ sub scan_file_for_include_command {
         .sudo_bashrc
                 [ -f $STDIN_OWNERS_HOME/<<HOMEPATH>> ] && source $STDIN_OWNERS_HOME/<<HOMEPATH>>
         .vimrc
-                exec "source " . ($STDIN_OWNERS_HOME=='' ? "~" : $STDIN_OWNERS_HOME) . "/<<HOMEPATH>>"
+                exec "source " . expand('<sfile>:p:h') . "/<<HOMEPATH>>"
 EOF
     #.vimrc =>    source <<PATH>>
     #print Dumper \%include_commands; exit;

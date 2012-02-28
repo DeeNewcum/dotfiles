@@ -56,3 +56,9 @@ augroup BufNewFileFromTemplate
 
 
 autocmd BufWrite *.pl silent !chmod a+x %
+
+
+
+" NOTE: if you want to start pathogen from an override ~/.vimrc file, then call infect like this:
+"
+"       call pathogen#infect(expand('<sfile>:p:h') . "/.vim/bundle")
