@@ -22,3 +22,7 @@ cmap w!! w !sudo tee % > /dev/null
 command! PP        !PATH=.:$PATH %
 command! PPL       !PATH=.:$PATH % | less
 command! CC        !perl -c % 2>&1 | head -20
+
+
+noremap ;; ;| map ; :|                                         " swap the : and ; keys
+
