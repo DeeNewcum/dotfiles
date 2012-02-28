@@ -2,14 +2,31 @@
 alias rl='. ~/.bash_aliases'
 alias ea='${EDITOR:-vi} ~/.bash_aliases; rl'
 
-## combinations of less/grep/find/xargs
-function lgrep()  { grep -Zls  "$@" | xargs -0 less    -p "$1"; }
-function lgrepi() { grep -Zlsi "$@" | xargs -0 less -i -p "$1"; }
-function xgrep() { xargs -i grep "$@" /dev/null {} ; }              # Solaris version only, needed for its underpowered find/xargs/grep arguments
+if [ "`uname`" != "SunOS" ]; then
+    ## combinations of less/grep/find/xargs
+    function lgrep()  { grep -Zls  "$@" | xargs -0 less    -p "$1"; }
+    function lgrepi() { grep -Zlsi "$@" | xargs -0 less -i -p "$1"; }
+    function xgrep() { xargs -i grep "$@" /dev/null {} ; }              # Solaris version only, needed for its underpowered find/xargs/grep arguments
 
-function largefiles() { find ${1:-~} -type f -print0 | xargs -0 ls -l | sort -n -k 5 | tail -100 | perl -ple 's/^(?:\S+\s+){4}//; s/$ENV{HOME}/~/'; }
-function largedirs() { du -k ${1:-~} | sort -n | tail -100; }
-function largeindividualdirs() { du -Sk ${1:-~} | sort -n | tail -1000; }
+    function largefiles() { find ${1:-~} -type f -print0 | xargs -0 ls -l | sort -n -k 5 | tail -100 | perl -ple 's/^(?:\S+\s+){4}//; s/$ENV{HOME}/~/'; }
+    function largedirs() { du -k ${1:-~} | sort -n | tail -100; }
+    function largeindividualdirs() { du -Sk ${1:-~} | sort -n | tail -1000; }
+else
+    # Try to make the fundamental Solaris tools a wee bit easier to use
+    function find-() { find $PWD -type f -print; }
+    function xargs_newline() { perl -e 'my@a=map{chomp;$_}<STDIN>;system@ARGV,splice(@a,0,200)while(@a)' "$@"; }
+
+    ## combinations of less/grep/find/xargs
+    function lgrep()  { grep -ls  "$@" | xargs_newline less    -p "$1"; }
+    function lgrepi() { grep -lsi "$@" | xargs_newline less -i -p "$1"; }
+    function xgrep()  { xargs_newline grep "$@" /dev/null; }              # Solaris version only, needed for its underpowered find/xargs/grep arguments
+    function xlgrep() { xargs_newline grep -l "$@" /dev/null | xargs less; }        # Solaris version only, needed for its underpowered find/xargs/grep arguments
+
+    function largefiles() { /bin/find ${1:-$PWD}  ! -local -prune -o -type f -print | xargs_newline /bin/ls -l | filesize_sort | tail -100; }
+    function largedirs() { /usr/bin/du -k ${1:-$PWD} | sort -n; }
+    function largedirs_onelevel() { /bin/ls -1 | perl -nle 'print qq[$ENV{PWD}/$_] if -d' | xargs_newline du -sk | sort -n | perl -ple 's/^(\d+?)\d\d\d\s/\1mb\t/'; }
+    function large_txtfiles() { /bin/find $PWD ! -local -prune -o -type f -print | perl -nle 'print if -T' | xargs_newline /bin/ls -l | filesize_sort | tail -100; }
+fi
 
 function vimwhich()  { vim  `which $1`; }
 function lesswhich() { less `which $1`; }
@@ -31,3 +48,5 @@ fi
 
 
 alias google='w3m google.com'
+
+
