@@ -20,7 +20,9 @@ Setup.pl knows about each file type, and will suggest the appropriate 'source'/'
 
 == Shared root
 
-I manage boxes where several people have access to root.  To avoid stepping on each other's toes, I have set up root's ~~/.bashrc so that it loads a ~~/.sudo_bashrc from the original user's home directory, if it exists.  ~~/.sudo_vimrc also gets used instead of root's own .vimrc.
+I manage boxes where several people have access to root.  To avoid stepping on each other's toes, I have set up root's ~~/.bashrc so that it loads a ~~/.sudo_bashrc from the original user's home directory, if it exists.
+
+~~/.sudo_vimrc also gets used instead of root's own .vimrc.
 
 The exact mechanism for accomplishing this functionality isn't trivial.  However, it's good to know the feature is there, because it shows up in a several random places throughout the dotfiles.
 
