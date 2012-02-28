@@ -13,6 +13,7 @@ To use this:
 
 There are a [[http://paperlined.org/apps/git/dotfiles/other_peoples_setup.html|TON of other people]] who store their dotfiles on github.  Ones that stand out for me:
 
+* [[https://github.com/rtomayko/dotfiles|rtomayko]]
 * [[https://github.com/aspiers/shell-env|aspiers]]
 * [[https://github.com/claytron/dotfiles|claytron]]
 * [[https://github.com/sjbach/env|sjbach]]
@@ -24,7 +25,6 @@ There are a [[http://paperlined.org/apps/git/dotfiles/other_peoples_setup.html|T
 * [[https://github.com/phleet/dotfiles|phleet]]
 * [[https://github.com/zan5hin/dotfiles|zan5hin]]
 * [[https://github.com/nelstrom/dotfiles|nelstrom]]
-* [[https://github.com/rtomayko/dotfiles|rtomayko]]
 
 == License
 
