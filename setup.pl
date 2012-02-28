@@ -115,7 +115,7 @@ sub scan_file_for_include_command {
 
     my %include_commands = map {s/^\s+|\s+$//sg; $_} split /[\n\r]+/, <<'EOF';
         .bash_aliases
-                [ -f <<PATH>> ] && source <<PATH>>
+                [ -f ${STDIN_OWNERS_HOME:-~}/<<HOMEPATH>> ] && source ${STDIN_OWNERS_HOME:-~}/<<HOMEPATH>>
         .bashrc
                 [ -f <<PATH>> ] && source <<PATH>>
         .sudo_bashrc
