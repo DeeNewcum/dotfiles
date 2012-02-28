@@ -22,6 +22,7 @@ if &diff | syntax off | endif                                   " syntax hilight
 
 " don't wrap lines in HTML files
 autocmd BufEnter *.html set textwidth=0
+autocmd BufEnter *.creole set textwidth=0
 
 
 " Take care of forgetting to use sudo with :w!!
