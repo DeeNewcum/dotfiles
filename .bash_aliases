@@ -23,7 +23,7 @@ function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "
 alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
 
 
-if [ "`which apt-get`" ];  then
+if [ "`which apt-get 2>/dev/null`" ];  then
     alias upup='sudo apt-get update; sudo apt-get upgrade'
 fi
 
