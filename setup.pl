@@ -70,6 +70,7 @@ sub _mkdir {
 
     if (-d "$ENV{HOME}/$dir") {
         #print "created   $dir\n";
+        print "setup    ~/$dir\n";
     } else {
         print "ERROR: unable to create directory '$dir'\n";
     }
@@ -85,12 +86,14 @@ sub _symlink {
     if (! -e $to) {
         symlink $from, $to;
         #print "creating symlink    $from     to    $to\n";
+        print "setup    ~/$file\n";
     } else {
         if (-l $to) {
             if (readlink($to) ne $from) {
                 unlink $to;
                 symlink $from, $to;
                 #print "creating symlink    $from     to    $to\n";
+                print "setup    ~/$file\n";
             }
         } else {
             if (!scan_file_for_include_command($file)) {

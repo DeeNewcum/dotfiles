@@ -37,3 +37,22 @@ command! CC        !perl -c % 2>&1 | head -20
 
 noremap ;; ;| map ; :|                                         " swap the : and ; keys
 
+
+
+" Originally from http://www.noah.org/engineering/dotfiles/.vimrc
+" License unclear.
+"
+" Automatically load templates for new files. Silent if the template for the
+" extension does not exist. Virtually all template plugins I have seen for Vim
+" are too complicated. This just loads what extension matches in
+" $VIMHOME/templates/. For example the contents of html.tmpl would be loaded
+" for new html documents.
+augroup BufNewFileFromTemplate
+au!
+autocmd BufNewFile * silent! 0r $HOME/.vim/templates/%:e.tmpl
+autocmd BufNewFile * normal! G"_dd1G
+autocmd BufNewFile * silent! match Todo /TODO/
+augroup BufNewFileFromTemplate
+
+
+autocmd BufWrite *.pl silent !chmod a+x %

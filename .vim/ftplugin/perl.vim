@@ -1,6 +1,6 @@
 " make Perl folds work properly
 " http://vim.wikia.com/wiki/Auto-fold_Perl_subs#foldexpr_workaround
-function GetPerlFold()
+function! GetPerlFold()
   if getline(v:lnum) =~ '^\s*sub\s'
     return ">1"
   elseif getline(v:lnum) =~ '\}\s*$'
