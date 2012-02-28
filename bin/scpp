@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# displays the path to the specified file, in the form that's useful to scp from another computer
+# Displays the path to the specified file, in the form that's useful to scp from another computer.
 
     use strict;
     use warnings;

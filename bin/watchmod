@@ -2,7 +2,10 @@
 
 # Watches all files under the current directory, and displays their name every time they're touched.
 #
-# Linux has 'inotifywait', BSD and OSX have kqueue.  When a unix doesn't have one of those, there's always the fallback to polling...
+# Linux has 'inotifywait', BSD and OSX have kqueue.  Those are much better solutions.
+#
+# This is a much slower fallback, for when you're on a un*x box that doesn't have something like
+# those available.
 
 
    use strict;

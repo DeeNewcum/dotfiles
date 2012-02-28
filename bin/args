@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-# just display the specific arguments that we receive, as a way to debug 
+# just display the specific arguments that we receive, as a way to debug
+# command-line problems, particularly regarding shell-quoting
 
     use strict;
     use warnings;

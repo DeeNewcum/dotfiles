@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# diff is called by git with 7 parameters:
+# 1 = path
+# 2 = old-file
+# 3 = old-hex
+# 4 = old-mode
+# 5 = new-file
+# 6 = new-hex
+# 7 = new-mode
+
+exec vimdiff -R "$2" "$5"
+exit
+
+
+
+To use this file, paste these into your ~/.gitconfig:
+
+
+[diff]
+    external = ~/bin/git_vimdiff_wrapper
+[pager]
+    diff =
+
