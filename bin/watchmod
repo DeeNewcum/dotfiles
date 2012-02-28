@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+# Watches all files under the current directory, and displays their name every time they're touched.
+#
+# Linux has 'inotifywait', BSD and OSX have kqueue.  When a unix doesn't have one of those, there's always the fallback to polling...
+
+
+   use strict;
+   use warnings;
+
+   my $CLEARCURLINE = "\r\e[K";
+
+
+my $last_mod = time();
+my $last_file_printed = "";
+
+
+while (1) {
+   open PIN, "find -type f 2>/dev/null |" or die;
+   my $next_last_mod = $last_mod;
+   while (<PIN>) {
+      s/[\n\r]+$//s;    # chomp
+
+      #next if (m#^\./tmp/#);
+      #next if (m#^\./log/#);
+      #next if (m#^\./Data/SisDB/SisDB.log#);
+
+      my $mod = (stat $_)[9]
+         or next;
+      if ($mod > $last_mod) {
+         $next_last_mod = $mod   if ($mod > $next_last_mod);
+         #printf "%s%-20s  %-8d  %s",
+         printf "%s%-20s  %s",
+               $last_file_printed ?
+                     (($_ eq $last_file_printed) ? "\e[2k\e[0G" : "\n")
+                     : "",
+               #scalar(localtime($mod)),
+               -s $_,
+               $_;
+         $| = 1;
+         $last_file_printed = $_;
+      }
+   }
+
+   #print "\n";
+
+   $last_mod = $next_last_mod;
+}

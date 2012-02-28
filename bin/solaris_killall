@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+# In Solaris, 'killall' doesn't work like killall does elsewhere -- it literally kills EVERYTHING.
+#
+# This works like killall does elsewhere.
+
+
+# Some /proc/ parsing routines were copied from
+#       http://www.brendangregg.com/Solaris/prusage
+
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+
+
+#@ARGV = ('httpd');
+
+my $pattern = shift
+    or die "Please specify a pattern to search for.\n";
+
+my $signal = 'INT';
+if ($pattern =~ s/^-//) {
+    $signal = $pattern;
+    $pattern = shift;
+}
+
+if ($signal !~ /^\d+$/) {
+    my %sig_names = signal_names();
+    $signal = $sig_names{$signal}   or die "Can't find that signal name.\n";
+}
+
+my $num_killed = 0;
+foreach my $pid (all_pids()) {
+    my %psinfo = parse_psinfo($pid);
+    #print Dumper \%psinfo; exit;
+
+    next if ($pid == $$);
+
+    #next unless ($psinfo{fname} =~ $pattern);
+    next unless ($psinfo{psargs} =~ $pattern);
+    print "killing  $pid $psinfo{psargs}\n";
+    kill $signal, $pid;
+    $num_killed++;
+}
+
+if (!$num_killed) {
+    print STDERR "No processed matched the pattern:  $pattern\n";
+}
+
+
+sub all_pids {sort {$a <=> $b} grep /^\d+$/, map {s#^.*/##;$_} glob "/proc/*"}
+
+
+# parse /proc/$pid/psinfo
+sub parse_psinfo {
+    my $pid = shift;
+
+    ### Read psinfo stats
+    open(PSINFO,"/proc/$pid/psinfo") || next;
+    read(PSINFO,my $psinfo,256);
+    close PSINFO;
+
+    ### Unpack psinfo values
+    my %psinfo;
+    @psinfo{ qw[ flag nlwp pid ppid pgid sid uid euid gid egid addr size rssize
+        pad1 ttydev pctcpu pctmem start time ctime fname psargs wstat argc argv
+        envp dmodel taskid projid nzomb ] }
+        = unpack("iiiiiiiiiiIiiiiSSa8a8a8Z16Z80iiIIaa3iiia",$psinfo);
+    return %psinfo;
+}
+
+
+use Config;
+sub signal_names { my $i = 0; map {$_, $i++} split(' ', $Config{sig_name}) }
+
+
+
+__END__
+
+==== register P ====
+:!%
+:!% 2>&1 | less
+

@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+# just display the specific arguments that we receive, as a way to debug 
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+
+printf "You passed in %d arguments:\n", scalar(@ARGV);
+
+for (my $ctr=0; $ctr<@ARGV; $ctr++) {
+    printf "%3d: %s\n", $ctr+1, $ARGV[$ctr];
+    #printf "%3d: %s\n", $ctr+1, Dumper($ARGV[$ctr]);
+}

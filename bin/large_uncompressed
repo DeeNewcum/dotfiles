@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+
+#  +===============================================================================================
+#  | Look for the largest files under the current directory that are uncompressed.
+#  +===============================================================================================
+
+    use strict;
+    use warnings;
+
+    use File::Find;
+    use IPC::Open2;
+    use Data::Dumper;
+
+use Term::ReadKey;
+my (undef, $num_rows) = Term::ReadKey::GetTerminalSize();
+
+
+### STEP 1  --  make a list of all files
+my @files;
+find({
+        wanted => \&wanted,
+        no_chdir => 1},
+    $ENV{PWD});
+
+
+    sub wanted {
+        my $size = -s $File::Find::name;
+        push @files, [$File::Find::name, $size]     if (defined $size);
+    }
+
+#print Dumper \@files; exit;
+
+
+### STEP 2  --  order them by size, largest to smallest
+@files = map {$_->[0]}
+        sort {$b->[1] <=> $a->[1]}
+        @files;
+
+
+### STEP 3  --  starting from the largest to the smallest, figure out which are compressed.  Stop when we find "enough" uncompressed files.
+
+#my $numfiles_needed = 25;
+my $numfiles_needed = $num_rows-2;
+foreach my $file (@files) {
+    my ($is_compressed, $compression_ratio) = is_compressed($file);
+    next if ($is_compressed);
+    #next unless ($is_compressed);
+    #printf "%12s  %s  [compression ratio: %5.2f]\n",
+    printf "%12s  %s\n",
+        commify(-s $file),
+        $file;
+        #$compression_ratio;
+
+    $numfiles_needed--;
+    last if ($numfiles_needed <= 0);
+}
+
+
+
+# do a heuristic -- instead of looking at the entire file, just check the first 8kb
+sub is_compressed {
+    my $filename = shift;
+
+    open my $FIN, "<$filename"      or die $!;
+    my $eightkb_blob = '';       # the uncompressed BLOB
+    my $uncompressed_size = sysread($FIN, $eightkb_blob, 4*1024);
+            # ^^ because the input-size is a critical part of the equation, we have to keep track of it in case we read less than 4kb
+    close $FIN;
+
+    # basically, we're creating several processes:
+    #       1. [PARENT]         [us/Perl]   reads the compressed BLOB, counts how many bytes are in it
+    #           2. [EIGHTKB]    [us/Perl]   outputs the 4kb BLOB
+    #           3. [GZIP]       [gzip]      inputs the 4kb BLOB, outputs the compressed BLOB
+    my $eightkb_pid = open(my $GZIP_OUTPUT, '-|');
+    defined($eightkb_pid) or die $!;
+    if (!$eightkb_pid) {
+        # child process
+
+        my $gzip_pid = open(my $GZIP_INPUT, '|-',
+                            'gzip', '--to-stdout', '-')
+            or die $!;
+        print $GZIP_INPUT $eightkb_blob;
+        close $GZIP_INPUT;
+        waitpid($gzip_pid, 0);
+        exit 0;
+    }
+
+    my $compressed_blob = do {local $/=undef; <$GZIP_OUTPUT>};
+    my $compressed_size = length($compressed_blob);
+
+    #print "For $filename, we got:\n\tuncompressed size: $uncompressed_size\n\t  compressed size: $compressed_size\n";
+
+    my $compression_ratio = $compressed_size / $uncompressed_size;
+    my $is_compressed = $compression_ratio > 0.8;
+    return wantarray ? ($is_compressed, $compression_ratio) : $is_compressed;
+}
+
+
+
+sub commify {
+    my $text = reverse $_[0];
+    $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+    return scalar reverse $text;
+}
+

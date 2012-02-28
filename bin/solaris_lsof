@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+
+# Before Solaris 10, Solaris didn't have an adequate version of 'lsof'.  This tries to fill in the gaps, though it runs very slowly.
+#
+#       http://prefetch.net/blog/index.php/2006/09/22/mapping-pfiles-output-to-files/
+#       http://blogs.sun.com/eschrock/date/20040618
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+
+my %device_paths = get_device_numbers();
+
+
+## Process arguments
+my @cmdline_pids = grep /^\d+$/, @ARGV;
+my $cmdline_hide_pids = grep /^-q$/, @ARGV;         # -q = quiet  (or, more quiet, at least)
+
+
+if (@cmdline_pids) {        # if specific PIDs are specified, we'll just scan those, to try to speed things up
+    foreach my $pid (@cmdline_pids) {
+        handle_process($pid);
+    }
+} else {
+    opendir PROCS, "/proc/"     or die $!;
+    while (defined(my $pid = readdir(PROCS))) {
+        next if ($pid eq '.' || $pid eq '..' || !-d "/proc/$pid");
+        handle_process($pid);
+    }
+}
+
+
+## Here's one specific PID that we want to process
+sub handle_process {
+    my $pid = shift;
+
+    opendir FD, "/proc/$pid/fd/"       or die $!;
+    while (defined(my $fd = readdir(FD))) {
+        next if ($fd eq '.' || $fd eq '..');
+        $fd = "/proc/$pid/fd/$fd";
+        handle_fd($pid, $fd);
+    }
+    closedir FD;
+}
+
+
+## Here's one specific open-file-descriptor that we want to process
+sub handle_fd {
+    my ($pid, $fd) = @_;
+
+    return unless (-f $fd);
+
+    my @stat = stat($fd);
+
+    my $device_path = $device_paths{ $stat[0] };
+    #my $full_path = qx[find $device_path -local -prune -o -inum $stat[1] -print];
+    #my $full_path = qx[find $device_path -inum $stat[1] -print];
+    my $full_path = no_stderr(qq[ find $device_path -inum $stat[1] -print]);
+        chomp $full_path;
+
+    $full_path = "$device_path/?" unless ($full_path =~ /\S/);
+
+    if (!$cmdline_hide_pids) {
+        printf "%d\t%s\n", $pid, $full_path;
+    } else {
+        print "$full_path\n";
+    }
+}
+
+
+sub get_device_numbers {
+    my %ret;
+    foreach (split /[\n\r]+/s, qx[df]) {
+        s/ .*//;
+        my ($device_num) = stat($_);
+        $ret{$device_num} = $_;
+    }
+    return %ret;
+}
+
+
+
+
+sub no_stderr {
+    my @cmd = @_;
+    #print Dumper \@cmd; exit;
+    my $pid = open my $pin, "-|";
+    defined($pid) or die $!;
+    if (!$pid) {
+        open STDERR, ">/dev/null";
+        #print "\n"; exit;
+        #exec {$cmd[0]} @cmd;
+        exec @cmd;
+    }
+    my $ret = do {local $/=undef; <$pin>};
+    close $pin;
+    return $ret;
+}
