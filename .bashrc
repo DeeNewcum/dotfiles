@@ -23,11 +23,11 @@ if [ "`which less`" ]; then export PAGER='less -i'; fi
 
 
 
-if [ "`tput -Tgnome-256color colors`" = "256" ]; then 
+if [ "`tput -Tgnome-256color colors 2>/dev/null`" = "256" ]; then 
     TERM=gnome-256color 
-elif [ "`tput -Txterm-256color colors`" = "256" ]; then 
+elif [ "`tput -Txterm-256color colors 2>/dev/null`" = "256" ]; then 
     TERM=xterm-256color 
-elif tput -Tgnome colors; then 
+elif tput -Tgnome colors 2>/dev/null; then 
     TERM=gnome 
 fi 
 
