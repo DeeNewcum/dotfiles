@@ -19,19 +19,26 @@
 chdir $FindBin::Bin;
 
 
+# run through all files/directories under ~/dotfiles/
 find { wanted => sub {
     s/^\.\///;
+
+    # directories to avoid altogether
     if ($_ eq '.git') {
         $File::Find::prune++;
         return;
     }
+
+    # files to skip
     return if ($_ eq '.' || $_ eq 'README.creole' || $_ eq 'setup.pl');
     return if /\.swp$/;
     
-    #print "$_\n";
     if (-d $_) {
+        # if it's a directory, create that path under $HOME
         _mkdir($_);
+
     } elsif (-f $_) {
+        # if it's a file, symlink it to $HOME
         if (/\.subst$/) {
             _substitute($_);
         } else {
@@ -39,6 +46,13 @@ find { wanted => sub {
         }
     }
 }, no_chdir=>1}, ".";
+
+
+if ($ENV{USER} =~ /^[p][h][r][8][4][3]$/) {
+    # in some cases, I want to make sure the checkin attribution is correct
+    system "git", "config", "user.name", "Dee Newcum";
+    system "git", "config", "user.email", 'dee.newcum@gmail.com';
+}
 
 
 
