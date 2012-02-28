@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# Display the output of stat(2)  (struct stat)  in maximum detail.
+
     use strict;
     use warnings;
 
