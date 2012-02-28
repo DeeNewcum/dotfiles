@@ -14,13 +14,13 @@ It outputs a report of problems that it sees, where existing files prevent the g
 
 In some cases, I want to have local settings, specific to a machine, that override these global settings.
 
-For files that allows for 'source' or '#include' functionality, this is possible.  For example, ~/.bashrc can be a real file (instead of a symlink to ~/dotfiles/.bashrc), and I can change settings before and after the line that sources ~/dotfiles/.bashrc.  So there is some cooperation that can happen here, between the global and local versions.
+For files that allows for 'source' or '#include' functionality, this is possible.  For example, ~~/.bashrc can be a real file (instead of a symlink to ~~/dotfiles/.bashrc), and I can change settings before and after the line that sources ~~/dotfiles/.bashrc.  So there is some cooperation that can happen here, between the global and local versions.
 
 Setup.pl knows about each file type, and will suggest the appropriate 'source'/'#include' line, whenever it notices a conflict with an existing local file.
 
 == Shared root
 
-I manage boxes where several people have access to root.  To avoid stepping on each other's toes, I have set up root's ~/.bashrc so that it loads a ~/.sudo_bashrc from the original user's home directory, if it exists.  ~/.sudo_vimrc also gets used instead of root's own .vimrc.
+I manage boxes where several people have access to root.  To avoid stepping on each other's toes, I have set up root's ~~/.bashrc so that it loads a ~~/.sudo_bashrc from the original user's home directory, if it exists.  ~~/.sudo_vimrc also gets used instead of root's own .vimrc.
 
 The exact mechanism for accomplishing this functionality isn't trivial.  However, it's good to know the feature is there, because it shows up in a several random places throughout the dotfiles.
 
