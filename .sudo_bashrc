@@ -21,3 +21,5 @@ export GIT_AUTHOR_EMAIL='dee.newcum@gmail.com'
 export GIT_COMMITTER_NAME=$GIT_AUTHOR_NAME GIT_COMMITTER_EMAIL=$GIT_AUTHOR_EMAIL
 
 alias ls='ls --color=tty'
+
+function vim() { `which vim` -u $STDIN_OWNERS_HOME/.sudo_vimrc "$@"; }
