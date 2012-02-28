@@ -93,9 +93,69 @@ sub _symlink {
                 #print "creating symlink    $from     to    $to\n";
             }
         } else {
-            print "WARNING: ~/$file  already exists\n";
+            if (!scan_file_for_include_command($file)) {
+                # If the above function returned false, that means it didn't notify the user about the status of the file.  So we'll use the fallback notification.
+                print "WARNING: ~/$file  already exists\n";
+            }
         }
     }
+}
+
+
+# Specific file types have the ability to '#include' or 'source' another file.
+# 
+# Here we scan through the file, line-by-line, checking if it has the specific command we're looking for.
+#
+# Returns true if this routine took care of notifying the user.
+sub scan_file_for_include_command {
+    my ($file) = @_;
+
+    my %include_commands = map {s/^\s+|\s+$//sg; $_} split /[\n\r]+/, <<'EOF';
+        .bash_aliases
+                [ -f <<PATH>> ] && source <<PATH>>
+        .bashrc
+                [ -f <<PATH>> ] && source <<PATH>>
+        .sudo_bashrc
+                [ -f $STDIN_OWNERS_HOME/<<HOMEPATH>> ] && source $STDIN_OWNERS_HOME/<<HOMEPATH>>
+        .vimrc
+                source <<PATH>>
+EOF
+    #print Dumper \%include_commands; exit;
+
+    return 0 unless (-e "$ENV{HOME}/$file");
+    return 0 unless (exists $include_commands{$file});
+
+    my $home_path = "$ENV{HOME}/$file";
+    my $repo_path = "$FindBin::Bin/$file";
+
+    my $lookingfor = $include_commands{$file};
+    my $lookingfor_path = $repo_path;
+    my $HOME = Cwd::abs_path($ENV{HOME});
+    $lookingfor_path =~ s/^\Q$HOME\E/~/;
+    $lookingfor =~ s/<<PATH>>/$lookingfor_path/g;
+    if ($lookingfor =~ /<<HOMEPATH>>/) {
+        my $lookingfor_homepath = $lookingfor_path;
+        if ($lookingfor_homepath =~ s#^~/##) {
+            $lookingfor =~ s/<<HOMEPATH>>/$lookingfor_homepath/g;
+        } else {
+            # It's impossible to use <<HOMEPATH>> in this case, because the $repo_path isn't anywhere under $ENV{HOME}
+            # So show them the fallback error message.
+            return 0;
+        }
+    }
+
+    open my $fin, "<", $home_path       or die $!;
+    while (<$fin>) {
+        s/^\s+|\s+$//gs;        # chomp & trim
+        if ($_ eq $lookingfor) {
+            # the user has the desired #include/source command here... so all is well....  no error message needed
+            return 1;
+        }
+    }
+    close $fin;
+
+    print "WARNING: ~/$file   already exists.  If you want to have local tailorings, insert this somewhere:\n\t$lookingfor\n";
+    return 1;
 }
 
 

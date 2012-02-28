@@ -5,9 +5,14 @@
 #       [ -f $STDIN_OWNERS_HOME/.sudo_bashrc ] && source $STDIN_OWNERS_HOME/.sudo_bashrc
 
 
-set -o vi
+PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
-PATH=$PATH:$STDIN_OWNERS_HOME/bin
+set -o vi
+if [ "`which vim`" ];  then export EDITOR=vim;      fi
+if [ "`which less`" ]; then export PAGER='less -i'; fi
+
+
+[ -d $STDIN_OWNERS_HOME/bin ] && export PATH=$PATH:$STDIN_OWNERS_HOME/bin
 
 [ -f $STDIN_OWNERS_HOME/.bash_aliases ] && source $STDIN_OWNERS_HOME/.bash_aliases
 
