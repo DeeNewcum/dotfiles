@@ -1,3 +1,8 @@
+" This gets pulled in while running as root, via this line in root's Bash shell:
+" 
+"       function vim() { /usr/bin/vim -u $STDIN_OWNERS_HOME/.sudo_vimrc "$@"; }
+
+
 " set default 'runtimepath' (without ~/.vim folders)
 let &runtimepath = printf('%s/vimfiles,%s,%s/vimfiles/after', $VIM, $VIMRUNTIME, $VIM)
 
