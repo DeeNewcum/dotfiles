@@ -36,9 +36,20 @@ command! PPL       !PATH=.:$PATH % | less
 command! CC        !perl -c % 2>&1 | head -20
 
 
+" ========================= http://vimbits.com/ ===================
+
 " swap the : and ; keys
 "           http://vim.wikia.com/wiki/Map_semicolon_to_colon
 nnoremap ; :| nnoremap : ;
+
+" use + and - to increment/decrement
+nnoremap + <C-a>| nnoremap - <C-x>
+
+" Scroll the viewpoint faster
+nnoremap <C-e> 3<C-e> 
+nnoremap <C-y> 3<C-y>
+
+" ========================= http://vimbits.com/ ===================
 
 
 
