@@ -15,8 +15,15 @@ set wildmenu wildmode=list:longest,full                         " http://paperli
 
 
 
-syntax on
-if &diff | syntax off | endif                                   " syntax hilighting is too hard to see during diffs...  just show the diff colors
+" the colors from diff-highlights really class with the colors from syntax-hilights, so turn the latter off
+if &diff
+    syntax off
+    set t_Co=256
+    colorscheme evening
+else
+    syntax on
+endif
+
 
 
 
