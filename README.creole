@@ -1,5 +1,5 @@
-{{| these files originate from    https://github.com/DeeNewcum/dotfiles
-}}
+<<< these files originate from    https://github.com/DeeNewcum/dotfiles >>>
+
 == My home directory ==
 
 Some configuration files I store in my home directory.  I often work in Ubuntu, RHEL, and Solaris, but ocassionally have to work in other un*xes.
