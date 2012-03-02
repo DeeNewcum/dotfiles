@@ -36,7 +36,9 @@ command! PPL       !PATH=.:$PATH % | less
 command! CC        !perl -c % 2>&1 | head -20
 
 
-noremap ;; ;| map ; :|                                         " swap the : and ; keys
+" swap the : and ; keys
+"           http://vim.wikia.com/wiki/Map_semicolon_to_colon
+nnoremap ; :| nnoremap : ;
 
 
 
