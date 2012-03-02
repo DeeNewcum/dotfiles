@@ -15,7 +15,7 @@ set wildmenu wildmode=list:longest,full                         " http://paperli
 
 
 
-" the colors from diff-highlights really class with the colors from syntax-hilights, so turn the latter off
+" the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
 if &diff
     syntax off
     set t_Co=256
