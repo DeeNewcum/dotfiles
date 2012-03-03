@@ -1,6 +1,6 @@
 " This gets pulled in while running as root, via this line in root's Bash shell:
 " 
-"       function vim() { /usr/bin/vim -u $STDIN_OWNERS_HOME/.sudo_vimrc "$@"; }
+"       export VIMINIT='let $MYVIMRC = "/home/myself/.vimrc" | source $MYVIMRC'
 
 
 " set default 'runtimepath' (without ~/.vim folders)

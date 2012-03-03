@@ -1,2 +1,14 @@
+# to regenerate:
+#       lesskey -o .less .lesskey
+
+
+#command
+
+# this is REALLY useful in combination with 'lgrep' -- it lets you rapidly scan through matching files
 ]       next-file
 [       prev-file
+
+
+#env
+
+LESS = -iR

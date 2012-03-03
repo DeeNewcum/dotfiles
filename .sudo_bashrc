@@ -1,18 +1,20 @@
 # To have this file be loaded after sudoing to root/others, put this in the target user's .bashrc:
 #
-#       # ========  ~/.sudo_bashrc  ========
+#       # ========  load ~/.sudo_bashrc  ========
 #       export STDIN_OWNERS_HOME=$(eval echo ~$(who am i | cut -d ' ' -f 1))
 #       [ -f $STDIN_OWNERS_HOME/.sudo_bashrc ] && source $STDIN_OWNERS_HOME/.sudo_bashrc
 
 
 
-##########################################################
-#### make other dotfiles work across the sudo barrier ####
-##########################################################
+##############################################################
+#### make various dotfiles work from someone else's $HOME ####
+##############################################################
 
 export INPUTRC=$STDIN_OWNERS_HOME/.inputrc
 
-export VIMINIT="let \$MYVIMRC = \"$STDIN_OWNERS_HOME/.vimrc\"|source \$MYVIMRC"
+export VIMINIT='let $MYVIMRC = "'$STDIN_OWNERS_HOME'/.vimrc" | source $MYVIMRC'
+
+export LESSKEY=$STDIN_OWNERS_HOME/.less
 
 
 

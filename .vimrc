@@ -56,6 +56,11 @@ nnoremap + <C-a>| nnoremap - <C-x>
 nnoremap <C-e> 3<C-e> 
 nnoremap <C-y> 3<C-y>
 
+" make F1 act as escape so you don't have to worry about it
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
+
 " ========================= http://vimbits.com/ ===================
 
 
