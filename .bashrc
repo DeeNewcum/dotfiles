@@ -18,8 +18,12 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 
 set -o vi
-if [ "`which vim`" ];  then export EDITOR=vim;      fi
-if [ "`which less`" ]; then export PAGER='less -i'; fi
+if [ "`which vim`" ];  then
+    export EDITOR=vim
+    export PAGER=vimpager
+else
+    if [ "`which less`" ]; then export PAGER='less -i'; fi
+fi
 
 
 
