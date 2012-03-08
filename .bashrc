@@ -10,6 +10,10 @@
 
 [ -d ~/bin/ ] && export PATH=$PATH:$HOME/bin
 
+# custom-compiled apps that override the system ones
+[ -d ~/apps/bin/ ] && export PATH=~/apps/bin/:$PATH
+
+
 # avoid having to use sux/sudox when changing to root    (this line cooperates with /etc/sudoers env_keep)
 [ -n "$DISPLAY" -a -e "$HOME/.Xauthority" ] && export XAUTHORITY="$HOME/.Xauthority"
 
