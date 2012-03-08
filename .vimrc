@@ -44,6 +44,7 @@ command! CC        !perl -c % 2>&1 | head -20
 
 
 " ========================= http://vimbits.com/ ===================
+" ========================= vvvvvvvvvvvvvvvvvvv ===================
 
 " swap the : and ; keys
 "           http://vim.wikia.com/wiki/Map_semicolon_to_colon
@@ -61,6 +62,7 @@ inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
+" ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================
 
 
