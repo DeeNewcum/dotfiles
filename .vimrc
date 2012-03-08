@@ -87,6 +87,33 @@ autocmd BufWrite *.pl silent !chmod a+x %
 
 
 
+
+
+
+" make ctrl-up and ctrl-down modify the font size    (unfortunately, ctrl-plus and ctrl-minus can't be bound)
+let s:pattern = '^\(.* \)\([1-9][0-9]*\)$'
+let s:minfontsize = 6
+let s:maxfontsize = 16
+function! AdjustFontSize(amount)
+  if has("gui_gtk2") && has("gui_running")
+    let fontname = substitute(&guifont, s:pattern, '\1', '')
+    let cursize = substitute(&guifont, s:pattern, '\2', '')
+    let newsize = cursize + a:amount
+    if (newsize >= s:minfontsize) && (newsize <= s:maxfontsize)
+      let newfont = fontname . newsize
+      let &guifont = newfont
+    endif
+  else
+    echoerr "You need to run the GTK2 version of Vim to use this function."
+  endif
+endfunction
+
+nnoremap <C-Up> :silent! call AdjustFontSize(1)<CR>
+nnoremap <C-Down> :silent! call AdjustFontSize(-1)<CR>
+
+
+
+
 " NOTE: if you want to start pathogen from an override ~/.vimrc file, then call infect like this:
 "
 "       call pathogen#infect(expand('<sfile>:p:h') . "/.vim/bundle")
