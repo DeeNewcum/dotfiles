@@ -58,7 +58,7 @@ export LESS_TERMCAP_se=$'\E[0m'             # end standout-mode
 export LESS_TERMCAP_us=$'\E[01;32m'         # begin underline
 export LESS_TERMCAP_ue=$'\E[0m'             # end underline
 
-alais ls='ls --color=auto -F'
+alias ls='ls --color=auto -F'
 
 
 
