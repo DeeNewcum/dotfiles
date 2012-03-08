@@ -24,10 +24,11 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 set -o vi
 if [ "`which vim`" ];  then
     export EDITOR=vim
-    export PAGER=vimpager
+    #export PAGER=vimpager
 else
     if [ "`which less`" ]; then export PAGER='less -i'; fi
 fi
+if [ "`which less`" ]; then export PAGER='less -i'; fi
 
 
 
@@ -40,6 +41,25 @@ elif tput -Txterm colors 2>/dev/null; then
 elif tput -Tvt100 colors 2>/dev/null; then 
     export TERM=vt100
 fi 
+
+
+
+### enable color for as many things as possible ###
+
+export GREP_OPTIONS='--color=auto' 
+
+# man pages
+export GROFF_NO_SGR=1
+export LESS_TERMCAP_mb=$'\E[01;34m'         # begin blinking
+export LESS_TERMCAP_md=$'\E[01;34m'         # begin bold
+export LESS_TERMCAP_me=$'\E[0m'             # end mode
+export LESS_TERMCAP_so=$'\E[01;44;33m'      # begin standout-mode
+export LESS_TERMCAP_se=$'\E[0m'             # end standout-mode
+export LESS_TERMCAP_us=$'\E[01;32m'         # begin underline
+export LESS_TERMCAP_ue=$'\E[0m'             # end underline
+
+alais ls='ls --color=auto -F'
+
 
 
 # load PerlBrew settings, if available

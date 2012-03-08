@@ -16,6 +16,8 @@ export VIMINIT='let $MYVIMRC = "'$STDIN_OWNERS_HOME'/.vimrc" | source $MYVIMRC'
 
 export LESSKEY=$STDIN_OWNERS_HOME/.less
 
+export ACKRC=$STDIN_OWNERS_HOME/.ackrc
+
 
 
 ############################################################
