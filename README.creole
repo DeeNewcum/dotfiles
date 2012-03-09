@@ -28,9 +28,9 @@ Setup.pl knows about each file type, and will suggest the appropriate 'source'/'
 
 == Shared root ==
 
-I manage boxes where several people have access to root.  To avoid stepping on each other admins' toes, I have set up root's ~~/.bashrc so that it loads a ~~/.sudo_bashrc from the [[http://paperlined.org/apps/host_sudo_su_boundaries/user_ids.html|original user's]] home directory.
+I manage boxes where several people have access to root.  To avoid stepping on each other other's toes, I have set up root's ~~/.bashrc so that it loads a ~~/.sudo_bashrc from the [[http://paperlined.org/apps/host_sudo_su_boundaries/user_ids.html|original user's]] home directory.
 
-The ~~/.sudo_bashrc located here will pull in a variety of other .rc settings from the original home directory, including ~~/.vimrc, ~~/.inputrc, ~~/.less, etc.
+My own ~~/.sudo_bashrc will pull in a variety of other .rc settings from the original home directory, including ~~/.vimrc, ~~/.inputrc, ~~/.less, etc.
 
 == Similar projects ==
 
@@ -56,7 +56,3 @@ There are a [[http://paperlined.org/apps/git/dotfiles/other_peoples_setup.html|T
 Unless otherwise noted, files here are available under the [[http://creativecommons.org/publicdomain/zero/1.0/|CC0 1.0]] license.
 
 Some files (particularly ones authored by other folks) may have their own licensing information at the top of the file.  Those notices supercede this one.
-
-== Footnotes ==
-
-† grep for {{{STDIN_OWNERS_HOME}}} and {{{<sfile>:p:h}}}
