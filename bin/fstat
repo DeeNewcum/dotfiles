@@ -10,6 +10,9 @@
 
 @ARGV or die "Please specify a filename.\n";
 
+my %devnums = get_device_numbers();
+#print Dumper \%devnums; exit;
+
 my ($name_order, %names) = ordered_hash(
     filename => "File name",
     dev      => "Device num",
@@ -56,6 +59,8 @@ foreach my $file (@ARGV) {
     $s{gid} .= " (" . getgrgid($s{gid}) . ")";
 
     $s{size} = commify($s{size}) . " bytes";
+
+    $s{dev} .= "   ($devnums{$s{dev}})";
 
     #print Dumper \%s;
     foreach my $name (@$name_order) {
@@ -111,8 +116,28 @@ BEGIN {
 }
 
 
+sub get_mountpoints {
+    if ($^O eq 'solaris') {
+        return map {(split ' ')[0]} readpipe_args('df');
+    } elsif ($^O eq 'linux') {
+        my @a = readpipe_args('df');
+        shift @a;
+        return map {(split ' ')[-1]} grep /\s\S.*\s/, @a;
+    }
+}
+
+sub get_device_numbers {
+    my %ret = map {(stat $_)[0] => $_} get_mountpoints();
+}
+
+
+
 
 sub ordered_hash { my $n; my @order = grep {!($n++ % 2)} @_; return (\@order, @_) }
 
 # add commas to a number
 sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}
+
+
+# like qx// or readpipe(), BUT it allows you to give explicitely delimited args, so you don't have to worry about escaping quotes
+sub readpipe_args {my$p=open(my$f,'-|',@_)or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
