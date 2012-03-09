@@ -14,7 +14,7 @@ filetype plugin on                                              " http://vim.wik
 set wildmenu wildmode=list:longest,full                         " http://paperlined.org/apps/vim/wildmenu.html
 
 
-let $STDIN_OWNERS_HOME = len($STDIN_OWNERS_HOME) ? $STDIN_OWNERS_HOME : $HOME
+let $STDIN_OWNERS_HOME = ($STDIN_OWNERS_HOME != "") ? $STDIN_OWNERS_HOME : $HOME
 call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
 
 
