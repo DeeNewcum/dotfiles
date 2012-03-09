@@ -2,6 +2,24 @@
 
 # Display the output of stat(2)  (struct stat)  in maximum detail.
 
+# TODO:
+#       - break out the permissions more deeply
+#               use Fcntl qw( :mode );
+#                   http://perldoc.perl.org/functions/stat.html
+#               S_IFSOCK    // socket
+#               S_IFLNK     // symlink
+#               S_IFREG     // regular file
+#               S_IFBLK     // block device
+#               S_IFDIR     // directory
+#               S_IFCHR     // character device
+#               S_IFIFO     // FIFO/pipe
+#
+#               
+#               S_ISUID     // setuid
+#               S_ISGID     // setuid
+#               S_ISVTX     // sticky bit
+
+
     use strict;
     use warnings;
 
