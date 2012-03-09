@@ -22,7 +22,7 @@ foreach my $f (@ARGV) {
 
     my $fullpath = File::Spec->rel2abs( $f );
 
-    open my $fh, ">$f" or die;
+    open my $fh, ">", $f or die "Unable to write to $f: $!\n";
     my @whole_script = <DATA>;
     if ($fullpath =~ m#/cgi-bin/#i) {
         # remove >> from the front of lines that have it, but keep those lines
