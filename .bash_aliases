@@ -2,6 +2,8 @@
 alias rl='. ~/.bash_aliases'
 alias ea='${EDITOR:-vi} ~/.bash_aliases; rl'
 
+
+function xargs_newline() { perl -e 'my@a=map{chomp;$_}<STDIN>;system@ARGV,splice(@a,0,200)while(@a)' "$@"; }
 if [ "`uname`" != "SunOS" ]; then
     ## combinations of less/grep/find/xargs
     function lgrep()  { grep -Zls  "$@" | xargs -0 less    -p "$1"; }
@@ -14,7 +16,6 @@ if [ "`uname`" != "SunOS" ]; then
 else
     # Try to make the fundamental Solaris tools a wee bit easier to use
     function find-() { find $PWD -type f -print; }
-    function xargs_newline() { perl -e 'my@a=map{chomp;$_}<STDIN>;system@ARGV,splice(@a,0,200)while(@a)' "$@"; }
 
     ## combinations of less/grep/find/xargs
     function lgrep()  { grep -ls  "$@" | xargs_newline less    -p "$1"; }
