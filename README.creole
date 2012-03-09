@@ -10,6 +10,14 @@ To use this:
 
 It outputs a report of problems that it sees, where existing files prevent the global settings from taking effect.
 
+{{{setup.pl}}} is designed to be run repeatedly.
+
+== General structure ==
+
+The git repository is cloned into something like ~~/dotfiles/.
+
+{{{setup.pl}}} creates symlinks from the parent directory into ~~/dotfiles/.  For example, ~~/.bashrc → ~~/dotfiles/.bashrc.
+
 == Machine-specific overrides ==
 
 In some cases, I want to have local settings, specific to a machine, that override these global settings.
