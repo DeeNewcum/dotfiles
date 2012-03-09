@@ -22,13 +22,13 @@ The git repository is cloned into something like ~~/dotfiles/.
 
 In some cases, I want to have local settings, specific to a machine, that override these global settings.
 
-For files that allow for 'source' or '#include' functionality, this is possible.  For example, ~~/.bashrc can be a real file (instead of a symlink to ~~/dotfiles/.bashrc), and I can change settings before and after the line that sources ~~/dotfiles/.bashrc.  So it is even possible to have some cooperation between the global and local versions.
+For files that allow for 'source' or '#include' functionality, this is possible.  For example, ~~/.bashrc can be a real file (instead of a symlink), and I can change settings before and after the line that sources ~~/dotfiles/.bashrc.
 
-Setup.pl knows about each file type, and will suggest the appropriate 'source'/'#include' line, whenever it notices a conflict with an existing local file.
+Setup.pl knows about each file type, and will suggest the appropriate 'source'/'#include' line, whenever it notices an existing local file that conflicts.  (setup.pl is careful to never overwrite existing data)
 
 == Shared root ==
 
-I manage boxes where several people have access to root.  To avoid stepping on each other's toes, I have set up root's ~~/.bashrc so that it loads a ~~/.sudo_bashrc from the original user's home directory, if it exists.
+I manage boxes where several people have access to root.  To avoid stepping on each other admins' toes, I have set up root's ~~/.bashrc so that it loads a ~~/.sudo_bashrc from the original user's home directory, if it exists.
 
 ~~/.sudo_vimrc also gets used instead of root's own .vimrc.†
 
