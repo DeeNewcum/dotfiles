@@ -20,9 +20,9 @@ silent! call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
 
 
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
+set t_Co=256
 if &diff
     syntax off
-    set t_Co=256
     colorscheme evening
 else
     syntax on
@@ -31,6 +31,9 @@ else
         syntax enable
         set background=light
         colorscheme solarized
+    else
+        "colorscheme desert
+        colorscheme pablo
     endif
 endif
 
