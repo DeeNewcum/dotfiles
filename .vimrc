@@ -15,7 +15,8 @@ set wildmenu wildmode=list:longest,full                         " http://paperli
 
 
 let $STDIN_OWNERS_HOME = ($STDIN_OWNERS_HOME != "") ? $STDIN_OWNERS_HOME : $HOME
-call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
+" This next line produces errors before Vim v7.0....  silence them
+silent! call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
 
 
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
@@ -25,10 +26,12 @@ if &diff
     colorscheme evening
 else
     syntax on
-    let g:solarized_termcolors=256
-    syntax enable
-    set background=light
-    colorscheme solarized
+    if v:version >= 700
+        let g:solarized_termcolors=256
+        syntax enable
+        set background=light
+        colorscheme solarized
+    endif
 endif
 
 
