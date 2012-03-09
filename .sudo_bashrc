@@ -12,7 +12,7 @@
 
 export INPUTRC=$STDIN_OWNERS_HOME/.inputrc
 
-export VIMINIT='let $MYVIMRC = "'$STDIN_OWNERS_HOME'/.vimrc" | source $MYVIMRC'
+export VIMINIT='let $MYVIMRC = "'$STDIN_OWNERS_HOME'/.sudo_vimrc" | source $MYVIMRC'
 
 export LESSKEY=$STDIN_OWNERS_HOME/.less
 
