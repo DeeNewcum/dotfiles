@@ -14,6 +14,9 @@ filetype plugin on                                              " http://vim.wik
 set wildmenu wildmode=list:longest,full                         " http://paperlined.org/apps/vim/wildmenu.html
 
 
+let $STDIN_OWNERS_HOME = len($STDIN_OWNERS_HOME) ? $STDIN_OWNERS_HOME : $HOME
+call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
+
 
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
 if &diff
@@ -22,6 +25,10 @@ if &diff
     colorscheme evening
 else
     syntax on
+    let g:solarized_termcolors=256
+    syntax enable
+    set background=light
+    colorscheme solarized
 endif
 
 
@@ -110,6 +117,7 @@ endfunction
 
 nnoremap <C-Up> :silent! call AdjustFontSize(1)<CR>
 nnoremap <C-Down> :silent! call AdjustFontSize(-1)<CR>
+
 
 
 
