@@ -88,18 +88,23 @@ sub _symlink {
         #print "creating symlink    $from     to    $to\n";
         print "setup    ~/$file\n";
     } else {
+        # The file already exists.  Now what?
         if (-l $to) {
             if (readlink($to) ne $from) {
+                # Change the symlink to point to our version.
                 unlink $to;
                 symlink $from, $to;
                 #print "creating symlink    $from     to    $to\n";
                 print "setup    ~/$file\n";
             }
         } else {
+            # It's a regular file.
+            # Is it one of the files we know about, that we can suggest a #include/source line to the user?
             if (!scan_file_for_include_command($file)) {
                 # If the above function returned false, that means it didn't notify the user about the status of the file.  So we'll use the fallback notification.
                 print "WARNING: ~/$file  already exists\n";
             }
+            # If it returned true, then it either decided that no error was needed, or it decided an error was needed, and it printed it.
         }
     }
 }
