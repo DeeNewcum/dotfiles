@@ -33,6 +33,9 @@ if [ "`which less`" ]; then export PAGER='less -i'; fi
 
 [ -d $STDIN_OWNERS_HOME/bin ] && export PATH=$PATH:$STDIN_OWNERS_HOME/bin
 
+# custom-compiled apps that override the system ones
+[ -d $STDIN_OWNERS_HOME/apps/bin/ ] && export PATH=$STDIN_OWNERS_HOME/apps/bin/:$PATH
+
 [ -f $STDIN_OWNERS_HOME/.bash_aliases ] && source $STDIN_OWNERS_HOME/.bash_aliases
 
 export GIT_AUTHOR_NAME='Dee Newcum'
