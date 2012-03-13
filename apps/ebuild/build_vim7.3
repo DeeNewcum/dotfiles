@@ -9,6 +9,7 @@ set -x
 SKIPTO=0            # allow for primitive 'make'-like functionality, by specifying a line to skip ahead to
 
 
+                                mkdir -p ~/apps/bin
                                 cd ~/apps
 [ $SKIPTO -le $LINENO ] &&      wget -N http://ftp.vim.org/pub/vim/unix/vim-7.3.tar.bz2
 [ $SKIPTO -le $LINENO ] &&      tar -xvjf vim-7.3.tar.bz2
