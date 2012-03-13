@@ -1,21 +1,25 @@
 #!/bin/bash
 
-SKIPTO=0            # the line to skip to
+set -x
 
-[ $SKIPTO -le $LINENO ] &&      cd ~/apps
+SKIPTO=0            # allow for primitive 'make'-like functionality, by specifying a line to skip ahead to
+
+
+                                cd ~/apps
 [ $SKIPTO -le $LINENO ] &&      wget -N http://ftp.vim.org/pub/vim/unix/vim-7.3.tar.bz2
 [ $SKIPTO -le $LINENO ] &&      tar -xvjf vim-7.3.tar.bz2
 
 [ $SKIPTO -le $LINENO ] &&      mv vim73 vim73_source
 [ $SKIPTO -le $LINENO ] &&      mkdir vim73
 
-[ $SKIPTO -le $LINENO ] &&      cd ~/apps/vim73_source/src
+                                cd ~/apps/vim73_source/src
 
 [ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#prefix =.*|prefix = $ENV{HOME}/apps/vim73|' Makefile
 [ $SKIPTO -le $LINENO ] &&      make
 [ $SKIPTO -le $LINENO ] &&      make install
 
-[ $SKIPTO -le $LINENO ] &&      cd ~/apps/bin
+                                cd ~/apps/bin
 [ $SKIPTO -le $LINENO ] &&      ln -s ../vim73/bin/* .
 
-[ $SKIPTO -le $LINENO ] &&      rm ~/apps/vim-7.3.tar.bz2
+                                cd ~/apps/
+[ $SKIPTO -le $LINENO ] &&      rm vim-7.3.tar.bz2
