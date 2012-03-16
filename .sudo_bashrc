@@ -18,6 +18,8 @@ export LESSKEY=$STDIN_OWNERS_HOME/.less
 
 export ACKRC=$STDIN_OWNERS_HOME/.ackrc
 
+function perltidy { $(which perltidy) --profile=$STDIN_OWNERS_HOME/.perltidyrc "$@"; }
+
 
 
 ############################################################

@@ -1,0 +1,23 @@
+##############################
+#  Config file for perltidy  #
+##############################
+
+    # pull 'else' up alongside the closing paren of the line above
+--cuddled-else                          
+
+    # tighter than default
+--paren-tightness=2
+
+    # tightness of non-block curly braces, parentheses, and square brackets
+    # 1 = do not break unless this would produce more than one step in indentation in a line
+--vertical-tightness=1                  
+
+    # same as "vertical tightness", but for Closing tokens
+    # 2 = never break before a closing token
+--vertical-tightness-closing=2
+
+--maximum-line-length=120
+
+    # "outdenting" annoys me
+--no-outdent-long-quotes
+--no-outdent-long-comments
