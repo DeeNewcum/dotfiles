@@ -3,6 +3,10 @@ alias rl='. ~/.bash_aliases'
 alias ea='${EDITOR:-vi} ~/.bash_aliases; rl'
 
 
+# Bash's equivalent to tcsh's built-in command
+alias where='type -Pa'
+
+
 function xargs_newline() { perl -e 'my@a=map{chomp;$_}<STDIN>;system@ARGV,splice(@a,0,200)while(@a)' "$@"; }
 if [ "`uname`" != "SunOS" ]; then
     ## combinations of less/grep/find/xargs
