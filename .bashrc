@@ -61,6 +61,14 @@ export LESS_TERMCAP_ue=$'\E[0m'             # end underline
 alias ls='ls --color=auto -F'
 
 
+if [ $USER = "root" ]; then
+    # take care when overwriting things, if root
+    alias rm='rm -i'
+    alias cp='cp -i'
+    alias mv='mv -i'
+fi
+
+
 
 # load PerlBrew settings, if available
 [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
