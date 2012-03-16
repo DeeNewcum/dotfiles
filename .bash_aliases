@@ -33,8 +33,8 @@ else
     function large_txtfiles() { /bin/find $PWD ! -local -prune -o -type f -print | perl -nle 'print if -T' | xargs_newline /bin/ls -l | filesize_sort | tail -100; }
 fi
 
-function vimwhich()  { vim  `which $1`; }
-function lesswhich() { less `which $1`; }
+function vimwhich()  { vim  $(type -P $1); }
+function lesswhich() { less $(type -P $1); }
 
 
 # gnome-open, kde-open, etc
@@ -45,7 +45,7 @@ function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "
 alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
 
 
-if [ "`which apt-get 2>/dev/null`" ];  then
+if [ "$(type -P apt-get)" ];  then
     alias upup='sudo apt-get update; sudo apt-get upgrade'
 fi
 

@@ -18,7 +18,7 @@ export LESSKEY=$STDIN_OWNERS_HOME/.less
 
 export ACKRC=$STDIN_OWNERS_HOME/.ackrc
 
-function perltidy { $(which perltidy) --profile=$STDIN_OWNERS_HOME/.perltidyrc "$@"; }
+function perltidy { $(type -P perltidy) --profile=$STDIN_OWNERS_HOME/.perltidyrc "$@"; }
 
 
 
@@ -29,8 +29,8 @@ function perltidy { $(which perltidy) --profile=$STDIN_OWNERS_HOME/.perltidyrc "
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 set -o vi
-if [ "`which vim`" ];  then export EDITOR=vim;      fi
-if [ "`which less`" ]; then export PAGER='less -i'; fi
+if [ "$(type -P vim)" ];  then export EDITOR=vim;      fi
+if [ "$(type -P less)" ]; then export PAGER='less -i'; fi
 
 
 [ -d $STDIN_OWNERS_HOME/bin ] && export PATH=$PATH:$STDIN_OWNERS_HOME/bin

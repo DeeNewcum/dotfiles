@@ -22,13 +22,13 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 
 set -o vi
-if [ "`which vim`" ];  then
+if [ "$(type -P vim)" ];  then
     export EDITOR=vim
     #export PAGER=vimpager
 else
-    if [ "`which less`" ]; then export PAGER='less -i'; fi
+    if [ "$(type -P less)" ]; then export PAGER='less -i'; fi
 fi
-if [ "`which less`" ]; then export PAGER='less -i'; fi
+if [ "$(type -P less)" ]; then export PAGER='less -i'; fi
 
 
 
