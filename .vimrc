@@ -62,6 +62,7 @@ command! CC        !perl -c % 2>&1 | head -20
 " swap the : and ; keys
 "           http://vim.wikia.com/wiki/Map_semicolon_to_colon
 nnoremap ; :| nnoremap : ;
+vnoremap ; :| vnoremap : ;
 
 " use + and - to increment/decrement
 nnoremap + <C-a>| nnoremap - <C-x>
