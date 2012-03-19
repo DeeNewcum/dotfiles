@@ -131,10 +131,3 @@ if has("gui_gtk2")
     nnoremap <C-Up> :silent! call AdjustFontSize(1)<CR>
     nnoremap <C-Down> :silent! call AdjustFontSize(-1)<CR>
 endif
-
-
-
-
-" NOTE: if you want to start pathogen from an override ~/.vimrc file, then call infect like this:
-"
-"       call pathogen#infect(expand('<sfile>:p:h') . "/.vim/bundle")
