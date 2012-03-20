@@ -20,7 +20,7 @@ if [ "`uname`" != "SunOS" ]; then
     function largeindividualdirs() { du -Sk ${1:-~} | sort -n | tail -1000; }
 else
     # Try to make the fundamental Solaris tools a wee bit easier to use
-    function find-() { find $PWD -type f -print; }
+    function find- { find2perl "$@" -print | perl; }
 
     ## combinations of less/grep/find/xargs
     function lgrep()  { grep -ls  "$@" | xargs_newline less    -p "$1"; }
