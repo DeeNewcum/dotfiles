@@ -37,9 +37,17 @@ foreach my $file (@ARGV) {
     $abs .= "/" if -d $file;
 
 
+    my $path = '';
     if (exists $ENV{CLEARCASE_ROOT} && $abs =~ m#^/vobs/#) {
-        print "$username\@$host:$ENV{CLEARCASE_ROOT}$abs\n";
+        $path = "$ENV{CLEARCASE_ROOT}$abs";
     } else {
-        print "$username\@$host:$abs\n";
+        $path = "$abs";
     }
+    if ($path =~ /[ \$\\]/) {
+        # The string gets shell-expanded on the far side of scp  (this is what allows us to pass "*" to the far side -- it gets expanded on the REMOTE side, not the local side)
+        #
+        # Since this string is usually pasted onto the command-line, it actually needs to be DOUBLE escaped.
+        $path = qq[\\''$path'\\'];
+    }
+    print "$username\@$host:$path\n";
 }
