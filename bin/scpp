@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# This helps you file a copy from one computer to another.
+# This is a helper script for copying a file from one computer to another.
 #
-# It displays the path to the specified file, in a form that's useful for scp'ing from another computer.
+# It outputs the path to the specified file, in a form that's useful for scp'ing from another computer.
 #
 # "SCPP" stands for "SCP path".
 #
@@ -22,7 +22,7 @@
 #           myuser@somehost.com:/home/myuser/some/directory/local_file.2
 #
 #           
-#   Then, paste that into the computer you're copying the file TO:
+#   Then, paste that string to the computer you're copying the file TO:
 #
 #           $  scp myuser@somehost.com:/home/myuser/some/directory/local_file.2 .
 #
