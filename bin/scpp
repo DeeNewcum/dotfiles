@@ -1,26 +1,30 @@
 #!/usr/bin/perl
 
-# Displays the path to the specified file, in a form that's useful for scp'ing from another computer.
+# This helps you file a copy from one computer to another.
+#
+# It displays the path to the specified file, in a form that's useful for scp'ing from another computer.
 #
 # "SCPP" stands for "SCP path".
 #
 #
 # Example:
 #
-#   On computer you're copying FROM:
+#   On computer you're copying the file FROM:
 #
-#           ~/some/directory/ $  ls
+#           $ cd ~/some/directory
+#
+#           $  ls
 #           local_file.1
 #           local_file.2
 #           local_file.3
 #
-#           ~/some/directory/ $  scpp ./local_file.2
+#           $  scpp ./local_file.2
 #           myuser@somehost.com:/home/myuser/some/directory/local_file.2
 #
 #           
-#   Then, paste that string into the computer you're copying TO:
+#   Then, paste that into the computer you're copying the file TO:
 #
-#           ~ $  scp myuser@somehost.com:/home/myuser/some/directory/local_file.2 .
+#           $  scp myuser@somehost.com:/home/myuser/some/directory/local_file.2 .
 #
 
 
