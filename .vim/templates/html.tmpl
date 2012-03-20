@@ -1,0 +1,30 @@
+<style>
+    /* --==##  links aren't underlined unless you :hover  ##==-- */
+    a:hover {text-decoration:underline}
+    a {text-decoration:none}
+    @media print { a {text-decoration:underline} }
+
+    /* --==##  make h1/h2/h3 stand out with bars  ##==-- */
+    h1, h2, h3 {padding:0.3em; border-top:2px solid #000; border-bottom:2px solid #000;
+    background-color:#ccc; margin-top:2em}
+    body>h1:first-child, body>h2:first-child, body>h3:first-child {margin-top:0}
+
+    /* --==##  table cells have a nice border  ##==-- */
+    table.wikitable {border-collapse:collapse}
+    table.wikitable td, table.wikitable th {border:1px solid #aaa; padding:0.3em}
+    table.wikitable th {background-color:#000; color:#fff}
+    table.wikitable th a {color:#aaf}
+    table.wikitable th a:visited {color:#faf}
+
+    /* --==##  kbd has gray background  ##==-- */
+    kbd {background-color:#bbb}
+
+    /* --==##  selectively make ul/ol spaced (non-cascading)  ##==-- */
+    ul.spaced > li, ol.spaced > li {margin-bottom:1em}
+    .spaced > li > .spaced {margin-top:1em}
+
+    /* --==##  CSS reset  ##==-- */
+    a img {border:0}
+</style>
+
+
