@@ -1,12 +1,14 @@
 #!/bin/bash
 
+    # vim: set number:
+
 # Prerequisites on Debian:
-#       sudo apt-get install ncurses-dev xorg-dev
+#       sudo apt-get install ncurses-dev xorg-dev libgtk2.0-dev
 #
 
 set -x
 
-SKIPTO=0            # allow for primitive 'make'-like functionality, by allowing the user to specify a line to skip ahead to
+SKIPTO=${1:-0}      # allow for primitive 'make'-like functionality, by allowing the user to specify a line to skip ahead to
 
 
                                 mkdir -p ~/apps/bin
@@ -14,17 +16,11 @@ SKIPTO=0            # allow for primitive 'make'-like functionality, by allowing
 [ $SKIPTO -le $LINENO ] &&      wget -N http://ftp.vim.org/pub/vim/unix/vim-7.3.tar.bz2
 [ $SKIPTO -le $LINENO ] &&      tar -xvjf vim-7.3.tar.bz2
 
-[ $SKIPTO -le $LINENO ] &&      mv vim73 vim73_source
-[ $SKIPTO -le $LINENO ] &&      mkdir vim73
-
-                                cd ~/apps/vim73_source/src
+                                cd ~/apps/vim73/src
 
 [ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#prefix =.*|prefix = $ENV{HOME}/apps|' Makefile
 [ $SKIPTO -le $LINENO ] &&      make
 [ $SKIPTO -le $LINENO ] &&      make install
-
-                                cd ~/apps/bin
-[ $SKIPTO -le $LINENO ] &&      ln -s ../vim73/bin/* .
 
                                 cd ~/apps/
 [ $SKIPTO -le $LINENO ] &&      rm vim-7.3.tar.bz2

@@ -17,6 +17,10 @@ set wildmenu wildmode=list:longest,full                         " http://paperli
 let $STDIN_OWNERS_HOME = ($STDIN_OWNERS_HOME != "") ? $STDIN_OWNERS_HOME : $HOME
 silent! call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
 
+if $LOGNAME != "root"       " modeline can compromise security
+    set modeline
+endif
+
 
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
 set t_Co=256
