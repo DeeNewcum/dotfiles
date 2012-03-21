@@ -47,7 +47,7 @@ my @key_order = $sort_by_count ?
             sort {$count{$a} <=> $count{$b}} keys %count :
             sort {&natural_sort} keys %count;
 foreach my $key (@key_order) {
-    printf "%-${longest_key_string}s (%${longest_value_string}d)  %s\n",
+    printf "%-${longest_key_string}s  (%${longest_value_string}d)   %s\n",
                 $key,
                 $count{$key},
                 '*' x (1 + ($max_bar_len * ($count{$key} - $min) / $divisor));
