@@ -3,8 +3,9 @@ alias rl='. ~/.bash_aliases'
 alias ea='${EDITOR:-vi} ~/.bash_aliases; rl'
 
 
-# Bash's equivalent to tcsh's built-in command
+# Bash equivalents to tcsh built-ins
 function where { type -pa "$@" | perl -nle 'print unless $seen{$_}++'; }
+alias rehash='hash -r'
 
 
 
