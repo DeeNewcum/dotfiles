@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Prerequisites on Debian:
-#       sudo apt-get install ncurses-dev
+#       sudo apt-get install ncurses-dev xorg-dev
 #
 
 set -x
 
-SKIPTO=0            # allow for primitive 'make'-like functionality, by specifying a line to skip ahead to
+SKIPTO=0            # allow for primitive 'make'-like functionality, by allowing the user to specify a line to skip ahead to
 
 
                                 mkdir -p ~/apps/bin
@@ -19,7 +19,7 @@ SKIPTO=0            # allow for primitive 'make'-like functionality, by specifyi
 
                                 cd ~/apps/vim73_source/src
 
-[ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#prefix =.*|prefix = $ENV{HOME}/apps/vim73|' Makefile
+[ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#prefix =.*|prefix = $ENV{HOME}/apps|' Makefile
 [ $SKIPTO -le $LINENO ] &&      make
 [ $SKIPTO -le $LINENO ] &&      make install
 
