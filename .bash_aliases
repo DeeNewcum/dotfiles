@@ -44,6 +44,14 @@ function go() { xdg-open "$@"; }
 function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "scp", $ARGV[0], "."; system "xdg-open *"' "$@"; }
 
 
+# Do ANSI-coloring of text, based on arbitrary regexps.
+# Arguments:   as many pairs as you want, with pairs being:
+#           first-arg:      a Perl regular expression, to match the text you want to hilight
+#           second-arg:     the ANSI color(s) you want to apply to the matched text
+# Example:          diff -U 9999999 file1 file2 | hil    '^\+.*' 92    '^-.*' 91
+function hil { pl=$(perl -e'print"s/($a[0])/\\e[$a[1]m\$1\\e[0m/gm;"while@a=splice@ARGV,0,2' "$@"); perl -0777 -pe"$pl"; }
+
+
 alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
 
 
