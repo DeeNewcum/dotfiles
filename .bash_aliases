@@ -48,7 +48,9 @@ function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "
 # Arguments:   as many pairs as you want, with pairs being:
 #           first-arg:      a Perl regular expression, to match the text you want to hilight
 #           second-arg:     the ANSI color(s) you want to apply to the matched text
-# Example:          diff -U 9999999 file1 file2 | hil    '^\+.*' 92    '^-.*' 91
+# Examples:
+#       diff -U 9999999 file1 file2 | hil    '^\+.*' 92    '^-.*' 91
+#       hil ':' 96 '[^:]+$' 91 < /etc/passwd
 function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=grep{$j++%2}@ARGV;@ARGV=()}s/$p/for($i=0;$i<@c&&!defined$-[$i+1];$i++){}"\e[$c[$i]m$+\e[0m"/gome' "$@"; }
 
 
