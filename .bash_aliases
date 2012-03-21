@@ -49,7 +49,8 @@ function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "
 #           first-arg:      a Perl regular expression, to match the text you want to hilight
 #           second-arg:     the ANSI color(s) you want to apply to the matched text
 # Example:          diff -U 9999999 file1 file2 | hil    '^\+.*' 92    '^-.*' 91
-function hil { pl=$(perl -e'print"s/($a[0])/\\e[$a[1]m\$1\\e[0m/gm;"while@a=splice@ARGV,0,2' "$@"); perl -0777 -pe"$pl"; }
+function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=grep{$j++%2}@ARGV;@ARGV=()}s/$p/for($i=0;$i<@c&&!defined$-[$i+1];$i++){}"\e[$c[$i]m$+\e[0m"/gome' "$@"; }
+
 
 
 alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
