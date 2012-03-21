@@ -14,10 +14,16 @@
     use warnings;
     
     use List::Util qw[min max];
+    use utf8;
 
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
+
+binmode STDOUT, ":utf8";
+
+# call via a symlink named "bargraphu" to use Unicode output
+my $char = ($0 =~ /bargraphu$/) ? '█' : '*';
 
 my %count;
 
@@ -39,8 +45,9 @@ foreach my $key (@key_order) {
     printf "%${longest_value_string}d  %-${longest_key_string}s  %s\n",
                 $count{$key},
                 $key,
-                '*' x (1 + ($max_bar_len * ($count{$key} - $min) / $divisor));
+                $char x (1 + ($max_bar_len * ($count{$key} - $min) / $divisor));
 }
+
 
 
 # Thanks to http://www.perlmonks.org/?node_id=68185
