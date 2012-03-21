@@ -142,8 +142,8 @@ if has("gui_gtk2")
       endif
     endfunction
 
-    nnoremap <C-Up> :silent! call AdjustFontSize(1)<CR>
-    nnoremap <C-Down> :silent! call AdjustFontSize(-1)<CR>
+    nnoremap <C-MouseDown> :silent! call AdjustFontSize(1)<CR>
+    nnoremap <C-MouseUp> :silent! call AdjustFontSize(-1)<CR>
 endif
 
 
