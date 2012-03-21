@@ -7,7 +7,7 @@
 #       http://jehiah.cz/a/ascii-bar-charts
 
 # Examples:
-#       last | cut -d \  -f 1 | bargraph -c
+#       last | cut -d \  -f 1 | bargraph | sort -n
 #       last | perl -nle '/(\d\d:\d)\d/ && print "${1}0"' | bargraph
 
 # Arguments:
@@ -21,12 +21,6 @@
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
-
-my $sort_by_count = 0;
-if (@ARGV && $ARGV[0] eq '-c') {
-    shift @ARGV;
-    $sort_by_count++;
-}
 
 my %count;
 
@@ -43,13 +37,11 @@ my $longest_value_string = max(map {length(sprintf "%d", $_)} values %count);
 my $max_bar_len = 80;
 my $divisor = ($max - $min + 1);
 
-my @key_order = $sort_by_count ?
-            sort {$count{$a} <=> $count{$b}} keys %count :
-            sort {&natural_sort} keys %count;
+my @key_order = sort {&natural_sort} keys %count;
 foreach my $key (@key_order) {
-    printf "%-${longest_key_string}s  (%${longest_value_string}d)   %s\n",
-                $key,
+    printf "%${longest_value_string}d  %-${longest_key_string}s  %s\n",
                 $count{$key},
+                $key,
                 '*' x (1 + ($max_bar_len * ($count{$key} - $min) / $divisor));
 }
 
