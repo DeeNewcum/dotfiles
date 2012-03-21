@@ -8,7 +8,7 @@
 
 # Examples:
 #       last | cut -d \  -f 1 | bargraph -c
-#       last | perl -nle '/(\d\d):\d\d/ && print $1' | bargraph
+#       last | perl -nle '/(\d\d:\d)\d/ && print "${1}0"' | bargraph
 
 # Arguments:
 #       -c      sort by count, rather than sort by string
