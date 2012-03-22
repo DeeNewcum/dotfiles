@@ -69,6 +69,8 @@ foreach my $file (@ARGV) {
     } else {
         $path = "$abs";
     }
+    die "scpp can't currently handle single-quotes or backslashes in filenames, due to problems with shell double-quoting.\n"
+            if ($path =~ /[\\']/);
     if ($path =~ /[ \$\\]/) {
         # The string gets shell-expanded on the far side of scp  (this is what allows us to pass "*" to the far side -- it gets expanded on the REMOTE side, not the local side)
         #
