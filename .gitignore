@@ -1,0 +1,7 @@
+# This is a global gitignore file.
+#
+# To make it active, you need to run this once in each repository:
+#
+#       git config --global core.excludesfile ~/.gitignore
+
+*.swp
