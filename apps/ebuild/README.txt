@@ -1,5 +1,9 @@
 Okay, these aren't literally ebuild/PKGBUILD/etc scripts, but they're something in the same vein.
 
-The files here may eventually become one of those.
+These scripts will download and compile various things from source for me, and configure them the
+way I want.
 
-For now those, these are semi-hard-coded scripts.
+They ultimately dump the binaries in ~/apps/bin/.
+
+These scripts may eventually become more like proper ebuild/pkgbuild scripts, but for now, they're
+hard-coded.

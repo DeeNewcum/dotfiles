@@ -19,6 +19,7 @@ SKIPTO=${1:-0}      # allow for primitive 'make'-like functionality, by allowing
                                 cd ~/apps/vim73/src
 
 [ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#prefix =.*|prefix = $ENV{HOME}/apps|' Makefile
+[ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#(?=CONF_OPT_MULTIBYTE)||' Makefile
 [ $SKIPTO -le $LINENO ] &&      make
 [ $SKIPTO -le $LINENO ] &&      make install
 
