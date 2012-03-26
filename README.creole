@@ -34,7 +34,7 @@ My own ~~/.sudo_bashrc will pull in a variety of other .rc settings from the ori
 
 == Similar projects ==
 
-There are a [[http://paperlined.org/apps/git/dotfiles/other_peoples_setup.html|TON of other people]] who store their dotfiles on github.  Ones that stand out for me:
+There are a [[https://github.com/search?utf8=%E2%9C%93&q=dotfiles&repo=&langOverride=&start_value=1&type=Repositories&language=|TON of other people]] who store their dotfiles on github.  Ones that stand out for me:
 
 * [[https://github.com/rtomayko/dotfiles|rtomayko]]
 * [[https://github.com/aspiers/shell-env|aspiers]]
