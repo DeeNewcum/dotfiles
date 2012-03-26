@@ -29,8 +29,10 @@ find { wanted => sub {
         return;
     }
 
-    # files to skip
-    return if ($_ eq '.' || $_ eq 'README.creole' || $_ eq 'setup.pl');
+    # files to not symlink
+    return if ($_ eq '.');
+    return if ($_ eq 'setup.pl');
+    return if /(?:^|\/)README.(?:creole|md)$/;
     return if /\.swp$/;
     
     if (-d $_) {
