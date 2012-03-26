@@ -50,6 +50,11 @@ if (!$foundit) {
 my $starting_URL = slurp($foundit);
 chomp $starting_URL;
 
+# escape a few characters
+#       (again, we're making some assumptions about what encoding method should be used here, but
+#        hopfully we make choices that work in as many places as possible)
+$append =~ s/ /%20/g;
+
 print "$starting_URL$append\n";
 
 
