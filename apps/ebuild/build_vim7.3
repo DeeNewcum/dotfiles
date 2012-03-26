@@ -22,6 +22,8 @@ SKIPTO=${1:-0}      # allow for primitive 'make'-like functionality, by allowing
 [ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#(?=CONF_OPT_MULTIBYTE)||' Makefile
 [ $SKIPTO -le $LINENO ] &&      make
 [ $SKIPTO -le $LINENO ] &&      make install
+                                cd ~/apps/bin
+[ $SKIPTO -le $LINENO ] &&      ln -s vim vi
 
                                 cd ~/apps/
 [ $SKIPTO -le $LINENO ] &&      rm vim-7.3.tar.bz2
