@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+# Pass this a filename/directory, and this will return the equivalent URL for that file.
+#
+# This relies on a file named '.url' located somewhere in the directory (or any of its
+# parents) of the specified file, that tells what that specific directory=>URL mapping is.
+#
+# While there are MANY things that might make it confusing to figure out where a given file is
+# actually served at (eg. Apache mod_rewrite, web framework routes, ...), it's hoped that these
+# manually-created files, sprinkled in a few places, may do the trick in many cases.
+
+    use strict;
+    use warnings;
+
+    use Cwd 'abs_path';
+    use File::Basename;
+
+    use Data::Dumper;
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+
+my $filename = shift    or die "Specify a filename.\n";
+
+my $absfilename = abs_path($filename);
+
+my $dir = $absfilename;
+my $append = '';
+if (-f $dir) {
+    $append = basename($absfilename);
+    $dir = dirname($absfilename);
+}
+
+
+my $foundit = '';
+while (1) {
+    if (-f "$dir/.url") {
+        $foundit = "$dir/.url";
+        last;
+    }
+    last if ($dir eq '/');
+    $append = basename($dir) . '/' . $append;
+    $dir = dirname($dir);
+}
+
+if (!$foundit) {
+    die "No '.url' file found above that in the directory structure.\n";
+}
+
+
+my $starting_URL = slurp($foundit);
+chomp $starting_URL;
+
+print "$starting_URL$append\n";
+
+
+
+# quickly read a whole file
+sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
+
