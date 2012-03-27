@@ -15,6 +15,7 @@ set clipboard=unnamed                                           " default to the
 set textwidth=100
 set guioptions-=T                                               " remove toolbar
 set noerrorbells visualbell t_vb=                               " quiet!!!
+let mapleader = ","
 
 filetype plugin on                                              " http://vim.wikia.com/wiki/Keep_your_vimrc_file_clean
 set wildmenu wildmode=list:longest,full                         " http://paperlined.org/apps/vim/wildmenu.html
@@ -100,6 +101,9 @@ nnoremap <silent> g# g#zz
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
+
+" take the line under the cursor, and run it as a vim command
+nnoremap <leader>S ^vg_y:execute @@<CR>
 
 " ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================
