@@ -15,14 +15,14 @@ I often work in Ubuntu, RHEL, and Solaris.  That's Solaris 9, on boxes I don't c
 
 ## General structure ##
 
-<tt>setup.pl</tt> is designed to be run repeatedly.  Run <tt>setup.pl</tt>, manually fix the problems that it notes, run <tt>setup.pl</tt>, ... repeat until <tt>setup.pl</tt> doesn't report any issues.
+Setup.pl is designed to be run repeatedly.  Run setup.pl, manually fix the problems that it notes, run setup.pl, ... repeat until it doesn't report any issues.
 
-<tt>setup.pl</tt> recognizes three different ways that the settings from ~/dotfiles/ directory can be incorporated into the working version:
+Setup.pl recognizes three different ways that the settings from ~/dotfiles/ directory can be incorporated into the working version:
 
-* **Symlink** — The easiest way is just to symlink, for example, ~/.bashrc ⇒ ~/dotfiles/.bashrc
+* **Symlink** — The easiest way is just to symlink, for example, ~/.bashrc → ~/dotfiles/.bashrc
 * **Source** — Some specific files have the ability to 'source' or '#include' another file.  For example, ~/.bashrc could include the line
 : <tt>[ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc</tt>
-* **Text substitution** — <tt>setup.pl</tt> can take the text that's in ~/dotfiles/.gitconfig.subst, and insert it into the middle of the ~/.gitconfig file.
+* **Text substitution** — setup.pl can take the text that's in ~/dotfiles/.gitconfig.subst, and insert it into the middle of the ~/.gitconfig file.
  
 ## Machine-specific overrides, via source ##
 
@@ -30,7 +30,7 @@ In some cases, I want to have local settings, specific to a machine, that overri
 
 For files that allow for 'source' or '#include' functionality, this is possible.  For example, ~/.bashrc can be a real file (instead of a symlink), and I can change settings before and after the line that sources ~/dotfiles/.bashrc.
 
-<tt>setup.pl</tt> knows about each file type, and will suggest the appropriate 'source'/'#include' line, whenever it notices an existing local file that conflicts.
+Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob/b3510c3a0bfedf2f33085a7eeacfa6586730b1f1/setup.pl#L124-131), and will suggest the appropriate 'source' line, whenever it notices an existing local file that conflicts.
 
 ## Machine-specific overrides, via text substitution ##
 
