@@ -12,11 +12,11 @@
 
 I use 5 unix boxes on a daily basis, so checking in my dotfiles is a must.
 
-I often work in Ubuntu, RHEL, and Solaris.  That's Solaris 9, on boxes I don't control so can't install a modern GNU toolset, so there are various tricks in here to try to coerce Solaris 9 to behave in similar ways to more modern OS's.
+I often work in Ubuntu, RHEL, and Solaris.  And that's Solaris 9, on boxes I don't control so I can't install a modern GNU toolset, so there are various tricks here to coerce Solaris 9 to behave in similar ways to modern OS's.
 
 ## General structure ##
 
-Setup.pl is designed to be run repeatedly.  Run setup.pl, manually fix the problems that it notes, run setup.pl, ... repeat until it doesn't report any issues.
+Setup.pl is designed to be run repeatedly.  Run setup.pl, manually fix the problems that it notes, run setup.pl ... repeat until it doesn't report any issues.
 
 Setup.pl recognizes three different ways that the settings in ~/dotfiles/ can be incorporated into the working versions:
 
