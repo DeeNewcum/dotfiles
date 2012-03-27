@@ -19,9 +19,10 @@ I often work in Ubuntu, RHEL, and Solaris.  That's Solaris 9, on boxes I don't c
 
 <tt>setup.pl</tt> recognizes three different ways that the settings from ~/dotfiles/ directory can be incorporated into the working version:
 
-* **Symlink** — The easiest way is just to symlink, for example, ~/.bashrc → ~/dotfiles/.bashrc
-* **Source** — Some specific files have the ability to 'source' or '#include' another file.  For example, ~/.bashrc could include the line <tt>[ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc</tt>
-* **Text substitution** — <tt>setup.pl</tt> can take the text that's in ~/dotfiles/.gitconfig.subst, and do text-substitution to insert the text into a specific place within ~/.gitconfig.
+* **Symlink** — The easiest way is just to symlink, for example, ~/.bashrc ⇒ ~/dotfiles/.bashrc
+* **Source** — Some specific files have the ability to 'source' or '#include' another file.  For example, ~/.bashrc could include the line
+: <tt>[ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc</tt>
+* **Text substitution** — <tt>setup.pl</tt> can take the text that's in ~/dotfiles/.gitconfig.subst, and insert it into the middle of the ~/.gitconfig file.
  
 ## Machine-specific overrides, via source ##
 
