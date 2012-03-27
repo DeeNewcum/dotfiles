@@ -1,3 +1,9 @@
+
+    "###
+    "###  TODO: read http://learnvimscriptthehardway.stevelosh.com/
+    "###
+
+
 set nocompatible encoding=utf8 nobackup                         " sane defaults
 set ignorecase hlsearch incsearch nowrapscan                    " search settings
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent   " tab and indent settings
