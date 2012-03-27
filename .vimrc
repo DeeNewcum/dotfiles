@@ -61,6 +61,10 @@ command! CC        !perl -c % 2>&1 | head -20
 " ========================= http://vimbits.com/ ===================
 " ========================= vvvvvvvvvvvvvvvvvvv ===================
 
+" Located in another file, but you REALLY MUST swap the capslock and escape keys, it saves SOOO much time.
+"       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_XWindows
+"       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_Windows
+
 " swap the : and ; keys
 " This helps TWO ways: 1) no more held-down shift key problems (eg. :Q), and 2) you use the command-line WAYYYY more
 "           http://vim.wikia.com/wiki/Map_semicolon_to_colon

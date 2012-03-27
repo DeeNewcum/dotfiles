@@ -12,9 +12,9 @@
 
 Setup.pl is designed to be run repeatedly.  Run setup.pl, manually fix the problems that it notes, run setup.pl...   and repeat until it doesn't report any issues.
 
-Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings:
+Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings into the working versions:
 
-* **Symlink** — The easiest way. For example: ~/.bashrc → ~/dotfiles/.bashrc
+* **Symlink** — The most common way. For example: ~/.bashrc → ~/dotfiles/.bashrc
 
 * **Source** — Some file types can source another file.  For example:  ~/.bashrc could include the line:
 
@@ -30,7 +30,7 @@ For files that allow for 'source' or '#include' functionality, this is possible.
 
 Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob/b3510c3a0bfedf2f33085a7eeacfa6586730b1f1/setup.pl#L124-131), and will suggest the appropriate 'source' line, whenever it notices an existing local file that conflicts.
 
-You need to manually insert the 'source' line, because order usually matters.  Often, you want your local settings to come after the 'source' line.
+You need to manually insert the 'source' line, because order usually matters.  Often, you want your local settings to come after the 'source' line, to override them, but it depends on file type.
 
 ## Machine-specific overrides — via text substitution ##
 
@@ -38,7 +38,7 @@ You need to manually insert the 'source' line, because order usually matters.  O
 
 ## Shared root ##
 
-I manage boxes where several people have access to root.  To avoid stepping on each other other's toes, I have [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L3-5) so that it loads a ~/.sudo_bashrc from the [original user's](http://paperlined.org/apps/host_sudo_su_boundaries
+I manage boxes where several people have access to root.  To avoid stepping on each other other's toes, I have [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L3-5) so that it loads a ~/.sudo_bashrc from the [original user's](http://paperlined.org/apps/host_sudo_su_boundaries/user_ids.html) home directory.
 
 My own ~/.sudo_bashrc will pull in a variety of other .rc settings from the original home directory, including ~/.vimrc, ~/.inputrc, ~/.less, ~/.ackrc, and ~/.perltidyrc.
 
