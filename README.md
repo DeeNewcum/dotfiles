@@ -5,33 +5,32 @@
     $  ./setup.pl
     $  ls -l ~/.bashrc
     ~/.bashrc -> ~/dotfiles/.bashrc
-    
+
     # Your dotfiles are safe.  Setup.pl won't overwrite anything.
 
-## My background ##
+## Overview ##
 
-I use 5 unix boxes on a daily basis, so checking in my dotfiles is a must.
+Setup.pl is designed to be run repeatedly.  Run setup.pl, manually fix the problems that it notes, run setup.pl...   and repeat until it doesn't report any issues.
 
-I often work in Ubuntu, RHEL, and Solaris.  And that's Solaris 9, on boxes I don't control so I can't install a modern GNU toolset, so there are various tricks here to coerce Solaris 9 to behave in similar ways to modern OS's.
+Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings:
 
-## General structure ##
+* **Symlink** — The easiest way. For example: ~/.bashrc → ~/dotfiles/.bashrc
 
-Setup.pl is designed to be run repeatedly.  Run setup.pl, manually fix the problems that it notes, run setup.pl ... repeat until it doesn't report any issues.
+* **Source** — Some file types can source another file.  For example:  ~/.bashrc could include the line:
 
-Setup.pl recognizes three different ways that the settings in ~/dotfiles/ can be incorporated into the working versions:
+        [ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc
 
-* **Symlink** — The easiest way is just to symlink, for example, ~/.bashrc → ~/dotfiles/.bashrc
-* **Source** — Some specific files have the ability to 'source' or '#include' another file.  For example, ~/.bashrc could include the line
-: <tt>[ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc</tt>
-* **Text substitution** — setup.pl can take the text that's in ~/dotfiles/.gitconfig.subst, and insert it into the middle of the ~/.gitconfig file.
- 
+* **Text substitution** — The text that's in ~/dotfiles/.gitconfig.subst would be cut-n-pasted into the middle of the ~/.gitconfig file.
+  
 ## Machine-specific overrides — via source ##
 
-In some cases, I want to have local settings, specific to a machine, that override the repository settings.
+In some cases, I want to have local settings, specific to a machine, that override the global repository settings.
 
 For files that allow for 'source' or '#include' functionality, this is possible.  For example, ~/.bashrc can be a real file (instead of a symlink), and I can change settings before and after the line that sources ~/dotfiles/.bashrc.
 
 Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob/b3510c3a0bfedf2f33085a7eeacfa6586730b1f1/setup.pl#L124-131), and will suggest the appropriate 'source' line, whenever it notices an existing local file that conflicts.
+
+You need to manually insert the 'source' line, because order usually matters.  Often, you want your local settings to come after the 'source' line.
 
 ## Machine-specific overrides — via text substitution ##
 
@@ -39,9 +38,15 @@ Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob
 
 ## Shared root ##
 
-I manage boxes where several people have access to root.  To avoid stepping on each other other's toes, I have [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L3-5) so that it loads a ~/.sudo_bashrc from the [original user's](http://paperlined.org/apps/host_sudo_su_boundaries/user_ids.html) home directory.
+I manage boxes where several people have access to root.  To avoid stepping on each other other's toes, I have [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L3-5) so that it loads a ~/.sudo_bashrc from the [original user's](http://paperlined.org/apps/host_sudo_su_boundaries
 
 My own ~/.sudo_bashrc will pull in a variety of other .rc settings from the original home directory, including ~/.vimrc, ~/.inputrc, ~/.less, ~/.ackrc, and ~/.perltidyrc.
+
+## My background ##
+
+I use 5 unix boxes on a daily basis, so checking in my dotfiles is a must.
+
+I often work in Ubuntu, RHEL, and Solaris.  And that's Solaris 9, on boxes I don't control so I can't install a modern GNU toolset, so there are various tricks here to coerce Solaris 9 to behave in similar ways to modern OS's.
 
 ## Similar projects ##
 
