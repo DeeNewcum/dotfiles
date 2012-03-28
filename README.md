@@ -20,7 +20,7 @@ Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings int
 
         [ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc
 
-* **Text substitution** — The text that's in ~/dotfiles/.gitconfig.subst would be cut-n-pasted into the middle of the ~/.gitconfig file.
+* **Text substitution** — Setup.pl will read the text from ~/dotfiles/.gitconfig.subst, and copy-n-paste it into the middle of the ~/.gitconfig file.
   
 ## Machine-specific overrides — via source ##
 
