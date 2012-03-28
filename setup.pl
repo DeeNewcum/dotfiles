@@ -13,7 +13,7 @@
 
     use Data::Dumper;
     $Data::Dumper::Useqq++;
-    use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
 
 (my $repository_dir = $FindBin::Bin) =~ s/^\Q$ENV{HOME}\E/~/;
