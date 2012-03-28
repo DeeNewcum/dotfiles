@@ -19,3 +19,8 @@
 
 [format]
     pretty = short
+
+
+[alias]
+    # credit: http://www.jukie.net/bart/blog/pimping-out-git-log
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
