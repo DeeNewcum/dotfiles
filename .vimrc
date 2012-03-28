@@ -53,6 +53,7 @@ endif
 
 " don't wrap lines in HTML files
 autocmd BufEnter *.html set textwidth=0
+autocmd BufEnter *.md set textwidth=0
 autocmd BufEnter *.creole set textwidth=0
 
 
