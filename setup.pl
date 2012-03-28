@@ -14,7 +14,7 @@
     use Data::Dumper;
     $Data::Dumper::Useqq++;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
-    use Carp::Always;              # uncomment this to get a full stack backtrace when errors hit
+    #use Carp::Always;              # uncomment this to get a full stack backtrace when errors hit
 
 
 my $abs_home = abs_path($ENV{HOME});

@@ -16,3 +16,6 @@
 
 [core]
 	excludesfile = $HOME/.gitignore
+
+[format]
+    pretty = short
