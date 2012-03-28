@@ -14,6 +14,7 @@
     use Data::Dumper;
     $Data::Dumper::Useqq++;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+    use Carp::Always;              # uncomment this to get a full stack backtrace when errors hit
 
 
 (my $repository_dir = $FindBin::Bin) =~ s/^\Q$ENV{HOME}\E/~/;
@@ -182,12 +183,12 @@ sub do_substitute {
             # "active" means the version of the config file that is directly used by the standard tools
     my $active_filename = "$ENV{HOME}/$subst_filename_basename";
 
-    my @active_old_contents = slurp($active_filename);
-
             # We include our repository directory here, because we want to be able to have multiple dotfile repositories on the same machine,
             # and have multipl repos substituting their text into different locations within the active file.
     my $header_text = "######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY .subst FILE IN: $repository_dir/ ########";
     my $footer_text = "######## END SUBSTITUTION FROM: $repository_dir/ ########";
+
+    my @active_old_contents = -e $active_filename ? slurp($active_filename) : ();
 
     # do we know where to insert it?
     if (!grep(/\Q$header_text\E/, @active_old_contents)) {
