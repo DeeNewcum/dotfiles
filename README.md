@@ -24,21 +24,19 @@ Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings int
   
 ## Machine-specific overrides — via source ##
 
-In some cases, I want to have local settings, specific to a machine, that override the global repository settings.
+'source' and text-substitution allow you to have local machine-specific settings that override the global repository settings.
 
-For files that allow for 'source' or '#include' functionality, this is possible.  For example, ~/.bashrc can be a real file (instead of a symlink), and I can change settings before and after the line that sources ~/dotfiles/.bashrc.
+Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob/b3510c3a0bfedf2f33085a7eeacfa6586730b1f1/setup.pl#L124-131), and will suggest the appropriate 'source' line when possible.
 
-Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob/b3510c3a0bfedf2f33085a7eeacfa6586730b1f1/setup.pl#L124-131), and will suggest the appropriate 'source' line, whenever it notices an existing local file that conflicts.
-
-You need to manually insert the 'source' line, because order usually matters.  Often, you want your local settings to come after the 'source' line, to override them, but it depends on file type.
+You need to manually insert the 'source' line, because order matters.
 
 ## Machine-specific overrides — via text substitution ##
 
-For files that don't allow for 'source', setup.pl will copy-n-paste the contents of, for example, ~/dotfiles/.gitconfig.subst into ~/.gitconfig.
+Setup.pl can copy-n-paste the contents of, for example, ~/dotfiles/.gitconfig.subst into ~/.gitconfig.
 
-Because order often matters, you again need to manually insert a line that indicates where the global configuration text should be inserted.  Setup.pl will tell you what text to insert.
+Because order often matters, you again need to manually insert a line that indicates where the text should be inserted.   Setup.pl will tell you the line to insert.
 
-The text is only substituted when setup.pl is run.  Therefore, to change the text inside the substitution region, you need to modify the ~/dotfiles/ version, and run setup.pl every time you want to test out your change.
+Obviously, running setup.pl just to push changes across isn't ideal, but when 'source' isn't available, it's the only possibility.
 
 An example:  The live version of ~/.ssh/config would end up looking like this after setup.pl runs:
 
