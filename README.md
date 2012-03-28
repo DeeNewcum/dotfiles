@@ -40,6 +40,19 @@ Because order often matters, you again need to manually insert a line that indic
 
 The text is only substituted when setup.pl is run.  Therefore, to change the text inside the substitution region, you need to modify the ~/dotfiles/ version, and run setup.pl every time you want to test out your change.
 
+An example:  The live version of ~/.ssh/config would end up looking like this after setup.pl runs:
+
+    # ######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY .subst FILE IN: ~/dotfiles/ ########
+    Host github.com
+        User git
+        IdentityFile ~/.ssh/github.priv
+    # ######## END SUBSTITUTION FROM: ~/dotfiles/ ########
+
+    Host webstaging.work.com
+        User my-username
+
+    # ... a bunch of other stuff that can't be checked into the public repository
+
 ## Shared root ##
 
 I manage boxes where several people have access to root.  To avoid stepping on each other other's toes, I have [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L3-5) so that it loads a ~/.sudo_bashrc from the [original user's](http://paperlined.org/apps/host_sudo_su_boundaries/user_ids.html) home directory.
