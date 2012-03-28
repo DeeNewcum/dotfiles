@@ -10,7 +10,7 @@
 
 ## Overview ##
 
-Setup.pl is designed to be run repeatedly.  Run setup.pl, manually fix the problems that it notes, run setup.pl...   and repeat until it doesn't report any issues.
+Run setup.pl, manually fix the problems that it notes, run setup.pl...   repeat until it doesn't report any issues.
 
 Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings into the working versions:
 
