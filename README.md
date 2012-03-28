@@ -10,7 +10,7 @@
 
 ## Overview ##
 
-Run setup.pl, manually fix the problems that it notes, run setup.pl...   repeat until it doesn't report any issues.
+Run setup.pl, fix the file conflicts that it notes, run setup.pl...   repeat until it doesn't report any conflicts.
 
 Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings into the working versions:
 
