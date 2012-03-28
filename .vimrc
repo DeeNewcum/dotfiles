@@ -13,12 +13,14 @@ command! W w                                                    " accomodate stu
 command! Q q
 set clipboard=unnamed                                           " default to the * clipboard when yanking/pasting
 set textwidth=100
-set guioptions-=T                                               " remove toolbar
 set noerrorbells visualbell t_vb=                               " quiet!!!
 let mapleader = ","
 
 filetype plugin on                                              " http://vim.wikia.com/wiki/Keep_your_vimrc_file_clean
 set wildmenu wildmode=list:longest,full                         " http://paperlined.org/apps/vim/wildmenu.html
+
+set guioptions-=T                                               " remove toolbar
+set guioptions+=b                                               " add horizontal scrollbar
 
 
 let $STDIN_OWNERS_HOME = ($STDIN_OWNERS_HOME != "") ? $STDIN_OWNERS_HOME : $HOME
