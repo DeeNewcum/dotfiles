@@ -17,7 +17,8 @@
     use Carp::Always;              # uncomment this to get a full stack backtrace when errors hit
 
 
-(my $repository_dir = $FindBin::Bin) =~ s/^\Q$ENV{HOME}\E/~/;
+my $abs_home = abs_path($ENV{HOME});
+(my $repository_dir = $FindBin::Bin) =~ s/^\Q$abs_home\E/~/;
 
 chdir $FindBin::Bin;
 
