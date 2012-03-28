@@ -34,7 +34,11 @@ You need to manually insert the 'source' line, because order usually matters.  O
 
 ## Machine-specific overrides — via text substitution ##
 
-(coming soon — this is needed for ~/.gitconfig and ~/.ssh/config, which are unable to source files)
+For files that don't allow for 'source', setup.pl will copy-n-paste the contents of, for example, ~/dotfiles/.gitconfig.subst into ~/.gitconfig.
+
+Because order often matters, you again need0 to manually insert a line that indicates where the global configuration text should be inserted.  Setup.pl will tell you what text to insert.
+
+The text is only substituted when setup.pl is run.  Therefore, to change the text inside the substitution region, you need to modify the ~/dotfiles/ version, and run setup.pl every time you want to test out your change.
 
 ## Shared root ##
 
