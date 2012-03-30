@@ -108,6 +108,12 @@ vnoremap <F1> <ESC>
 " take the line under the cursor, and run it as a vim command
 nnoremap <leader>S ^vg_y:execute @@<CR>
 
+" <leader>l  = lock in the current-search pattern
+" <leader>L  = clear all locked-in search patterns
+nnoremap <leader>l :call matchadd('Visual', @/)<cr>
+nnoremap <leader>L :call clearmatches()<cr>
+
+
 " ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================
 
