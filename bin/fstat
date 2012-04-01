@@ -73,15 +73,25 @@ foreach my $file (@ARGV) {
     my $mode_str = format_mode($s{mode});
     $s{mode} = sprintf("%06o     %s", $s{mode}, $mode_str);
 
-    $s{uid} .= " (" . getpwuid($s{uid}) . ")";
-    $s{gid} .= " (" . getgrgid($s{gid}) . ")";
+    $s{uid} .= "  (" . getpwuid($s{uid}) . ")";
+    $s{gid} .= "  (" . getgrgid($s{gid}) . ")";
 
     $s{size} = commify($s{size}) . " bytes";
+    $s{blocks} = commify($s{blocks});
 
     $s{dev} .= "   ($devnums{$s{dev}})";
 
+    if ($s{rdev}) {
+        # figure out the major + minor numbers for this block or character device
+        # we REALLY should use File::Stat::Bits for this, it would be far more portable
+        $s{rdev} .= sprintf "   (%d, %d)",  $s{rdev} >> 8, $s{rdev} & 255;
+    } else {
+        delete $s{rdev};
+    }
+
     #print Dumper \%s;
     foreach my $name (@$name_order) {
+        next unless exists $s{$name};
         printf "\%${descrlen}s  %s\n",
             ($names{$name} || $name) . ":",
             $s{$name};
