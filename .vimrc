@@ -1,3 +1,9 @@
+
+    "###
+    "###  TODO: read http://learnvimscriptthehardway.stevelosh.com/
+    "###
+
+
 set nocompatible encoding=utf8 nobackup                         " sane defaults
 set ignorecase hlsearch incsearch nowrapscan                    " search settings
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent   " tab and indent settings
@@ -7,11 +13,14 @@ command! W w                                                    " accomodate stu
 command! Q q
 set clipboard=unnamed                                           " default to the * clipboard when yanking/pasting
 set textwidth=100
-set guioptions-=T                                               " remove toolbar
 set noerrorbells visualbell t_vb=                               " quiet!!!
+let mapleader = ","
 
 filetype plugin on                                              " http://vim.wikia.com/wiki/Keep_your_vimrc_file_clean
 set wildmenu wildmode=list:longest,full                         " http://paperlined.org/apps/vim/wildmenu.html
+
+set guioptions-=T                                               " remove toolbar
+set guioptions+=b                                               " add horizontal scrollbar
 
 
 let $STDIN_OWNERS_HOME = ($STDIN_OWNERS_HOME != "") ? $STDIN_OWNERS_HOME : $HOME
@@ -44,6 +53,7 @@ endif
 
 " don't wrap lines in HTML files
 autocmd BufEnter *.html set textwidth=0
+autocmd BufEnter *.md set textwidth=0
 autocmd BufEnter *.creole set textwidth=0
 
 
@@ -60,6 +70,10 @@ command! CC        !perl -c % 2>&1 | head -20
 
 " ========================= http://vimbits.com/ ===================
 " ========================= vvvvvvvvvvvvvvvvvvv ===================
+
+" Located in another file, but you REALLY MUST swap the capslock and escape keys, it saves SOOO much time.
+"       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_XWindows
+"       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_Windows
 
 " swap the : and ; keys
 " This helps TWO ways: 1) no more held-down shift key problems (eg. :Q), and 2) you use the command-line WAYYYY more
@@ -90,6 +104,15 @@ nnoremap <silent> g# g#zz
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
+
+" take the line under the cursor, and run it as a vim command
+nnoremap <leader>S ^vg_y:execute @@<CR>
+
+" <leader>l  = lock in the current-search pattern
+" <leader>L  = clear all locked-in search patterns
+nnoremap <leader>l :call matchadd('Visual', @/)<cr>
+nnoremap <leader>L :call clearmatches()<cr>
+
 
 " ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================

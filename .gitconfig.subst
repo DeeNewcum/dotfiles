@@ -1,0 +1,29 @@
+        #   vim: set syntax=gitconfig:
+
+[color]
+    ui = auto
+
+[diff]
+    external = ~/bin/git_vimdiff_wrapper
+[pager]
+    diff =
+
+[user]
+	name = Dee Newcum
+    # email must be filled in -- it's not checked in to the centralized repo
+
+[github]
+    user = DeeNewcum
+    # github token must be filled in -- it's not checked in to the centralized repo
+
+[core]
+	excludesfile = $HOME/.gitignore
+
+[format]
+    pretty = short
+
+
+[alias]
+    # credit: http://www.jukie.net/bart/blog/pimping-out-git-log
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+

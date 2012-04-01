@@ -12,9 +12,13 @@
     use File::Find;
 
     use Data::Dumper;
+    $Data::Dumper::Useqq++;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+    #use Carp::Always;              # uncomment this to get a full stack backtrace when errors hit
 
 
+my $abs_home = abs_path($ENV{HOME});
+(my $repository_dir = $FindBin::Bin) =~ s/^\Q$abs_home\E/~/;
 
 chdir $FindBin::Bin;
 
@@ -29,20 +33,22 @@ find { wanted => sub {
         return;
     }
 
-    # files to skip
-    return if ($_ eq '.' || $_ eq 'README.creole' || $_ eq 'setup.pl');
+    # files to not symlink
+    return if ($_ eq '.');
+    return if ($_ eq 'setup.pl');
+    return if /(?:^|\/)README.(?:creole|md)$/;
     return if /\.swp$/;
     
     if (-d $_) {
         # if it's a directory, create that path under $HOME
-        _mkdir($_);
+        do_mkdir($_);
 
     } elsif (-f $_) {
         # if it's a file, symlink it to $HOME
         if (/\.subst$/) {
-            _substitute($_);
+            do_substitute($_);
         } else {
-            _symlink($_);
+            do_symlink($_);
         }
     }
 }, no_chdir=>1}, ".";
@@ -56,7 +62,7 @@ if ($ENV{USER} =~ /^[p][h][r][8][4][3]$/) {
 
 
 
-sub _mkdir {
+sub do_mkdir {
     my ($dir) = @_;
 
     return if (-d "$ENV{HOME}/$dir");
@@ -77,7 +83,7 @@ sub _mkdir {
 }
 
 
-sub _symlink {
+sub do_symlink {
     my ($file) = @_;
 
     my $to   = "$ENV{HOME}/$file";
@@ -168,8 +174,72 @@ EOF
 }
 
 
-sub _substitute {
-    my ($file) = @_;
+sub do_substitute {
+    my ($subst_filename) = @_;
 
-    warn "_substitute($file) not yet implemented\n";
+    (my $subst_filename_basename = $subst_filename) =~ s/\.subst$//;
+
+    my @subst_contents = slurp($subst_filename);
+
+            # "active" means the version of the config file that is directly used by the standard tools
+    my $active_filename = "$ENV{HOME}/$subst_filename_basename";
+
+            # We include our repository directory here, because we want to be able to have multiple dotfile repositories on the same machine,
+            # and have multipl repos substituting their text into different locations within the active file.
+    my $header_text = "######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY .subst FILE IN: $repository_dir/ ########";
+    my $footer_text = "######## END SUBSTITUTION FROM: $repository_dir/ ########";
+
+    my @active_old_contents = -e $active_filename ? slurp($active_filename) : ();
+
+    # do we know where to insert it?
+    if (!grep(/\Q$header_text\E/, @active_old_contents)) {
+        print "WARNING: you need to insert this line into ~/$subst_filename_basename\nto be able to pull in the contents of $repository_dir/$subst_filename:\n\n\t$header_text\n\n(insert it as a comment, using whatever comment syntax is appropriate)\n";
+        return;
+    }
+
+    # remove the existing text, if any
+            # (existing text is anything between the header and footer...  if there is no 0
+    my @active_new_contents = @active_old_contents;
+    my $header_index = grep_index(qr/\Q$header_text\E/, @active_new_contents);
+    my $footer_index = grep_index(qr/\Q$footer_text\E/, @active_new_contents);
+        #$header_index = '(undef)' unless defined($header_index); $footer_index = '(undef)' unless defined($footer_index); print "header = $header_index\nfooter = $footer_index\n"; exit;
+    if (defined($footer_index)) {
+        splice(@active_new_contents, $header_index+1, $footer_index - $header_index);
+    }
+        #print Dumper \@active_new_contents; exit;
+
+    # insert the new text
+    (my $comment_prefix = $active_new_contents[$header_index])      # every file type uses different comment syntax
+            =~ s/\Q$header_text\E.*//s;
+    chomp $comment_prefix;
+        #print ">>$comment_prefix<<\n"; exit;
+    splice(@active_new_contents, $header_index+1, 0,   @subst_contents, "$comment_prefix$footer_text\n");
+        #print Dumper \@active_new_contents; exit;
+
+    # only write the data out if we actually changed something
+    if (join("", @active_old_contents) ne join("", @active_new_contents)) {
+        print "setup    ~/$subst_filename_basename\n";
+        open my $fout, '>', $active_filename        or die "Unable to write to $active_filename:  $!";
+        print $fout @active_new_contents;
+        close $fout;
+    }
 }
+
+
+
+# Return the index of the first array element that matches the given pattern.
+#
+# It would be nice to use List::Utils::first_index instead, but we can't guarantee that will be installed on every machine.
+sub grep_index {
+    my ($pattern, @ary) = @_;
+    for (my $ctr=0; $ctr<=$#ary; $ctr++) {
+        if ($ary[$ctr] =~ $pattern) {
+            return $ctr;
+        }
+    }
+    return undef;
+}
+
+
+# quickly read a whole file
+sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
