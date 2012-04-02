@@ -22,6 +22,7 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 
 set -o vi
+bind -m vi-insert "\C-l":clear-screen       # make Ctrl-L work the same as it does in emacs mode
 if [ "$(type -P vim)" ];  then
     export EDITOR=vim
     #export PAGER=vimpager
