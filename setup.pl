@@ -50,8 +50,7 @@ find { wanted => sub {
         } else {
             do_symlink($_);
         }
-    }
-}, no_chdir=>1}, ".";
+    } }, no_chdir=>1}, ".";
 
 
 if ($ENV{USER} =~ /^[p][h][r][8][4][3]$/) {
@@ -186,14 +185,14 @@ sub do_substitute {
 
             # We include our repository directory here, because we want to be able to have multiple dotfile repositories on the same machine,
             # and have multipl repos substituting their text into different locations within the active file.
-    my $header_text = "######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY .subst FILE IN: $repository_dir/ ########";
-    my $footer_text = "######## END SUBSTITUTION FROM: $repository_dir/ ########";
+    my $header_text = "######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY CONTENTS OF: $repository_dir/$subst_filename ########";
+    my $footer_text = "######## END SUBSTITUTION FROM: $repository_dir/$subst_filename ########";
 
     my @active_old_contents = -e $active_filename ? slurp($active_filename) : ();
 
     # do we know where to insert it?
     if (!grep(/\Q$header_text\E/, @active_old_contents)) {
-        print "WARNING: you need to insert this line into ~/$subst_filename_basename\nto be able to pull in the contents of $repository_dir/$subst_filename:\n\n\t$header_text\n\n(insert it as a comment, using whatever comment syntax is appropriate)\n";
+        print "WARNING: you need to insert this line into ~/$subst_filename_basename\nto be able to pull in the contents of $repository_dir/$subst_filename:\n\t$header_text\n(insert it as a comment, using whatever comment syntax is appropriate)\n\n";
         return;
     }
 

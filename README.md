@@ -38,15 +38,15 @@ For files that don't have 'source' capability, text substitution is available as
 
 For example, setup.pl will copy-n-paste the contents of ~/dotfiles/.ssh/config.subst into ~/.ssh/config:
 
-    # ######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY .subst FILE IN: ~/dotfiles/ ########
+    ######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY CONTENTS OF: ~/dotfiles/.ssh/config.subst ########
     Host github.com
         User git
         IdentityFile ~/.ssh/github.priv
-    # ######## END SUBSTITUTION FROM: ~/dotfiles/ ########
-
+    ######## END SUBSTITUTION FROM: ~/dotfiles/.ssh/config.subst ########
+    
     Host webstaging.work.com
         User my-username
-
+    
     # ... a bunch of other private stuff that I don't want to make available on the public repository.
 
 ## Shared root ##
