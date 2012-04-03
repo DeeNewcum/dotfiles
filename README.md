@@ -14,31 +14,29 @@ Run setup.pl, fix the file conflicts that it notes, run setup.pl...   repeat u
 
 Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings into the working versions:
 
-* **Symlink** — The most common way. For example: ~/.bashrc → ~/dotfiles/.bashrc
+* **Symlink** — If you don't want any local-machine overrides. For example, ~/.bashrc can just be a symlink to ~/dotfiles/.bashrc
 
-* **Source** — Some file types can source another file.  For example:  ~/.bashrc could include the line:
+* **Source** — Some file types have the ability to 'source' another file.
 
-        [ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc
-
-* **Text substitution** — Setup.pl will read the text from ~/dotfiles/.gitconfig.subst, and copy-n-paste it into the middle of the ~/.gitconfig file.
+* **Text substitution** — Setup.pl will read the text from *.subst files, and copy-n-paste it into the middle of the working version.
   
 ## Machine-specific overrides — via source ##
 
-'source' and text-substitution allow you to have local machine-specific settings that override the global repository settings.
+One way to have local machine-specific settings that override the global repository settings is to use the 'source' feature available in some file types.  For example, ~/.bashrc:
 
-Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob/b3510c3a0bfedf2f33085a7eeacfa6586730b1f1/setup.pl#L124-131), and will suggest the appropriate 'source' line when possible.
+    # Pull in the global settings
+    [ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc
 
-You need to manually insert the 'source' line, because order matters.
+    # Override the global settings for this specific machine
+    export TERM=xtermc
+
+Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob/b3510c3a0bfedf2f33085a7eeacfa6586730b1f1/setup.pl#L124-131), and will suggest the appropriate 'source' line.
 
 ## Machine-specific overrides — via text substitution ##
 
-Setup.pl can copy-n-paste the contents of, for example, ~/dotfiles/.gitconfig.subst into ~/.gitconfig.
+For files that don't have 'source' capability, text substitution is available as a fallback.
 
-Because order often matters, you again need to manually insert a line that indicates where the text should be inserted.   Setup.pl will tell you the line to insert.
-
-Obviously, running setup.pl just to push changes across isn't ideal, but when 'source' isn't available, it's the only possibility.
-
-An example:  The live version of ~/.ssh/config would end up looking like this after setup.pl runs:
+For example, setup.pl will copy-n-paste the contents of ~/dotfiles/.ssh/config.subst into ~/.ssh/config:
 
     # ######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY .subst FILE IN: ~/dotfiles/ ########
     Host github.com
@@ -49,7 +47,7 @@ An example:  The live version of ~/.ssh/config would end up looking like this af
     Host webstaging.work.com
         User my-username
 
-    # ... a bunch of other stuff that can't be checked into the public repository
+    # ... a bunch of other private stuff that I don't want to make available on the public repository.
 
 ## Shared root ##
 
@@ -59,7 +57,7 @@ My own ~/.sudo_bashrc will pull in a variety of other .rc settings from the orig
 
 ## My background ##
 
-I use 5 unix boxes on a daily basis, so checking in my dotfiles is a must.
+I use five unix boxes on a daily basis, so checking in my dotfiles is a must.
 
 I often work in Ubuntu, RHEL, and Solaris.  And that's Solaris 9, on boxes I don't control so I can't install a modern GNU toolset, so there are various tricks here to coerce Solaris 9 to behave in similar ways to modern OS's.
 
