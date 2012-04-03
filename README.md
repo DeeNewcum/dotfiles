@@ -14,7 +14,7 @@ Run setup.pl, fix the file conflicts that it notes, run setup.pl...   repeat u
 
 Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings into the working versions:
 
-* **Symlink** — If you don't want any local-machine overrides. For example, ~/.bashrc can just be a symlink to ~/dotfiles/.bashrc
+* **Symlink** — If you don't want any local-machine overrides. For example, ~/.bashrc can just be a symlink to ~/dotfiles/.bashrc.
 
 * **Source** — Some file types have the ability to 'source' another file.
 
@@ -22,7 +22,7 @@ Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings int
   
 ## Machine-specific overrides — via source ##
 
-One way to have local machine-specific settings that override the global repository settings is to use the 'source' feature available in some file types.  For example, ~/.bashrc:
+One way to have local machine-specific settings that override the global repository settings is to use the 'source' feature available in some file types.  For example, ~/.bashrc can contain:
 
     # Pull in the global settings
     [ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc
@@ -36,7 +36,7 @@ Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob
 
 For files that don't have 'source' capability, text substitution is available as a fallback.
 
-For example, setup.pl will copy-n-paste the contents of ~/dotfiles/.ssh/config.subst into ~/.ssh/config:
+For example, setup.pl will update the section of ~/.ssh/config every time it's run: 
 
     ######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY CONTENTS OF: ~/dotfiles/.ssh/config.subst ########
     Host github.com
@@ -51,13 +51,13 @@ For example, setup.pl will copy-n-paste the contents of ~/dotfiles/.ssh/config.s
 
 ## Shared root ##
 
-I manage boxes where several people have access to root.  To avoid stepping on each other other's toes, I have [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L3-5) so that it loads a ~/.sudo_bashrc from the [original user's](http://paperlined.org/apps/host_sudo_su_boundaries/user_ids.html) home directory.
+I manage boxes where several people have access to root.  To avoid stepping on each other other's toes, I have [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L3-5) so that it loads a ~/.sudo_bashrc from the original user's home directory. 
 
 My own ~/.sudo_bashrc will pull in a variety of other .rc settings from the original home directory, including ~/.vimrc, ~/.inputrc, ~/.less, ~/.ackrc, and ~/.perltidyrc.
 
 ## My background ##
 
-I use five unix boxes on a daily basis, so checking in my dotfiles is a must.
+I use five unix boxes on a daily basis, so checking in my dotfiles saves me a lot of time.
 
 I often work in Ubuntu, RHEL, and Solaris.  And that's Solaris 9, on boxes I don't control so I can't install a modern GNU toolset, so there are various tricks here to coerce Solaris 9 to behave in similar ways to modern OS's.
 
