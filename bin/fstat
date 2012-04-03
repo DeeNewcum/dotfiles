@@ -2,6 +2,8 @@
 
 # Display the output of stat(2)  (struct stat)  in maximum detail.
 
+# See http://www.gnu.org/software/libc/manual/html_node/Attribute-Meanings.html
+
 # TODO:
 #       - break out the permissions more deeply
 #               use Fcntl qw( :mode );
@@ -79,11 +81,19 @@ foreach my $file (@ARGV) {
     $s{size} = commify($s{size}) . " bytes";
     $s{blocks} = commify($s{blocks});
 
-    $s{dev} .= "   ($devnums{$s{dev}})";
+    $s{dev} .= "   (" . ($devnums{$s{dev}} || '?') . ")";
 
     if ($s{rdev}) {
         # figure out the major + minor numbers for this block or character device
-        # we REALLY should use File::Stat::Bits for this, it would be far more portable
+        # we REALLY should use File::Stat::Bits for this, it would be FAR more portable
+
+        # "Early systems stored the device number in a 16-bit integer, with 8 bits for the major
+        #  number and 8 bits for the minor number. FreeBSD 5.2.1 and Mac OS X 10.3 use a 32-bit
+        #  integer, with 8 bits for the major number and 24 bits for the minor number. On 32-bit
+        #  systems, Solaris 9 uses a 32-bit integer for dev_t, with 14 bits designated as the major
+        #  number and 18 bits designated as the minor number. On 64-bit systems, Solaris 9 represents
+        #  dev_t as a 64-bit integer, with 32 bits for each number. On Linux 2.4.22, although dev_t
+        #  is a 64-bit integer, currently the major and minor numbers are each only 8 bits."
         $s{rdev} .= sprintf "   (%d, %d)",  $s{rdev} >> 8, $s{rdev} & 255;
     } else {
         delete $s{rdev};
