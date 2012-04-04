@@ -74,5 +74,6 @@ fi
 # apply PerlBrew and local::lib settings, if available
 [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
 [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
-[ -f ~/perl5/bin/cpanm ]           && eval $(perl -ple 'if(/END OF FATPACK CODE/){print;print"use local::lib";exit}' ~/perl5/bin/cpanm | perl -)
+    # apply the environment variables that local::lib::print_environment_vars_for specifies
+[ -f ~/perl5/bin/cpanm ]           && eval $(sed 's/use App::cpanminus::script/use local::lib/' ~/perl5/bin/cpanm | perl -)
 [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
