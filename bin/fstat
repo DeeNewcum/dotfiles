@@ -27,6 +27,7 @@
 
     use List::Util qw[max];
     use Data::Dumper;
+    eval "require File::Stat::Bits";        # an optional library
 
 @ARGV or die "Please specify a filename.\n";
 
@@ -84,9 +85,9 @@ foreach my $file (@ARGV) {
     $s{dev} .= "   (" . ($devnums{$s{dev}} || '?') . ")";
 
     if ($s{rdev}) {
-        # figure out the major + minor numbers for this block or character device
-        # we REALLY should use File::Stat::Bits for this, it would be FAR more portable
-
+        # There's no way we can hard-code how to calculate the major/minor numbers.
+        # It varies greatly by OS:
+        #
         # "Early systems stored the device number in a 16-bit integer, with 8 bits for the major
         #  number and 8 bits for the minor number. FreeBSD 5.2.1 and Mac OS X 10.3 use a 32-bit
         #  integer, with 8 bits for the major number and 24 bits for the minor number. On 32-bit
@@ -94,7 +95,10 @@ foreach my $file (@ARGV) {
         #  number and 18 bits designated as the minor number. On 64-bit systems, Solaris 9 represents
         #  dev_t as a 64-bit integer, with 32 bits for each number. On Linux 2.4.22, although dev_t
         #  is a 64-bit integer, currently the major and minor numbers are each only 8 bits."
-        $s{rdev} .= sprintf "   (%d, %d)",  $s{rdev} >> 8, $s{rdev} & 255;
+        if (exists $INC{'File/Stat/Bits.pm'}) {
+            $s{rdev} .= sprintf "   (%d, %d)",
+                            File::Stat::Bits::dev_split($s{rdev});
+        }
     } else {
         delete $s{rdev};
     }
