@@ -74,6 +74,6 @@ fi
 # apply PerlBrew and local::lib settings, if available
 [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
 [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
-    # apply the environment variables that local::lib::print_environment_vars_for specifies
+    # apply local::lib bash variables   (using the copy of local::lib that's fatpacked inside cpanm)
 [ "$(type -P cpanm)" ]             && eval $(sed 's/use App::cpanminus::script/use local::lib/' $(type -P cpanm) | perl -)
 [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
