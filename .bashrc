@@ -77,3 +77,15 @@ fi
     # apply local::lib bash variables   (using the copy of local::lib that's fatpacked inside cpanm)
 [ "$(type -P cpanm)" ]             && eval $(sed 's/use App::cpanminus::script/use local::lib/' $(type -P cpanm) | perl -)
 [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
+
+
+# you don't want to use local::lib while in PerlBrew
+function local_lib_disable {
+    unset PERL_LOCAL_LIB_ROOT
+    unset PERL_MB_OPT
+    unset PERL_MM_OPT
+    unset PERL5LIB
+}
+function local_lib_enable {
+    eval $(sed 's/use App::cpanminus::script/use local::lib/' $(type -P cpanm) | perl -)
+}
