@@ -65,3 +65,6 @@ fi
 alias google='w3m google.com'
 
 
+if [ -z "$(type _feh 2>/dev/null)" ]; then
+    function _feh { feh --recursive --full-screen --auto-zoom --draw-filename ${1:-.} 2>/dev/null & }
+fi
