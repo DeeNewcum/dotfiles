@@ -1,6 +1,6 @@
 #!/bin/bash
 
-    # vim: set number:
+    # vim: set number tw=0:
 
 # Prerequisites on Debian:
 #       sudo apt-get install ncurses-dev xorg-dev libgtk2.0-dev
@@ -10,20 +10,26 @@ set -x
 
 SKIPTO=${1:-0}      # allow for primitive 'make'-like functionality, by allowing the user to specify a line to skip ahead to
 
+export VER_FULL=7.3
+VER_SHORT=73
 
-                                mkdir -p ~/apps/bin
-                                cd ~/apps
-[ $SKIPTO -le $LINENO ] &&      wget -N http://ftp.vim.org/pub/vim/unix/vim-7.3.tar.bz2
-[ $SKIPTO -le $LINENO ] &&      tar -xvjf vim-7.3.tar.bz2
 
-                                cd ~/apps/vim73/src
+                                mkdir -p ~/apps/build
+                                cd ~/apps/build
+[ $SKIPTO -le $LINENO ] &&      [ -f vim-$VER_FULL.tar.bz2 ] || wget -N http://ftp.vim.org/pub/vim/unix/vim-$VER_FULL.tar.bz2
+[ $SKIPTO -le $LINENO ] &&      tar -xvjf vim-$VER_FULL.tar.bz2
 
-[ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#prefix =.*|prefix = $ENV{HOME}/apps|' Makefile
+                                cd ~/apps/build/vim$VER_SHORT/src
+
+[ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#prefix =.*|prefix = $ENV{HOME}/apps/stow/vim-$ENV{VER_FULL}|' Makefile
 [ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#(?=CONF_OPT_MULTIBYTE)||' Makefile
+
 [ $SKIPTO -le $LINENO ] &&      make
 [ $SKIPTO -le $LINENO ] &&      make install
                                 cd ~/apps/bin
 [ $SKIPTO -le $LINENO ] &&      ln -s vim vi
 
-                                cd ~/apps/
-[ $SKIPTO -le $LINENO ] &&      rm vim-7.3.tar.bz2
+                                cd ~/apps/build
+[ $SKIPTO -le $LINENO ] &&      rm vim-$VER_FULL.tar.bz2
+
+                                stow vim-$VER_FULL

@@ -70,12 +70,16 @@ if [ $USER = "root" ]; then
 fi
 
 
+mkdir -p ~/apps/stow/
+mkdir -p ~/apps/build/
+[ -d ~/apps/stow ]                 && export STOW_DIR=~/apps/stow
+
 
 # apply PerlBrew and local::lib settings, if available
 [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
 [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
     # apply local::lib bash variables   (using the copy of local::lib that's fatpacked inside cpanm)
-[ "$(type -P cpanm)" ]             && eval $(sed 's/use App::cpanminus::script/use local::lib/' $(type -P cpanm) | perl -)
+[ -f ~/perl5/lib/perl5/local/lib.pm ] && eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
 
 
@@ -87,5 +91,5 @@ function local_lib_disable {
     unset PERL5LIB
 }
 function local_lib_enable {
-    eval $(sed 's/use App::cpanminus::script/use local::lib/' $(type -P cpanm) | perl -)
+    eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 }
