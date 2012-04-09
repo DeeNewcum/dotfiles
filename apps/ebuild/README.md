@@ -1,6 +1,7 @@
 These are similar to, but not literally the same as:
 
 * [Brew Formulas](https://github.com/mxcl/homebrew/wiki/Formula-Cookbook) ([examples](https://github.com/mxcl/homebrew/tree/master/Library/Formula/))
+* [Zero Install](http://0install.net/) ([examples](http://roscidus.com/0mirror/))
 * [ebuild](http://en.wikipedia.org/wiki/Ebuild) ([examples](http://gentoo-portage.com/Newest))
 * [PKGBUILD](http://en.wikipedia.org/wiki/Arch_Linux#Arch_User_Repository) ([examples](http://aur.archlinux.org/packages.php) — click on the " :: PKGBUILD" link)
 
