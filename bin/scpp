@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # This is a helper script for copying a file from one computer to another.
 #

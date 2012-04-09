@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # Solaris's tail doesn't have the -s option, so you can't do the uber-useful `tail -fs0`.
 # This duplicates that functionality.

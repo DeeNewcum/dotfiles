@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # Does the same thing as 'xxd -r', but tries to do some extra text-massaging to
 # allow it to ingest hex dumps from other tools as well.

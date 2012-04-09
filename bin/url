@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # Pass this a filename/directory, and this will return the equivalent URL for that file.
 #

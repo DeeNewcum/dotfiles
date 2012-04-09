@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # do a hex-dump, similar to "xxd", for machines that don't/can't install it
 
