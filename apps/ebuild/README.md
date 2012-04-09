@@ -1,8 +1,8 @@
 These are similar to, but not literally the same as:
 
-* [Brew Formulas](https://github.com/mxcl/homebrew/wiki/Formula-Cookbook) ([lots of examples](https://github.com/mxcl/homebrew/tree/master/Library/Formula/))
-* [ebuild](http://en.wikipedia.org/wiki/Ebuild)
-* [PKGBUILD](http://en.wikipedia.org/wiki/Arch_Linux#Arch_User_Repository)
+* [Brew Formulas](https://github.com/mxcl/homebrew/wiki/Formula-Cookbook) ([examples](https://github.com/mxcl/homebrew/tree/master/Library/Formula/))
+* [ebuild](http://en.wikipedia.org/wiki/Ebuild) ([examples](http://gentoo-portage.com/Newest))
+* [PKGBUILD](http://en.wikipedia.org/wiki/Arch_Linux#Arch_User_Repository) ([examples](http://aur.archlinux.org/packages.php) — click on the " :: PKGBUILD" link)
 
 These scripts will download and compile various things from source for me, and configure them the way I want.
 
