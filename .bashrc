@@ -70,9 +70,11 @@ if [ $USER = "root" ]; then
 fi
 
 
+alias rel2abs='perl -MCwd -e "print Cwd::abs_path shift"'
+
 mkdir -p ~/apps/stow/
 mkdir -p ~/apps/build/
-[ -d ~/apps/stow ]                 && export STOW_DIR=~/apps/stow
+[ -d ~/apps/stow ]                 && export STOW_DIR=$(rel2abs $HOME/apps/stow)
 
 
 # apply PerlBrew and local::lib settings, if available
