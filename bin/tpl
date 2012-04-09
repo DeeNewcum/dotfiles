@@ -19,7 +19,7 @@
 sub TEMP_DIR {"$ENV{HOME}/tmp/pl/"}
 
 #$ENV{EDITOR} = "vi" unless $ENV{EDITOR};
-$ENV{EDITOR} = q{vim -X +999 -c startinsert};
+$ENV{EDITOR} = q{vim +999 -c startinsert};
 
 
 use File::Temp;
