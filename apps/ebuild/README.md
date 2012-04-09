@@ -1,9 +1,11 @@
-Okay, these aren't literally ebuild/PKGBUILD/etc scripts, but they're something in the same vein.
+These are similar to, but not literally the same as:
 
-These scripts will download and compile various things from source for me, and configure them the
-way I want.
+* [Brew Formulas](https://github.com/mxcl/homebrew/wiki/Formula-Cookbook) ([lots of examples](https://github.com/mxcl/homebrew/tree/master/Library/Formula/))
+* [ebuild](http://en.wikipedia.org/wiki/Ebuild)
+* [PKGBUILD](http://en.wikipedia.org/wiki/Arch_Linux#Arch_User_Repository)
 
-They ultimately dump the binaries in ~/apps/bin/.
+These scripts will download and compile various things from source for me, and configure them the way I want.
 
-These scripts may eventually become more like proper ebuild/pkgbuild scripts, but for now, they're
-hard-coded.
+They ultimately dump the binaries in ~/apps/stow/.
+
+These scripts may eventually become more like proper ebuild/pkgbuild scripts, but for now, they're fairly immature and hard-coded.
