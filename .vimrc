@@ -116,6 +116,10 @@ nnoremap <leader>L :call clearmatches()<cr>
 " make tabs visible
 set list listchars=tab:› 
 
+" toggle between spaces and tabs  (to do a manual form of "smart tabs")
+nnoremap <C-t> :set et!<cr>
+vnoremap <C-t> :set et!<cr>
+
 " ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================
 
