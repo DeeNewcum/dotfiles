@@ -113,6 +113,8 @@ nnoremap <leader>S ^vg_y:execute @@<CR>
 nnoremap <leader>l :call matchadd('Visual', @/)<cr>
 nnoremap <leader>L :call clearmatches()<cr>
 
+" make tabs visible
+set list listchars=tab:› 
 
 " ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================
