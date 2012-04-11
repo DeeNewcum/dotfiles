@@ -113,6 +113,13 @@ nnoremap <leader>S ^vg_y:execute @@<CR>
 nnoremap <leader>l :call matchadd('Visual', @/)<cr>
 nnoremap <leader>L :call clearmatches()<cr>
 
+" ========================= ^^^^^^^^^^^^^^^^^^^ ===================
+" ========================= http://vimbits.com/ ===================
+
+
+
+" Use 'smart tabs'  -- tabs for indenting, spaces for aligning
+
 " make tabs visible
 set list listchars=tab:› 
 
@@ -120,8 +127,8 @@ set list listchars=tab:› 
 nnoremap <C-t> :set et!<cr>
 vnoremap <C-t> :set et!<cr>
 
-" ========================= ^^^^^^^^^^^^^^^^^^^ ===================
-" ========================= http://vimbits.com/ ===================
+" hilight tabs that are used for alignment -- we only want to use them for indenting
+match ErrorMsg /\(	\|^\)\@<!	\+/
 
 
 
