@@ -15,14 +15,14 @@ VER_SHORT=73
 
 
                                 mkdir -p ~/apps/build
+                                mkdir -p ~/apps/stow
                                 cd ~/apps/build
 [ $SKIPTO -le $LINENO ] &&      [ -f vim-$VER_FULL.tar.bz2 ] || wget -N http://ftp.vim.org/pub/vim/unix/vim-$VER_FULL.tar.bz2
 [ $SKIPTO -le $LINENO ] &&      tar -xvjf vim-$VER_FULL.tar.bz2
 
                                 cd ~/apps/build/vim$VER_SHORT/src
 
-[ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#prefix =.*|prefix = $ENV{HOME}/apps/stow/vim-$ENV{VER_FULL}|' Makefile
-[ $SKIPTO -le $LINENO ] &&      perl -i -ple 's|^#(?=CONF_OPT_MULTIBYTE)||' Makefile
+[ $SKIPTO -le $LINENO ] &&      ./configure --prefix="$HOME/apps/stow/vim-$VER_FULL" --enable-multibyte --with-features=huge
 
 [ $SKIPTO -le $LINENO ] &&      make
 [ $SKIPTO -le $LINENO ] &&      make install
