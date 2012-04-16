@@ -4,6 +4,7 @@ These are similar to, but not literally the same as:
 * [Zero Install](http://0install.net/) ([examples](http://roscidus.com/0mirror/))
 * [ebuild](http://en.wikipedia.org/wiki/Ebuild) ([examples](http://gentoo-portage.com/Newest))
 * [PKGBUILD](http://en.wikipedia.org/wiki/Arch_Linux#Arch_User_Repository) ([examples](http://aur.archlinux.org/packages.php) — click on the " :: PKGBUILD" link)
+* [SlackBuild scripts](http://www.slackwiki.com/SlackBuild_Scripts) ([examples](http://www.slackbuilds.org/repository/13.37/development/) — see "individual files")
 
 These scripts will download and compile various things from source for me, and configure them the way I want.
 
