@@ -26,7 +26,8 @@ function perltidy { command perltidy --profile=$STDIN_OWNERS_HOME/.perltidyrc "$
 #### pull in specific ~/.bashrc settings we really need ####
 ############################################################
 
-PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+XTERM_TITLE='\[\033]0;\u@\h:\w\007\]'
+PS1=$XTERM_TITLE'\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 [ -d $STDIN_OWNERS_HOME/bin ] && export PATH=$PATH:$STDIN_OWNERS_HOME/bin
 
