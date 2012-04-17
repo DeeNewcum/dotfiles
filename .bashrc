@@ -18,6 +18,11 @@
 [ -z "$XAUTHORITY" -a -n "$DISPLAY" -a -e "$HOME/.Xauthority" ] && export XAUTHORITY="$HOME/.Xauthority"
 
 
+# Note: As suggested by
+#           http://tldp.org/HOWTO/Bash-Prompt-HOWTO/xterm-title-bar-manipulations.html
+#       we should only update the Xterm title when we're SURE that the end-user's terminal
+#       supports this feature.  Currently, all of mine do, and also my $TERM is an unreliable way to 
+#       check if the end-user's terminal does.  So, for now, I'm always sending this.
 XTERM_TITLE='\[\033]0;\h\007\]'
 PS1=$XTERM_TITLE'\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
