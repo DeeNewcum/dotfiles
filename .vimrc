@@ -49,6 +49,8 @@ else
     endif
 endif
 
+set notitle     " don't change the xterm title -- the one set by ~/.bashrc is the one I prefer
+
 
 
 " don't wrap lines in HTML files
