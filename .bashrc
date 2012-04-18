@@ -101,3 +101,13 @@ function local_lib_disable {
 function local_lib_enable {
     eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 }
+
+
+
+# workaround for menu not appearing:
+#   https://bugs.launchpad.net/ubuntu/+source/vim/+bug/771810
+#   https://bugs.launchpad.net/ubuntu/+source/vim/+bug/776499
+function gvim {
+    command gvim -f "$@" >/dev/null 2>/dev/null &
+    disown
+}
