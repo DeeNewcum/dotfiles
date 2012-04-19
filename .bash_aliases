@@ -47,7 +47,7 @@ function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "
 
 
 # Do ANSI-coloring of text, based on arbitrary regexps.
-# see documentation:  https://github.com/DeeNewcum/individual_scripts/blob/master/hil.md
+# see documentation:  https://github.com/DeeNewcum/individual_scripts/blob/master/hil.README.md
 function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=grep{$j++%2}@ARGV;@ARGV=()}s/$p/for($i=0;$i<@c&&!defined$-[$i+1];$i++){}"\e[$c[$i]m$+\e[0m"/gome' "$@"; }
 
 
