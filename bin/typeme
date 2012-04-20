@@ -4,7 +4,7 @@
 
 
 # Put '#!/usr/bin/env typeme' at the top of a text file (via the she-bang method), and chmod +x the
-# text file.  Then, when you run that file, it will inject itself to the keyboard.
+# text file.  Then, when you run that file, it will inject the text contents of the file to the keyboard.
 #
 # Now, you can run that file directly, in response to pressing some shortcut key.
 
