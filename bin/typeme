@@ -1,10 +1,13 @@
 #!/usr/bin/perl
 
-# Put this at the top of a text file (via the she-bang method), and chmod +x the text file.  Then,
-# when you run it, the file will inject itself to the keyboard.
+# This is a wrapper script for `xdotool type` -- for injecting text into the keyboard buffer.
+
+
+# Put '#!/usr/bin/env typeme' at the top of a text file (via the she-bang method), and chmod +x the
+# text file.  Then, when you run that file, it will inject itself to the keyboard.
 #
-# Now, you can run that file directly, in response to pressing some shortcut key, and it will use
-# xdotool to type in the contents of that text file.
+# Now, you can run that file directly, in response to pressing some shortcut key.
+
 
     use strict;
     use warnings;
