@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+# Put this at the top of a text file (via the she-bang method), and chmod +x the text file.  Then,
+# when you run it, the file will inject itself to the keyboard.
+#
+# Now, you can run that file directly, in response to pressing some shortcut key, and it will use
+# xdotool to type in the contents of that text file.
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+
+my $string = do {local $/=undef; <>};
+
+# skip the she-bang, if present
+$string =~ s/^#![^\x0d\x0a]*(?:\x0d\x0a|\x0d|\x0a)//s;
+
+# parse out <<pause ...>> tags
+my @tokens = split /(<<pause[^>]*>>)/, $string;
+foreach my $token (@tokens) {
+    if ($token =~ /^<<pause(?:\s+([^>]*))?>>$/) {
+        cmd_pause($1);
+    } else {
+        system qw[xdotool type --delay 1], $token;
+    }
+}
+
+
+# Pauses for a number of seconds, which can be fractional.
+# Defaults to 2.0, if no argument is given.
+sub cmd_pause {
+    my ($length) = @_;
+    $length = 2.0      unless defined($length);
+    select(undef, undef, undef, $length);
+}
