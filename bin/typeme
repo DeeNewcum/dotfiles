@@ -27,7 +27,7 @@ foreach my $token (@tokens) {
     if ($token =~ /^<<pause(?:\s+([^>]*))?>>$/) {
         cmd_pause($1);
     } else {
-        system qw[xdotool type --delay 1], $token;
+        system qw[xdotool type --delay 0], $token;
     }
 }
 
