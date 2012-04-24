@@ -9,7 +9,7 @@
     diff =
 
 [user]
-	name = Dee Newcum
+    name = Dee Newcum
     # email must be filled in -- it's not checked in to the centralized repo
 
 [github]
@@ -18,11 +18,7 @@
 
 [core]
     # see: https://github.com/github/gitignore/tree/master/Global
-	excludesfile = $HOME/.gitignore
-
-[format]
-    pretty = short
-
+    excludesfile = $HOME/.gitignore
 
 [alias]
     # credit: http://www.jukie.net/bart/blog/pimping-out-git-log
