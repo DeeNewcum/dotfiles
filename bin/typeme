@@ -8,6 +8,12 @@
 #
 # Now, set your window manager's hotkey system to run ~/.paste1 in response to Ctrl+F1,
 # run ~/.paste2 in response to Ctrl+F2, etc.
+# 
+#
+# The reason for a semi-complicated script, compared to something like:
+#       xdotool type "$(cat ~/.paste1)"
+# is that simpler alternatives strip newlines from the file.  This script leaves everything intact,
+# giving the user the final decision about including newlines.
 
 
     use strict;
