@@ -1,12 +1,13 @@
 #!/usr/bin/perl
 
-# This is a wrapper script for `xdotool type` -- for injecting text into the keyboard buffer.
-
-
-# Put '#!/usr/bin/env typeme' at the top of a text file (via the she-bang method), and chmod +x the
-# text file.  Then, when you run that file, it will inject the text contents of the file to the keyboard.
+# This is a wrapper script for `xdotool type'.  It injects text into the keyboard buffer.
 #
-# Now, you can run that file directly, in response to pressing some shortcut key.
+#
+# Put '#!/usr/bin/env typeme' at the top of a text file and chmod +x it.  Then, when you run that
+# file, it will inject the text contents of the file to the keyboard.
+#
+# Now, set your window manager's hotkey system to run ~/.paste1 in response to Ctrl+F1,
+# run ~/.paste2 in response to Ctrl+F2, etc.
 
 
     use strict;
