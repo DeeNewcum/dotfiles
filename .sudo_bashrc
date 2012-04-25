@@ -20,6 +20,11 @@ export ACKRC=$STDIN_OWNERS_HOME/.ackrc
 
 function perltidy { command perltidy --profile=$STDIN_OWNERS_HOME/.perltidyrc "$@"; }
 
+# Use the correct ~/.gitconfig.
+# May have serious side-effects:  https://github.com/DeeNewcum/dotfiles/issues/1
+git() {
+    HOME=$STDIN_OWNERS_HOME command git "$@"
+}
 
 
 ############################################################
