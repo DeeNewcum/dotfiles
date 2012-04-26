@@ -1,20 +1,86 @@
-<!--
-   -  This is a file that gets stored locally on all of my machines.
-   -
-   -  Because it's stored locally, it can be loaded very quickly.
-   -
-   -  Whenever you do a search in a browser, the search gets redirected here, and it
-   -  makes some decisions about where to send your search to.
-   -
-   -
-   -  Load this file by itself to see the full help text.
- -->
+<script>
+/*
+ *  This is a file that gets stored locally on all of my machines.
+ *
+ *  Because it's stored locally, it can be loaded very quickly.
+ *
+ *  Whenever you do a search in a browser, the search gets redirected here, and
+ *  the Javascript code makes some decisions about where to send your search
+ *  to.
+ *
+ *  Load this file by itself to see the full help text.
+ *
+ */
 
 
-<!--
-    TODO:
-        - add instructions for setting this up on Chrome
--->
+/* TODO:
+ *      - add instructions for setting this up on Chrome
+ */
+
+var commands = {
+    google   : "https://www.google.com/search?q=%s&ie=utf-8&oe=utf-8",
+    perl     : "http://perldoc.perl.org/search.html?q=%s",
+    perlfunc : "http://perldoc.perl.org/functions/%s.html",
+    cpan     : "https://metacpan.org/search?q=%s",
+    man      : "http://man.cx/%s",
+    js       : "https://www.google.com/search?q=site%3Adeveloper.mozilla.org+%s&ie=utf-8&oe=utf-8",
+    testing  : function() {     // an example of how (typeof(cmd) == "function") works
+        return "http://reddit.com";
+    },
+};
+
+
+function main() {
+    if (window.location.search.match(/^\??$/)) {
+        // if the page is loaded directly, display the help text in <script language="ignore"> below
+        show_help_text();
+    } else {
+        parse_search();
+    }
+}
+
+
+function show_help_text() {
+    document.write( document.getElementById("really_html").innerHTML );
+}
+
+
+function parse_search() {
+    var search = decodeURIComponent(
+                    window.location.search
+                        .replace(/^\?/, "")
+                        .replace(/\+/g, "%20"));
+    var cmd = search.match(/^(\S+)/)[0];
+    search = search.replace(/^\S+\s+/, "");
+    do_search(cmd, search);
+}
+
+
+function do_search(cmd, args) {
+    //alert(cmd + "\n" + args);
+    if (!commands[cmd]) {
+        //alert("unknown command: " + cmd);
+        //show_help_text();
+        //return;
+
+        // fallback to just googling the whole thing
+        args = cmd + " " + args;
+        cmd = "google";
+    }
+    var redirectto = commands[cmd];
+    if (typeof(redirectto) == "string") {
+        redirectto = redirectto.replace(/%s/, encodeURI(args));
+    } else if (typeof(redirectto) == "function") {
+        redirectto = redirectto(args);
+    } else {
+        alert("oops");
+        return;
+    }
+    window.location = redirectto;
+}
+
+
+</script>
 
 
 
@@ -86,73 +152,6 @@ This allows you to replace the default search engine in Firefox + Chrome with on
 
 
 
-
 <script>
-
-var commands = {
-    google   : "https://www.google.com/search?q=%s&ie=utf-8&oe=utf-8",
-    perl     : "http://perldoc.perl.org/search.html?q=%s",
-    perlfunc : "http://perldoc.perl.org/functions/%s.html",
-    cpan     : "https://metacpan.org/search?q=%s",
-    man      : "http://man.cx/%s",
-    js       : "https://www.google.com/search?q=site%3Adeveloper.mozilla.org+%s&ie=utf-8&oe=utf-8",
-    testing  : function() {     // an example of how (typeof(cmd) == "function") works
-        return "http://reddit.com";
-    },
-};
-
-
-
-if (window.location.search.match(/^\??$/)) {
-    // if the page is loaded directly, display the help text in <script language="ignore"> below
-    show_help_text();
-} else {
-    parse_search();
-}
-
-
-function show_help_text() {
-    document.write( document.getElementById("really_html").innerHTML );
-}
-
-
-function parse_search() {
-    var search = decodeURIComponent(
-                    window.location.search
-                        .replace(/^\?/, "")
-                        .replace(/\+/g, "%20"));
-    var cmd = search.match(/^(\S+)/)[0];
-    search = search.replace(/^\S+\s+/, "");
-    do_search(cmd, search);
-}
-
-
-function do_search(cmd, args) {
-    //alert(cmd + "\n" + args);
-    if (!commands[cmd]) {
-        //alert("unknown command: " + cmd);
-        //show_help_text();
-        //return;
-
-        // fallback to just googling the whole thing
-        args = cmd + " " + args;
-        cmd = "google";
-    }
-    var redirectto = commands[cmd];
-    if (typeof(redirectto) == "string") {
-        redirectto = redirectto.replace(/%s/, encodeURI(args));
-    } else if (typeof(redirectto) == "function") {
-        redirectto = redirectto(args);
-    } else {
-        alert("oops");
-        return;
-    }
-    window.location = redirectto;
-}
-
-
+main();
 </script>
-
-
-
-
