@@ -1,5 +1,39 @@
+
+# http://en.wikipedia.org/wiki/Editor_war
+set editing-mode vi
+
+# for some reason, Bash only allows ctrl+l in emacs mode...  restore in vi mode
 C-L: clear-screen
 
 # Extraneous noises/beeps really bother me.
 #     http://paperlined.org/apps/unix/stop_beeping.html
 set bell-style none
+
+
+
+################################[ tab completion ]###################################
+
+# Be more intelligent when autocompleting by also looking at the text after
+# the cursor. For example, when the current line is "cd ~/src/mozil", and
+# the cursor is on the "z", pressing Tab will not autocomplete it to "cd
+# ~/src/mozillail", but to "cd ~/src/mozilla". (This is supported by the
+# Readline used by Bash 4.)
+set skip-completed-text on
+
+# immediately add a trailing slash when autocompleting symlinks to directories
+set mark-symlinked-directories on
+
+
+#######################[ showing all possible completions ]###################################
+
+# require only a single-tab key instead of tab+tab to produce a list of all possible completions when:
+#       - when a partial completion is possible, or
+#       - when no completion is possible
+set show-all-if-ambiguous on
+
+# show file types when listing file matches, like 'ls -F' does
+set visible-stats on
+
+# don’t prompt unless there are over 500 possible completions
+set completion-query-items 500
+
