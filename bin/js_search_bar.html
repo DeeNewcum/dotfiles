@@ -84,7 +84,11 @@ function do_search(cmd, args) {
     }
     var redirectto = commands[cmd];
     if (typeof(redirectto) == "string") {
-        redirectto = redirectto.replace(/%s/, encodeURI(args));
+        redirectto = redirectto.replace(/%s/, encodeURIComponent(args));
+            // reasons why this should be "encodeURIComponent":
+            //      - so the plus-symbol in  [g 2+3=] gets sent to Google
+            // reasons why this should be "encodeURI":
+            //      - ...
     } else if (typeof(redirectto) == "function") {
         redirectto = redirectto(args);
     } else {
@@ -94,7 +98,7 @@ function do_search(cmd, args) {
     if (lucky_upgrade && redirectto.match(/^https?:\/\/([^\/]*\.)google\.com\//)) {
         redirectto = redirectto + "&btnI=1";
     }
-    //alert("redirecting to\n" + redirectto); return;
+    //alert("redirecting to\n" + redirectto); // return;
     window.location = redirectto;
 }
 
