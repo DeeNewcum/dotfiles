@@ -23,14 +23,23 @@
 var commands = {
     google   : google(""),
     g        : google(""),
+    wiki     : google("site:en.wikipedia.org"),
+
+    // development
     perl     : "http://perldoc.perl.org/search.html?q=%s",
     perlfunc : "http://perldoc.perl.org/functions/%s.html",
     cpan     : "https://metacpan.org/search?q=%s",
-    man      : "http://man.cx/%s",
     js       : google("site:developer.mozilla.org"),
     git      : google("site:schacon.github.com/git/"),
+
+    // sysadmin
+    man      : "http://man.cx/%s",
+    ubuntu   : google("site:packages.ubuntu.com"),
+    deb      : google("site:packages.debian.org"),
+
     "case"   : "http://gtss-support.corp.mot.com/cases/tcsg2html.pl?%s",
     mot      : "http://motds.mot-solutions.com/default.asp?numParms=1&hasSubmitted=1&selSort=5&selAttrib1=multiple&selLogic1=contains&txtValue1=%s",
+
     testing  : function() {     // an example of how (typeof(cmd) == "function") works
         return "http://reddit.com";
     },
