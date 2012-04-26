@@ -21,7 +21,8 @@
 // NOTE: if you append "+" to a command that's a Google query, it upgrades it to "I'm feeling lucky"
 //              (eg. "git" is a normal Google search, while "git+" is the lucky version)
 var commands = {
-    google   : google(),
+    google   : google(""),
+    g        : google(""),
     perl     : "http://perldoc.perl.org/search.html?q=%s",
     perlfunc : "http://perldoc.perl.org/functions/%s.html",
     cpan     : "https://metacpan.org/search?q=%s",
