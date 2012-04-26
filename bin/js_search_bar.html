@@ -17,13 +17,19 @@
  *      - add instructions for setting this up on Chrome
  */
 
+
+// NOTE: if you append "+" to a command that's a Google query, it upgrades it to "I'm feeling lucky"
+//              (eg. "git" is a normal Google search, while "git+" is the lucky version)
 var commands = {
-    google   : "https://www.google.com/search?q=%s&ie=utf-8&oe=utf-8",
+    google   : google(),
     perl     : "http://perldoc.perl.org/search.html?q=%s",
     perlfunc : "http://perldoc.perl.org/functions/%s.html",
     cpan     : "https://metacpan.org/search?q=%s",
     man      : "http://man.cx/%s",
-    js       : "https://www.google.com/search?q=site%3Adeveloper.mozilla.org+%s&ie=utf-8&oe=utf-8",
+    js       : google("site:developer.mozilla.org"),
+    git      : google("site:schacon.github.com/git/"),
+    "case"   : "http://gtss-support.corp.mot.com/cases/tcsg2html.pl?%s",
+    mot      : "http://motds.mot-solutions.com/default.asp?numParms=1&hasSubmitted=1&selSort=5&selAttrib1=multiple&selLogic1=contains&txtValue1=%s",
     testing  : function() {     // an example of how (typeof(cmd) == "function") works
         return "http://reddit.com";
     },
@@ -58,14 +64,22 @@ function parse_search() {
 
 function do_search(cmd, args) {
     //alert(cmd + "\n" + args);
+    var lucky_upgrade = false;
     if (!commands[cmd]) {
-        //alert("unknown command: " + cmd);
-        //show_help_text();
-        //return;
+        // check if this is a Feeling Lucky upgrade
+        var cmd_unlucky;
+        if ((cmd_unlucky = cmd.replace(/\+$/, "")) != cmd && commands[cmd_unlucky]) {
+            lucky_upgrade = true;
+            cmd = cmd_unlucky;
+        } else {
+            //alert("unknown command: " + cmd);
+            //show_help_text();
+            //return;
 
-        // fallback to just googling the whole thing
-        args = cmd + " " + args;
-        cmd = "google";
+            // fallback to just googling the whole thing
+            args = cmd + " " + args;
+            cmd = "google";
+        }
     }
     var redirectto = commands[cmd];
     if (typeof(redirectto) == "string") {
@@ -76,7 +90,20 @@ function do_search(cmd, args) {
         alert("oops");
         return;
     }
+    if (lucky_upgrade && redirectto.match(/^https?:\/\/([^\/]*\.)google\.com\//)) {
+        redirectto = redirectto + "&btnI=1";
+    }
+    //alert("redirecting to\n" + redirectto); return;
     window.location = redirectto;
+}
+
+
+function feeling_lucky(args) {
+    return google(args) + "&btnI=1";
+}
+
+function google(args) {
+    return "https://www.google.com/search?q=" + encodeURI(args) + "+%s&ie=utf-8&oe=utf-8";
 }
 
 
