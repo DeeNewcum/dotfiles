@@ -1,12 +1,13 @@
 <script>
 /*
+ *  Whenever you do a search in a browser, the search gets redirected here, and
+ *  the Javascript code makes some decisions about where to send your search
+ *  to.
+ *
  *  This is a file that gets stored locally on all of my machines.
  *
  *  Because it's stored locally, it can be loaded very quickly.
  *
- *  Whenever you do a search in a browser, the search gets redirected here, and
- *  the Javascript code makes some decisions about where to send your search
- *  to.
  *
  *  Load this file by itself to see the full help text.
  *
@@ -18,8 +19,10 @@
  */
 
 
+// Browser Keymarks.
+//
 // NOTE: if you append "+" to a command that's a Google query, it upgrades it to "I'm feeling lucky"
-//              (eg. "git" is a normal Google search, while "git+" is the lucky version)
+//              (eg. "git+" is the feeling-lucky version of "git")
 var commands = {
     google   : google(""),
     g        : google(""),
@@ -34,9 +37,17 @@ var commands = {
 
     // sysadmin
     man      : "http://man.cx/%s",
-    ubuntu   : google("site:packages.ubuntu.com"),
     deb      : google("site:packages.debian.org"),
 
+    // ubuntu
+    ubuntu   : google("site:ubuntu.com"),
+    u        : google("site:ubuntu.com"),
+    upkg     : google("site:packages.ubuntu.com"),
+    uhelp    : google("site:help.ubuntu.com"),
+    uman     : google("site:manpages.ubuntu.com"),
+    uforum   : google("site:ubuntuforums.org"),
+
+    // other
     "case"   : "http://gtss-support.corp.mot.com/cases/tcsg2html.pl?%s",
     mot      : "http://motds.mot-solutions.com/default.asp?numParms=1&hasSubmitted=1&selSort=5&selAttrib1=multiple&selLogic1=contains&txtValue1=%s",
 
