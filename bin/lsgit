@@ -41,7 +41,9 @@ while (my ($git_dir, $data) = each %repos) {
     $data->{latest_change} = 0;
     $data->{latest_change_human} = '';
     foreach my $l (split /\n\n/s, git(qw[rev-list --all --walk-reflogs --pretty=%ct%n%cr%n], $git_dir)) {
-        my ($revision, $datetime, $datetime_human) = split /\n/, $l;
+        my @F = split /\n/, $l;
+        splice @F, 0, scalar(@F) - 3;
+        my ($revision, $datetime, $datetime_human) = @F;
         push( @{$revisions{$revision}}, $git_dir);
         if ($datetime > $data->{latest_change}) {
             $data->{latest_change}       = $datetime;
