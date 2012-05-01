@@ -17,7 +17,7 @@
 my %repos;
 
 
-open my $pin, '-|',  'locate', '-ber', '^HEAD$'
+open my $pin, '-|',  'locate', '-r', '/HEAD$'
         or die $!;
 while (<$pin>) {
     chomp;
