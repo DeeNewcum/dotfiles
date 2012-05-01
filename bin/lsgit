@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+# list ALL Git repositories on the current machine, clumped by related repositories
+# 
+#   (note: requires GNU locate)
+
+    use strict;
+    use warnings;
+
+    use File::Basename;
+    use List::Util qw[max];
+
+    use Data::Dumper;
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+
+my %repos;
+
+
+open my $pin, '-|',  'locate', '-ber', '^HEAD$'
+        or die $!;
+while (<$pin>) {
+    chomp;
+    my $git_dir = File::Basename::dirname($_);
+
+    if (-d "$git_dir/refs/heads" && -f "$git_dir/HEAD" && -d "$git_dir/branches") {
+        $repos{$git_dir} = {};
+    }
+}
+
+my %revisions;
+while (my ($git_dir, $data) = each %repos) {
+
+    ## find the work tree, if any
+    if (git(qw[ config --get core.bare ], $git_dir) =~ /^false$/) {
+        ## this is a rough guesstimate
+        $data->{work_tree} = File::Basename::dirname($git_dir);
+    }
+
+    ## get the info that %related_to later needs
+    $data->{latest_change} = 0;
+    $data->{latest_change_human} = '';
+    foreach my $l (split /\n\n/s, git(qw[rev-list --all --walk-reflogs --pretty=%ct%n%cr%n], $git_dir)) {
+        my ($revision, $datetime, $datetime_human) = split /\n/, $l;
+        push( @{$revisions{$revision}}, $git_dir);
+        if ($datetime > $data->{latest_change}) {
+            $data->{latest_change}       = $datetime;
+            $data->{latest_change_human} = $datetime_human;
+        }
+    }
+}
+
+## for every repo, fill out %related_to
+foreach my $repos (values %revisions) {
+    next if (@$repos == 1);
+    for (my $ctr1=0; $ctr1<scalar(@$repos); $ctr1++) {
+        for (my $ctr2=0; $ctr2<scalar(@$repos); $ctr2++) {
+            next if ($ctr1 == $ctr2);
+            my ($repo1, $repo2) = ($repos->[$ctr1], $repos->[$ctr2]);
+            $repos{$repo1}{related_to}{$repo2} = 1;
+        }
+    }
+}
+
+## print the list, clustered by related-to
+my %output_seen;
+my $is_first = 1;
+foreach my $repo (sort repo_sort keys %repos) {
+    next if ($output_seen{$repo});
+    my @this_cluster = ($repo, keys(%{$repos{$repo}{related_to}}));
+    print "-"x80, "\n"      unless ($is_first);
+    foreach my $r (sort repo_sort @this_cluster) {
+        $output_seen{$r}++;
+        display_repo($r);
+    }
+    $is_first = 0;
+}
+
+
+
+sub display_repo {
+    my $git_dir = shift;
+    my %repo = %{$repos{$git_dir}};
+    my $name = $repo{work_tree} || $git_dir;
+    my $when = scalar(localtime($repo{latest_change}));
+    #print "$name/   $when\n";
+    print "$name/   $repo{latest_change_human}\n";
+}
+
+
+sub repo_sort {
+       $repos{$b}{latest_change} <=> $repos{$a}{latest_change}
+    or $a cmp $b
+}
+
+
+
+
+# runs a 'git' command, under the context of a specific repo....  the repo should be specified as
+# the last argument
+sub git {
+    my $repo_dir = pop;
+    $ENV{GIT_DIR} = $repo_dir;
+    readpipe_args("git", @_);
+}
+
+
+# like qx// or readpipe(), BUT it allows you to give explicitely delimited args, so you don't have to worry about escaping quotes
+# see also   IPC::System::Simple
+sub readpipe_args {my$p=open(my$f,'-|',@_)or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
