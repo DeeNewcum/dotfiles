@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 
-# list ALL Git repositories on the current machine, clumped by related repositories
+# List ALL Git repositories on the current machine, clumped by related repositories.
 # 
-#   (note: requires GNU locate)
+# This is essentially a wrapper around:
+#       locate -br '^HEAD$'
 
     use strict;
     use warnings;
 
     use File::Basename;
-    use List::Util qw[max];
 
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
@@ -78,7 +78,7 @@ foreach my $repos (values %revisions) {
 }
 
 
-## print the list, clustered by related-to
+## print the list, clustered by %related_to
 my %output_seen;
 my $is_first = 1;
 foreach my $repo (sort repo_sort keys %repos) {
@@ -98,7 +98,7 @@ sub display_repo {
     my $git_dir = shift;
     my %repo = %{$repos{$git_dir}};
     my $name = $repo{work_tree} || $git_dir;
-    my $when = scalar(localtime($repo{latest_change}));
+    #my $when = scalar(localtime($repo{latest_change}));
     print "$name/   $repo{latest_change_human}\n";
 }
 
