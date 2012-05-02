@@ -51,6 +51,9 @@ while (my ($git_dir, $data) = each %repos) {
         }
     }
 }
+#print Dumper \%repos; exit;
+#print Dumper \%revisions; exit;
+
 
 ## for every repo, fill out %related_to
 foreach my $repos (values %revisions) {
@@ -63,6 +66,7 @@ foreach my $repos (values %revisions) {
         }
     }
 }
+
 
 ## print the list, clustered by related-to
 my %output_seen;
@@ -102,11 +106,19 @@ sub repo_sort {
 # the last argument
 sub git {
     my $repo_dir = pop;
-    $ENV{GIT_DIR} = $repo_dir;
-    readpipe_args("git", @_);
+    #print "GIT_DIR=$repo_dir git ", join(" ", @_), "\n";
+    readpipe_ultimate( sub {
+            $ENV{GIT_DIR} = $repo_dir;
+            open STDERR, '>', '/dev/null';
+        }, 
+        "git", @_);
 }
 
 
 # like qx// or readpipe(), BUT it allows you to give explicitely delimited args, so you don't have to worry about escaping quotes
 # see also   IPC::System::Simple
 sub readpipe_args {my$p=open(my$f,'-|',@_)or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
+
+# lie qx// or readpipe(), BUT it allows complete control over what the child pid does between
+# forking and execing...  you pass it a subroutine that gets run just after forking
+sub readpipe_ultimate {my$s=shift;defined(my$p=open(my$f,'-|'))or die$!;if(!$p){&$s;exec@_ or die$!}my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
