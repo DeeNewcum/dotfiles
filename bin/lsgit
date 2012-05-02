@@ -13,7 +13,8 @@
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
-my ($is_view_all) = grep /^--all$/, @ARGV;
+my ($cmdline_view_all) = grep /^--all$/, @ARGV;     # display everything, despite lsgit.hide
+my ($cmdline_raw)      = grep /^--raw$/, @ARGV;     # don't cluster things, display only the directory list
 
 
 my %repos;
@@ -33,7 +34,7 @@ while (my ($git_dir, $data) = each %repos) {
     ## You can hide individual repos from lsgit, by doing this:
     ##      git config lsgit.hide true
     ## Note: using 'lsgit --all' makes us display everything, regardless of what lsgit.hide says.
-    if (!$is_view_all && git(qw[ config --get lsgit.hide ], $git_dir) =~ /^true$/) {
+    if (!$cmdline_view_all && git(qw[ config --get lsgit.hide ], $git_dir) =~ /^true$/) {
         delete $repos{$git_dir};
         next;
     }
@@ -57,14 +58,16 @@ while (my ($git_dir, $data) = each %repos) {
     ## fill out %revisions
     $data->{latest_change} = 0;
     $data->{latest_change_human} = '';
-    foreach my $l (split /\n\n/s, git(qw[rev-list --all --walk-reflogs --pretty=%ct%n%cr%n], $git_dir)) {
-        my @F = split /\n/, $l;
-        splice @F, 0, scalar(@F) - 3;
-        my ($revision, $datetime, $datetime_human) = @F;
-        push( @{$revisions{$revision}}, $git_dir);
-        if ($datetime > $data->{latest_change}) {
-            $data->{latest_change}       = $datetime;
-            $data->{latest_change_human} = $datetime_human;
+    if (!$cmdline_raw) {
+        foreach my $l (split /\n\n/s, git(qw[rev-list --all --walk-reflogs --pretty=%ct%n%cr%n], $git_dir)) {
+            my @F = split /\n/, $l;
+            splice @F, 0, scalar(@F) - 3;
+            my ($revision, $datetime, $datetime_human) = @F;
+            push( @{$revisions{$revision}}, $git_dir);
+            if ($datetime > $data->{latest_change}) {
+                $data->{latest_change}       = $datetime;
+                $data->{latest_change_human} = $datetime_human;
+            }
         }
     }
 }
@@ -83,20 +86,27 @@ foreach my $repos (values %revisions) {
         }
     }
 }
+#print Dumper \%repos; exit;
 
 
 ## print the list, clustered by %related_to
-my %output_seen;
-my $is_first = 1;
-foreach my $repo (sort repo_sort keys %repos) {
-    next if ($output_seen{$repo});
-    my @this_cluster = ($repo, keys(%{$repos{$repo}{related_to}}));
-    print "-"x80, "\n"      unless ($is_first);
-    foreach my $r (sort repo_sort @this_cluster) {
-        $output_seen{$r}++;
-        display_repo($r);
+if ($cmdline_raw) {
+    print join("\n", map {
+            $repos{$_}{work_tree} || $_
+        } sort repo_sort keys %repos), "\n";
+} else {
+    my %output_seen;
+    my $is_first = 1;
+    foreach my $repo (sort repo_sort keys %repos) {
+        next if ($output_seen{$repo});
+        my @this_cluster = ($repo, keys(%{$repos{$repo}{related_to}}));
+        print "-"x80, "\n"      unless ($is_first);
+        foreach my $r (sort repo_sort @this_cluster) {
+            $output_seen{$r}++;
+            display_repo($r);
+        }
+        $is_first = 0;
     }
-    $is_first = 0;
 }
 
 
