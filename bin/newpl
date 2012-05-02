@@ -63,6 +63,8 @@ __DATA__
 >>    BEGIN {require "\$ENV{HOME}/.cgiEnvVars.pm"}
 
 >>    use CGI;
+    use Const::Fast;
+
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
