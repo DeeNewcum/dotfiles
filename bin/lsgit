@@ -13,6 +13,7 @@
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
+my ($is_view_all) = grep /^--all$/, @ARGV;
 
 
 my %repos;
@@ -29,6 +30,13 @@ while (<$pin>) {
 
 my %revisions;      # data needed to create %related_to
 while (my ($git_dir, $data) = each %repos) {
+    ## You can hide individual repos from lsgit, by doing this:
+    ##      git config lsgit.hide true
+    ## Note: using 'lsgit --all' makes us display everything, regardless of what lsgit.hide says.
+    if (!$is_view_all && git(qw[ config --get lsgit.hide ], $git_dir) =~ /^true$/) {
+        delete $repos{$git_dir};
+        next;
+    }
 
     ## find the work tree, if any
     if (git(qw[ config --get core.bare ], $git_dir) =~ /^false$/) {
