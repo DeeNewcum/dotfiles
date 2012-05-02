@@ -8,7 +8,7 @@
 
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
 
-[ -d ~/bin/ ] && export PATH=$PATH:$HOME/bin
+[ -d ~/bin/ ] && export PATH=$HOME/bin:$PATH
 
 # custom-compiled apps that override the system ones
 [ -d ~/apps/bin/ ] && export PATH=~/apps/bin/:$PATH
