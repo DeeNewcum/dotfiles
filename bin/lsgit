@@ -36,6 +36,10 @@ while (my ($git_dir, $data) = each %repos) {
         if ($data->{work_tree} = git(qw[ config --get core.worktree ], $git_dir)) {
             $data->{work_tree} =~ s#[/\n\r]+$##s;
         } else {
+            ## there are other ways to specify the git-dir and work-tree...
+            ##      http://paperlined.org/apps/git/separate_working_tree.html
+            ## TODO: can we support any more of them?
+
             ## this is a rough guesstimate
             if ((my $w = $git_dir) =~ s#/\.git$##) {
                 $data->{work_tree} = $w;
