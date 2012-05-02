@@ -33,8 +33,12 @@ while (my ($git_dir, $data) = each %repos) {
 
     ## find the work tree, if any
     if (git(qw[ config --get core.bare ], $git_dir) =~ /^false$/) {
-        ## this is a rough guesstimate
-        $data->{work_tree} = File::Basename::dirname($git_dir);
+        if ($data->{work_tree} = git(qw[ config --get core.worktree ], $git_dir)) {
+            $data->{work_tree} =~ s#[/\n\r]+$##s;
+        } else {
+            ## this is a rough guesstimate
+            $data->{work_tree} = File::Basename::dirname($git_dir);
+        }
     }
 
     ## get the info that %related_to later needs
