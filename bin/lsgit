@@ -14,9 +14,8 @@
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
 
+
 my %repos;
-
-
 open my $pin, '-|',  'locate', '-r', '/HEAD$'
         or die $!;
 while (<$pin>) {
@@ -28,7 +27,7 @@ while (<$pin>) {
     }
 }
 
-my %revisions;
+my %revisions;      # data needed to create %related_to
 while (my ($git_dir, $data) = each %repos) {
 
     ## find the work tree, if any
@@ -47,7 +46,7 @@ while (my ($git_dir, $data) = each %repos) {
         }
     }
 
-    ## get the info that %related_to later needs
+    ## fill out %revisions
     $data->{latest_change} = 0;
     $data->{latest_change_human} = '';
     foreach my $l (split /\n\n/s, git(qw[rev-list --all --walk-reflogs --pretty=%ct%n%cr%n], $git_dir)) {
