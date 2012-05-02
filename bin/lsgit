@@ -37,7 +37,9 @@ while (my ($git_dir, $data) = each %repos) {
             $data->{work_tree} =~ s#[/\n\r]+$##s;
         } else {
             ## this is a rough guesstimate
-            $data->{work_tree} = File::Basename::dirname($git_dir);
+            if ((my $w = $git_dir) =~ s#/\.git$##) {
+                $data->{work_tree} = $w;
+            }
         }
     }
 
@@ -93,11 +95,12 @@ sub display_repo {
     my %repo = %{$repos{$git_dir}};
     my $name = $repo{work_tree} || $git_dir;
     my $when = scalar(localtime($repo{latest_change}));
-    #print "$name/   $when\n";
     print "$name/   $repo{latest_change_human}\n";
 }
 
 
+# Defines the sort order for displaying repositories, both within one cluster,
+# as well as how to order the clusters amongst each other.
 sub repo_sort {
        $repos{$b}{latest_change} <=> $repos{$a}{latest_change}
     or $a cmp $b
