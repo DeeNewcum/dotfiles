@@ -94,14 +94,6 @@ nnoremap + <C-a>| nnoremap - <C-x>
 nnoremap <C-e> 5<C-e> 
 nnoremap <C-y> 5<C-y>
 
-" keep search pattern at the center of the screen
-nnoremap <silent> n nzz
-nnoremap <silent> N Nzz
-nnoremap <silent> * *zz
-nnoremap <silent> # #zz
-nnoremap <silent> g* g*zz
-nnoremap <silent> g# g#zz
-
 " make F1 act as escape so you don't have to worry about it
 inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
