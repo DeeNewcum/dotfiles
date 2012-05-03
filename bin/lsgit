@@ -33,7 +33,12 @@ my %revisions;      # data needed to create %related_to
 while (my ($git_dir, $data) = each %repos) {
     ## You can hide individual repos from lsgit, by doing this:
     ##      git config lsgit.hide true
-    ## Note: using 'lsgit --all' makes us display everything, regardless of what lsgit.hide says.
+    ##
+    ## The most common use for this is to hide things that are maintiained by
+    ## other organizations, so lsgit by default only displays the in-house
+    ## repositories.
+    ##
+    ## 'lsgit --all' displays everything, ignoring any lsgit.hide settings.
     if (!$cmdline_view_all && git(qw[ config --get lsgit.hide ], $git_dir) =~ /^true$/) {
         delete $repos{$git_dir};
         next;
