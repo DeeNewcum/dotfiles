@@ -48,6 +48,7 @@ var commands = {
     testing  : function() {     // an example of how (typeof(cmd) == "function") works
         return "http://reddit.com";
     },
+    help : function() { return window.location.href.replace(/\?.*/, "") },
 };
 
 
