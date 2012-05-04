@@ -11,7 +11,8 @@ alias rehash='hash -r'
 
 function xargs_newline() { perl -e 'my@a=map{chomp;$_}<STDIN>;system@ARGV,splice(@a,0,200)while(@a)' "$@"; }
 if [ "`uname`" != "SunOS" ]; then
-    ## lgrep = less-grep, xgrep = xargs-grep
+    # lgrep = grep, and display the results in less   (where you use :n and :p to view all results)
+    # xgrep = pipe a list of filenames in, and it greps only those files
     function lgrep()  { grep -Zls  "$@" | xargs -0 less    -p "$1"; }
     function lgrepi() { grep -Zlsi "$@" | xargs -0 less -i -p "$1"; }
     function xgrep() { xargs -i grep "$@" /dev/null {} ; }              # Solaris version only, needed for its underpowered find/xargs/grep arguments
@@ -24,7 +25,8 @@ else
     # Try to make the fundamental Solaris tools a wee bit easier to use
     function find- { find2perl "$@" -print | perl; }
 
-    ## lgrep = less-grep, xgrep = xargs-grep
+    # lgrep = grep, and display the results in less   (where you use :n and :p to view all results)
+    # xgrep = pipe a list of filenames in, and it greps only those files
     function lgrep()  { grep -ls  "$@" | xargs_newline less    -p "$1"; }
     function lgrepi() { grep -lsi "$@" | xargs_newline less -i -p "$1"; }
     function xgrep()  { xargs_newline grep "$@" /dev/null; }              # Solaris version only, needed for its underpowered find/xargs/grep arguments
@@ -37,6 +39,11 @@ else
     function large_txtfiles() { /bin/find $PWD ! -local -prune -o -type f -print | perl -nle 'print if -T' | xargs_newline /bin/ls -l | filesize_sort | tail -100; }
 fi
 
+# Do an mboxgrep search, and display the results in mutt.
+# Arguments are EXACTLY the same as mboxgrep's arguments.
+function mmboxgrep() { local tmp=$(mktemp); mboxgrep "$@" > $tmp; mutt -f $tmp; rm -f $tmp; }
+
+# run 'which' on the specified program, and then vim or less it
 function vimwhich()  { vim  $(type -P $1); }
 function lesswhich() { less $(type -P $1); }
 
