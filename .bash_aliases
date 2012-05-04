@@ -50,7 +50,7 @@ function lesswhich() { less $(type -P $1); }
 
 # gnome-open, kde-open, etc
 function go() { xdg-open "$@"; }
-function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "scp", $ARGV[0], "."; system "xdg-open *"' "$@"; }
+#function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "scp", $ARGV[0], "."; system "xdg-open *"' "$@"; }
 
 
 # Do ANSI-coloring of text, based on arbitrary regexps.

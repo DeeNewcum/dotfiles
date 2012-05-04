@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+# combination of:  scp + xdg-open         (on my system, I always alias go=xdg-open)
+#
+# That is, it downloads a remote file, and then opens it on the local system.
+#
+# This is particularly useful if you have servers that produce OpenOffice files, or images, but
+# those servers don't have the software installed to be able to display them.
+
+    use strict;
+    use warnings;
+
+    use File::Basename;
+    use File::Temp;
+    use File::Path;
+    use File::Spec::Functions;
+    use Fcntl qw(:flock);
+
+    use Data::Dumper;
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+
+    use constant CLEANUP => 0;      # 0 means "don't cleanup files...  leave them sitting in /tmp"
+                                    # 1 means "try to cleanup files"     (note: this currently
+                                    #                   doesn't work well, and makes OpenOffice crash)
+    
+
+
+my @temp_dirs;
+my $cur_dir;
+
+
+my $scp_path = shift
+    or die "Specify a SCP path of a file to open.\n";
+
+
+## scp the file
+new_tempdir();
+system "scp", "-q", $scp_path, ".";
+    exit ($? >> 8)      if (($? >> 8) != 0);
+my $cur_file = catfile($cur_dir, File::Basename::basename($scp_path));
+exit unless -f ($cur_file);
+
+
+## uncompress the file, if needed
+my $final_file = unpack_if_possible($cur_file);
+    ### $final_file
+
+
+## open the file
+system "xdg-open", $final_file;
+
+open my $final_fh, '<', $final_file;
+
+
+if (&CLEANUP) {
+    ## wait around for 1 minute, to let the user interact with the file
+    #sleep(1 * 60);
+    sleep(10);
+
+        ### acquiring exclusive lock
+    flock($final_fh, LOCK_EX)   or die "Unable to exclusively lock $final_file: $!\n";
+        ### exclusive lock acquired
+}
+
+
+## cleanup
+END {
+    if (&CLEANUP) {
+        ### cleaning up
+        chdir '/';      # make sure CWD isn't inside one of the tempdirs
+        File::Path::remove_tree(@temp_dirs);
+    } else {
+        ### quitting without cleaning up
+    }
+}
+
+
+
+sub unpack_if_possible {
+    my $cur_file = shift;
+        ### $cur_file
+
+    if ($cur_file =~ /\.zip$/i) {
+        new_tempdir();
+        system "unzip", "-q", $cur_file;
+    } elsif ($cur_file =~ /\.t?gz$/) {
+        system "gzip", "-d", $cur_file;
+    } elsif ($cur_file =~ /\.bz2$/) {
+        system "bzip2", "-d", $cur_file;
+    } elsif ($cur_file =~ /\.tar$/) {
+        new_tempdir();
+        system "tar", "xf", $cur_file;
+
+    # ...  TODO: uncompress / unpack more formats
+    } else {
+        # terminal case: no files could be unpacked...
+        return $cur_file;
+    }
+
+    ## at this point, we have unpacked some files...  find which one should be chosen as $cur_file
+    my @available_files = glob(catfile($cur_dir, "*"));
+            ### @available_files
+    if (@available_files == 0) {
+        die "No files were unpacked.\n";
+    } elsif (@available_files > 1) {
+        die "More than one file was unpacked.  This script can't guess which to open.\n";
+    } else {
+        return unpack_if_possible( $available_files[0] );
+    }
+}
+
+
+
+sub new_tempdir {
+    push(@temp_dirs, $cur_dir = File::Temp::tempdir());
+    chdir $cur_dir;
+        ### $cur_dir
+    return $cur_dir;
+}
