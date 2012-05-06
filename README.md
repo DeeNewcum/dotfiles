@@ -2,52 +2,17 @@
 
     $  git clone https://github.com/DeeNewcum/dotfiles.git
     $  cd dotfiles
-    $  ./setup.pl
+    $  ./deedot
     $  ls -l ~/.bashrc
     ~/.bashrc -> ~/dotfiles/.bashrc
 
-    # Your dotfiles are safe.  Setup.pl won't overwrite anything.
+    # Your dotfiles are safe.  DeeDot won't overwrite anything.
 
-## Overview ##
+This is my personal dotfile repo.  There are [many like it](https://github.com/search?utf8=%E2%9C%93&q=dotfiles&repo=&langOverride=&start_value=1&type=Repositories&language=), but this one is mine.
 
-Run setup.pl, fix the file conflicts that it notes, run setup.pl...   repeat until it doesn't report any conflicts.
+## [DeeDot](https://github.com/DeeNewcum/deedot) ##
 
-Setup.pl recognizes three different ways to incorporate ~/dotfiles/ settings into the working versions:
-
-* **Symlink** — If you don't want any local-machine overrides. For example, ~/.bashrc can just be a symlink to ~/dotfiles/.bashrc.
-
-* **Source** — Some file types have the ability to 'source' another file.
-
-* **Text substitution** — Setup.pl will read the text from *.subst files, and copy-n-paste it into the middle of the working version.
-  
-## Machine-specific overrides — via source ##
-
-One way to have local machine-specific settings that override the global repository settings is to use the 'source' feature available in some file types.  For example, ~/.bashrc can contain:
-
-    # Pull in the global settings
-    [ -f ~/dotfiles/.bashrc ] && source ~/dotfiles/.bashrc
-
-    # Override the global settings for this specific machine
-    export TERM=xtermc
-
-Setup.pl [knows about each file type](https://github.com/DeeNewcum/dotfiles/blob/b3510c3a0bfedf2f33085a7eeacfa6586730b1f1/setup.pl#L124-131), and will suggest the appropriate 'source' line.
-
-## Machine-specific overrides — via text substitution ##
-
-For files that don't have 'source' capability, text substitution is available as a fallback.
-
-For example, setup.pl will update the section of ~/.ssh/config every time it's run: 
-
-    ######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY CONTENTS OF: ~/dotfiles/.ssh/config.subst ########
-    Host github.com
-        User git
-        IdentityFile ~/.ssh/github.priv
-    ######## END SUBSTITUTION FROM: ~/dotfiles/.ssh/config.subst ########
-    
-    Host webstaging.work.com
-        User my-username
-    
-    # ... a bunch of other private stuff that I don't want to make available on the public repository.
+DeeDot is the script that installs/maintains the symlinks, and it's well-documented over there.
 
 ## Shared root ##
 

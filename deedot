@@ -1,5 +1,11 @@
 #!/usr/bin/perl
 
+# a tool for managing your ~/dotfile/ symlinks
+#       https://github.com/DeeNewcum/deedot
+#
+# Available under the MIT license:
+#       https://github.com/DeeNewcum/deedot/blob/master/LICENSE
+
 
     use strict;
     use warnings;
@@ -35,7 +41,7 @@ find { wanted => sub {
 
     # files to not symlink
     return if ($_ eq '.');
-    return if ($_ eq 'setup.pl');
+    return if ($_ eq 'deedot');
     return if /(?:^|\/)README.(?:creole|md)$/;
     return if /\.swp$/;
     
