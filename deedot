@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# a tool for managing your ~/dotfile/ symlinks
+# a tool for installing/maintaining your ~/dotfile/ symlinks
 #       https://github.com/DeeNewcum/deedot
 #
 # Available under the MIT license:

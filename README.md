@@ -12,7 +12,7 @@ This is my personal dotfile repo.  There are [many like it](https://github.com/s
 
 ## [DeeDot](https://github.com/DeeNewcum/deedot) ##
 
-DeeDot is the script that installs/maintains the symlinks, and it's well-documented over there.
+DeeDot is a script I wrote that installs/maintains the symlinks, and it's well-documented [over there](https://github.com/DeeNewcum/deedot).
 
 ## Shared root ##
 
