@@ -188,7 +188,7 @@ sub do_substitute {
     my $header_text = "######## MODIFICATIONS HERE WILL BE OVERWRITTEN BY CONTENTS OF: $repository_dir/$subst_filename ########";
     my $footer_text = "######## END SUBSTITUTION FROM: $repository_dir/$subst_filename ########";
 
-    my @active_old_contents = -e $active_filename ? slurp($active_filename) : ($header_text);
+    my @active_old_contents = -e $active_filename ? slurp($active_filename) : ("$header_text\n");
 
     # do we know where to insert it?
     if (!grep(/\Q$header_text\E/, @active_old_contents)) {
