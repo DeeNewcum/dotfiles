@@ -1,10 +1,22 @@
 #!/usr/bin/env perl
 
-# Produce bar graphs at the command line.
+# Produce ASCII bar graphs at the command line.
 
 # A simplified version of:
 #       http://search.cpan.org/dist/Text-Graph/Graph.pm
 #       http://jehiah.cz/a/ascii-bar-charts
+
+
+# Usage:
+# 
+# Pipe a series of strings into bargraph.  Bargraph will count up how often it sees each string, and
+# will draw that string on the left, and a bar after it that represents the number of times the
+# string was seen.
+#
+# The output is sorted by the string.  If you want to sort by frequency instead, simply pipe the
+# output of 'bargraph' through 'sort -n'.
+
+
 
 # Examples:
 #       last | cut -d \  -f 1 | bargraph | sort -n

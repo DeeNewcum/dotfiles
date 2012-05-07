@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+
+# Produce ASCII bar graphs at the command line.
+#
+# Unlike 'bargraph', 'bargraphchar' allows you to plot *stacked* bar graphs.
+
+# A simplified version of:
+#       http://search.cpan.org/dist/Text-Graph/Graph.pm
+#       http://jehiah.cz/a/ascii-bar-charts
+
+
+# Usage:
+# 
+# Pipe a series of lines into bargraph.  Each line of text has this format:
+#       - first character:      the character to use when plotting this part of the stack
+#       - reminder of line:     the 'key' to use, the string to display to the left of the bargraph
+#
+# The vertical order is by the key.  If you want to sort by total count instead, pipe the output of 'bargraphchar' through 'sort -n'.
+#
+# The horizontal order is by character.
+#
+# If you want to apply ASCII coloring to the output, 'hil' is recommended:
+#       https://github.com/DeeNewcum/individual_scripts/
+
+
+
+# Examples:
+#       last | perl -nle '/^(.).*(\d\d:\d)\d/ && print "$1${2}0"' | bargraphchar
+
+    use strict;
+    use warnings;
+    
+    use List::Util qw[min max];
+    use utf8;
+
+    use Data::Dumper;
+    use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+
+binmode STDOUT, ":utf8";
+
+# call via a symlink named "bargraphu" to use Unicode output
+my $char = ($0 =~ /bargraphu$/) ? '█' : '*';
+
+my %count;
+my %total;
+
+while (<>) {
+    chomp;
+    $count{substr $_, 1}{substr $_, 0, 1}++;
+    $total{substr $_, 1}++;
+}
+
+my $max = max(values(%total));                                                  ### $max
+my $longest_key_string = max(map {length} keys %count);                         ### $longest_key_string
+my $longest_value_string = max(map {length(sprintf "%d", $_)} values %count);   ### $longest_value_string
+
+#die Dumper [$min, $max, $longest_key_string, $longest_value_string];
+
+my $max_bar_len = 80;
+
+my @key_order = sort {&natural_sort} keys %count;
+#die Dumper \@key_order;
+foreach my $key (@key_order) {
+    #my $barlen = 1 + (($max_bar_len * $total{$key}) / $max);
+    #my @chars = sort {$count{$key}{$b} <=> $count{$key}{$a}} keys %{$count{$key}};
+    #foreach my $c (@chars) { print "$c $count{$key}{$c}\n"; } exit;
+
+    my $x = 0;      # floating-point, represents how many ASCII boxes we have rendered so far
+    my $barlen = int(($max_bar_len * $total{$key} / $max) + 0.5);
+    my @bar = map {' '} 1..$barlen;
+    foreach my $char (sort keys %{$count{$key}}) {
+        for my $x1 (int($x)..($barlen-1)) {
+            $bar[$x1] = $char;
+        }
+        $x += $max_bar_len * $count{$key}{$char} / $max;
+    }
+
+    printf "%${longest_value_string}d  %-${longest_key_string}s  %s\n",
+                $total{$key},
+                $key,
+                join("", @bar);
+                #$char x (1 + ($max_bar_len * $total{$key} / $max));
+                #sprintf("%d", (1 + ($max_bar_len * $total{$key}) / $max));
+}
+
+
+
+# Thanks to http://www.perlmonks.org/?node_id=68185
+sub natural_sort {
+  my @a = split /(\d+)/, $a;
+  my @b = split /(\d+)/, $b;
+  my $M = @a > @b ? @a : @b;
+  my $res = 0;
+  for (my $i = 0; $i < $M; $i++) {
+    return -1 if ! defined $a[$i];
+    return 1 if  ! defined $b[$i];
+    if ($a[$i] =~ /\d/) {
+      $res = $a[$i] <=> $b[$i];
+    } else {
+      $res = $a[$i] cmp $b[$i];
+    }
+    last if $res;
+  }
+  $res;
+}
