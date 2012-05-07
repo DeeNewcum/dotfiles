@@ -80,3 +80,58 @@ sub natural_sort {
   }
   $res;
 }
+
+
+__END__
+
+
+# Print out a timestamp in a format that's useful for ingesting by 'bargraph' / 'bargraphchar'.
+#
+# This will truncate the time to the desired $level, which should be
+#   "seconds", "minutes", "hourly", "daily", "weekly", "monthly", or "yearly"
+#
+# $gmlocal means "1" for gmtime, "0" for localtime
+    use POSIX qw[strftime];
+    use Time::Local;
+sub bargraph_time {
+    my ($timestamp, $level, $gmlocal) = @_;
+    my $strftime = '';      # the strftime(3) format to use
+
+    my $truncate_to = 0;    # in seconds
+    my $relative_to = 0;
+    my $zero_out = 0;
+    
+    # forward and reverse code-refs
+    my $for = sub { $gmlocal ? gmtime(shift) : localtime(shift) };
+    my $rev = $gmlocal ? \&Time::Local::timegm : \&Time::Local::timelocal;
+
+    my @ts = &$for($timestamp);
+    my $BOY    = &$rev(0, 0, 0, 1, 0, $ts[5]);             # beginning of year
+    my $BOD    = $rev->(0, 0, 0, $ts[3], $ts[4], $ts[5]);   # beginning of the day
+    my $BOYsun = ((7 - ($for->($BOY))[6]) % 7) * (60 * 60 * 24) + $BOY;      # the first sunday of the year
+
+    if ($level eq 'yearly') {
+        $strftime = '%Y';
+    } elsif ($level eq 'monthly') {
+        $strftime = '%Y-%m';
+    } elsif ($level eq 'weekly') {
+        $strftime = '%Y-%m-%d';
+        $truncate_to = 60 * 60 * 24 * 7;
+        $relative_to = $BOYsun;
+    } elsif ($level eq 'daily') {
+        $strftime = '%Y-%m-%d';
+    } elsif ($level eq 'hourly') {
+        $strftime = '%Y-%m-%d %H:00';
+    } elsif ($level eq 'minutes') {
+        $strftime = '%Y-%m-%d %H:%M';
+    } elsif ($level eq 'seconds') {
+        $strftime = '%Y-%m-%d %H:%M:%S';
+    }
+
+    if ($truncate_to > 0) {
+        $timestamp = $relative_to + $truncate_to * int(($timestamp - $relative_to) / $truncate_to);
+    }
+    return POSIX::strftime($strftime, $gmlocal ? gmtime($timestamp) : localtime($timestamp));
+}
+
+
