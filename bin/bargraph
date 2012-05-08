@@ -95,17 +95,18 @@ sent to 'bargraph'.
 # Print out a timestamp in a format that's useful for ingesting by 'bargraph' / 'bargraphchar'.
 #
 # This will truncate the time to the desired $level, which should be
-#   "seconds", "minutes", "hourly", "daily", "weekly", "monthly", or "yearly"
+#   "yearly", "monthly", "weekly", "daily", "hourly", "sexihourly" (10 minutes), "minutes", or "seconds"
 #
-# $gmlocal means "1" for gmtime, "0" for localtime
     use POSIX qw[strftime];
     use Time::Local;
 sub bargraph_time {
-    my ($timestamp, $level, $gmlocal) = @_;
+    my $timestamp = shift;
+    my $level     = shift;
+    my $gmlocal   = shift;      # true = gmtime, false = localtime
 
-    my $strftime = '';      # the strftime(3) format to use
-    my $modulo      = 0;    # in seconds
-    my $relative_to = 0;    # the zero-point for the modulo calculation
+    my $strftime = '';          # the strftime(3) format to use
+    my $modulo      = 0;        # in seconds
+    my $relative_to = 0;        # the zero-point for the modulo calculation
     
     # forward and reverse code-refs
     my $for = sub { $gmlocal ? gmtime(shift) : localtime(shift) };
@@ -113,8 +114,8 @@ sub bargraph_time {
 
     my @ts = &$for($timestamp);
     my $BOY    = &$rev(0, 0, 0, 1, 0, $ts[5]);             # beginning of year
-    my $BOD    = $rev->(0, 0, 0, $ts[3], $ts[4], $ts[5]);   # beginning of the day
-    my $BOYsun = ((7 - ($for->($BOY))[6]) % 7) * (60 * 60 * 24) + $BOY;      # the first sunday of the year
+    my $BOD    = &$rev(0, 0, 0, $ts[3], $ts[4], $ts[5]);   # beginning of the day
+    my $BOYsun = ((7 - (&$for($BOY))[6]) % 7) * (60 * 60 * 24) + $BOY;      # the first sunday of the year
 
     if ($level eq 'yearly') {
         $strftime = '%Y';
@@ -128,12 +129,16 @@ sub bargraph_time {
         $strftime = '%Y-%m-%d';
     } elsif ($level eq 'hourly') {
         $strftime = '%Y-%m-%d %H:00';
+    } elsif ($level eq 'sexihourly' || $level eq 'decaminutes') {
+        $strftime = '%Y-%m-%d %H:%M';
+        $modulo = 60 * 10;
+        $relative_to = $BOD;
     } elsif ($level eq 'minutes') {
         $strftime = '%Y-%m-%d %H:%M';
     } elsif ($level eq 'seconds') {
         $strftime = '%Y-%m-%d %H:%M:%S';
     } else {
-        die "argument must be one of: yearly, monthly, weekly, daily, hourly, minutes, or seconds";
+        die "argument must be one of: yearly, monthly, weekly, daily, hourly, sexihourly (10 minutes), minutes, or seconds";
     }
 
     if ($modulo > 0) {
