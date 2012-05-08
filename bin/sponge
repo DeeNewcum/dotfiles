@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+# a Perl implementation of http://joeyh.name/code/moreutils/
+
+    use strict;
+    use warnings;
+
+
+my $outfile = shift;
+
+my $contents = do {local $/=undef; <STDIN>};
+
+if ($outfile) {
+    open my $fout, '>', $outfile        or die "Unable to write to $outfile: $!\n";
+    print $fout $contents;
+} else {
+    print $contents;
+}
