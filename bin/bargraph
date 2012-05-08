@@ -1,26 +1,28 @@
 #!/usr/bin/env perl
 
 # Produce ASCII bar graphs at the command line.
-
-# A simplified version of:
-#       http://search.cpan.org/dist/Text-Graph/Graph.pm
-#       http://jehiah.cz/a/ascii-bar-charts
-
-
-# Usage:
-# 
-# Pipe a series of strings into bargraph.  Bargraph will count up how often it sees each string, and
-# will draw that string on the left, and a bar after it that represents the number of times the
-# string was seen.
 #
-# The output is sorted by the string.  If you want to sort by frequency instead, simply pipe the
-# output of 'bargraph' through 'sort -n'.
+# ==== Usage ====
+# 
+#   Pipe a series of strings into bargraph.  Bargraph will count up how often it sees each string,
+#   and will draw that string on the left, and a bar after it that represents the number of times
+#   the string was seen.
+#
+#   The output is sorted by the string (natural sort, so it works for both words and numbers).
+#   If you want to sort by frequency instead, pipe the output of 'bargraph' through 'sort -n'.
+#
+# ==== Examples ====
+#
+#   last | cut -d \  -f 1 | bargraph | sort -n
+#   last | perl -nle '/(\d\d:\d)\d/ && print "${1}0"' | bargraph
+#
+# ==== Similar projects ====
+#
+#   http://search.cpan.org/dist/Text-Graph/Graph.pm
+#   http://jehiah.cz/a/ascii-bar-charts
 
 
 
-# Examples:
-#       last | cut -d \  -f 1 | bargraph | sort -n
-#       last | perl -nle '/(\d\d:\d)\d/ && print "${1}0"' | bargraph
 
     use strict;
     use warnings;
@@ -84,6 +86,11 @@ sub natural_sort {
 
 __END__
 
+The routine below is useful to include in other scripts, when generating timestamps that will be
+sent to 'bargraph'.
+
+
+
 
 # Print out a timestamp in a format that's useful for ingesting by 'bargraph' / 'bargraphchar'.
 #
@@ -95,11 +102,10 @@ __END__
     use Time::Local;
 sub bargraph_time {
     my ($timestamp, $level, $gmlocal) = @_;
-    my $strftime = '';      # the strftime(3) format to use
 
-    my $truncate_to = 0;    # in seconds
-    my $relative_to = 0;
-    my $zero_out = 0;
+    my $strftime = '';      # the strftime(3) format to use
+    my $modulo      = 0;    # in seconds
+    my $relative_to = 0;    # the zero-point for the modulo calculation
     
     # forward and reverse code-refs
     my $for = sub { $gmlocal ? gmtime(shift) : localtime(shift) };
@@ -116,7 +122,7 @@ sub bargraph_time {
         $strftime = '%Y-%m';
     } elsif ($level eq 'weekly') {
         $strftime = '%Y-%m-%d';
-        $truncate_to = 60 * 60 * 24 * 7;
+        $modulo = 60 * 60 * 24 * 7;
         $relative_to = $BOYsun;
     } elsif ($level eq 'daily') {
         $strftime = '%Y-%m-%d';
@@ -126,10 +132,12 @@ sub bargraph_time {
         $strftime = '%Y-%m-%d %H:%M';
     } elsif ($level eq 'seconds') {
         $strftime = '%Y-%m-%d %H:%M:%S';
+    } else {
+        die "argument must be one of: yearly, monthly, weekly, daily, hourly, minutes, or seconds";
     }
 
-    if ($truncate_to > 0) {
-        $timestamp = $relative_to + $truncate_to * int(($timestamp - $relative_to) / $truncate_to);
+    if ($modulo > 0) {
+        $timestamp = $relative_to + $modulo * int(($timestamp - $relative_to) / $modulo);
     }
     return POSIX::strftime($strftime, $gmlocal ? gmtime($timestamp) : localtime($timestamp));
 }
