@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# This is a script that gets launched directly in response to some keyboard shortcut.
+# It launches dmenu  (by way of pydmenu.py).
+#
+# To modify the keyboard shortcuts in Ubuntu 12.04, run:
+#       gnome-control-center keyboard
+
+
+[ -f ~/.bash_aliases ] && source ~/.bash_aliases
+
+[ -f ~/dotfiles/.bash_aliases ] && source ~/dotfiles/.bash_aliases
+
+eval "$(/home/phr843/apps/bin/pydmenu.py)" > /tmp/$USER.dmenu 2>&1
+
+    # Sometimes aliases and other commands don't work...
+    # All output (including errors) is logged to /tmp/$USER.dmenu, to help you dianose the problem.
