@@ -43,6 +43,7 @@ foreach my $tok (@tokens) {
                 $fg = undef;
                 $bg = undef;
                 $bold = 0;
+                $underline = 0;
             } elsif ($attrib == 1) {
                 $bold = 1;
                 print "<b>";
