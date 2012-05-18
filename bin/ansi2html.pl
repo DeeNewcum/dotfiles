@@ -32,11 +32,9 @@ sub ansi2html {
             (                           # preserve the delimeters
               \e[^a-z]*[a-z]            # an escape sequence
             |                           # a markdown-like header
-              (?:[\n\r]|^)              # start at the beginning of a line
-              ==[^\n\r]+
-            |
-              (?:[\n\r]|^)              # start at the beginning of a line
-              \#\#[^\n\r]+
+              (?:\x0d\x0a|\x0d|0x0a|^)  # start at the beginning of a line
+              (?:==|\#\#)               # markdown line can start with == or ##
+              [^\n\r]+
             )
         /six, $ansi;
     #die Dumper [ map {s/\e/<ESC>/gs; $_} @tokens ];
