@@ -15,6 +15,16 @@
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
 
+#||     #####################
+#||     ##  issue tracker  ##
+#||     #####################
+#||
+#||     1. improve backspace handling
+#||                 current behavior isn't sufficient, it's very confusing for readers
+#||
+#||     2. add command-line options handling, for choosing the default background/foreground colors
+
+
 my $ansi = do { local $/ = undef; <STDIN>};
 my $html = ansi2html($ansi);
 print $html;
