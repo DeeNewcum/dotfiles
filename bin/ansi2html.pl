@@ -22,7 +22,11 @@
 #||     1. improve backspace handling
 #||                 current behavior isn't sufficient, it's very confusing for readers
 #||
-#||     2. add command-line options handling, for choosing the default background/foreground colors
+#||     2. add command-line options handling, allow user to choose the default background/foreground
+#||        color
+#||
+#||     3. release this on CPAN
+#||                 IMHO, it's better than HTML::FromANSI
 
 
 my $ansi = do { local $/ = undef; <STDIN>};
