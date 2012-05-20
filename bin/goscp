@@ -105,6 +105,10 @@ sub unpack_if_possible {
         die "No files were unpacked.\n";
     } elsif (@available_files > 1) {
         die "More than one file was unpacked.  This script can't guess which to open.\n";
+
+        # Goscp is only designed to open compressed files that are ultimately only one file wrapped up....
+        # If more than one file has been wrapped up, we [currently] don't have any mechanism that
+        # allows the user to specify which one they're interested in.
     } else {
         return unpack_if_possible( $available_files[0] );
     }
