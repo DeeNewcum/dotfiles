@@ -11,7 +11,12 @@
 
 [ -f ~/dotfiles/.bash_aliases ] && source ~/dotfiles/.bash_aliases
 
-eval "$(/home/phr843/apps/bin/pydmenu.py)" > /tmp/$USER.dmenu 2>&1
+alias trrm='gnome-terminal'
+
+
+cmdline=$(~/apps/bin/pydmenu.py)
+echo $cmdline   >  /tmp/$USER.dmenu
+eval "$cmdline" >> /tmp/$USER.dmenu 2>&1
 
     # Sometimes aliases and other commands don't work...
     # All output (including errors) is logged to /tmp/$USER.dmenu, to help you dianose the problem.
