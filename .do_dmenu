@@ -9,13 +9,10 @@
 # In Ubuntu 10.10, run:
 #       gnome-keybinding-properties
 
+# without this, aliases won't work in dmenu
+shopt -s expand_aliases     # allow alias expansion in non-interactive shells
 
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
-
-[ -f ~/dotfiles/.bash_aliases ] && source ~/dotfiles/.bash_aliases
-
-alias trrm='gnome-terminal'
-
 
 cmdline=$(~/apps/bin/pydmenu.py)
 echo $cmdline   >  /tmp/$USER.dmenu
