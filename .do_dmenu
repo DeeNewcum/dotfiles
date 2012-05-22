@@ -5,6 +5,9 @@
 #
 # To modify the keyboard shortcuts in Ubuntu 12.04, run:
 #       gnome-control-center keyboard
+#
+# In Ubuntu 10.10, run:
+#       gnome-keybinding-properties
 
 
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
