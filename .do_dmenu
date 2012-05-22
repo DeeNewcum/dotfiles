@@ -1,13 +1,18 @@
 #!/bin/bash
 
-# This is a script that gets launched directly in response to some keyboard shortcut.
+# This script gets launched directly in response to some keyboard shortcut.
 # It launches dmenu  (by way of pydmenu.py).
 #
-# To modify the keyboard shortcuts in Ubuntu 12.04, run:
+#
+# Command to configure a key to launch this
+# =========================================
+#
+#   Ubuntu 12.04:
 #       gnome-control-center keyboard
 #
-# In Ubuntu 10.10, run:
+#   Ubuntu 10.10:
 #       gnome-keybinding-properties
+
 
 # without this, aliases won't work in dmenu
 shopt -s expand_aliases     # allow alias expansion in non-interactive shells
@@ -18,5 +23,6 @@ cmdline=$(~/apps/bin/pydmenu.py)
 echo $cmdline   >  /tmp/$USER.dmenu
 eval "$cmdline" >> /tmp/$USER.dmenu 2>&1
 
-    # Sometimes aliases and other commands don't work...
-    # All output (including errors) is logged to /tmp/$USER.dmenu, to help you dianose the problem.
+    # Sometimes aliases and other commands don't work.
+    # To diagnose the problem, run:
+    #       tail -f /tmp/$USER.dmenu
