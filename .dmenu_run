@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# A better version of the stock 'dmenu_run'.
+#
 # This script gets launched directly in response to some keyboard shortcut.
 # It launches dmenu  (by way of pydmenu.py).
 #
@@ -19,6 +21,7 @@ shopt -s expand_aliases     # allow alias expansion in non-interactive shells
 
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
 
+#cmdline=$(dmenu_path | dmenu)
 cmdline=$(~/apps/bin/pydmenu.py)
 echo $cmdline   >  /tmp/$USER.dmenu
 eval "$cmdline" >> /tmp/$USER.dmenu 2>&1
