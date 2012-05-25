@@ -21,11 +21,26 @@ shopt -s expand_aliases     # allow alias expansion in non-interactive shells
 
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
 
+
 #cmdline=$(dmenu_path | dmenu)
 cmdline=$(~/apps/bin/pydmenu.py)
+
+set -- $cmdline
+if [ "$1" = "error" ]; then
+    if perl -nle 'exit 1 if $.>1' /tmp/$USER.dmenu; then
+        zenity --info --text="the last command ($(cat /tmp/$USER.dmenu)) produced no output"
+    else
+        zenity --info --text="the output from last command was:\n\n$(perl -ple 'print q[=]x50 if $.==2' /tmp/$USER.dmenu)"
+    fi
+    exit
+fi
+
 echo $cmdline   >  /tmp/$USER.dmenu
 eval "$cmdline" >> /tmp/$USER.dmenu 2>&1
+
+#zenity --info --text="$(cat /tmp/$USER.dmenu)"
 
     # Sometimes aliases and other commands don't work.
     # To diagnose the problem, run:
     #       tail -f /tmp/$USER.dmenu
+
