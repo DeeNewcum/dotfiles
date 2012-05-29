@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+# this is the output of `w`, sorted by idle time
+#
+# (ie. its purpose is to show which users aren't idle)
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+
+    use constant SHOW_FULL_USERNAME => 1;
+
+
+## read output of `w`
+my @w = qx[w];
+
+
+## output the header; don't try to sort it
+print splice @w, 0, 2;
+
+
+## sort by idle time  (least idle at the bottom)
+my %idle_time = map {$_ => -M "/dev/" . (split)[1]} @w;
+@w =  sort {$idle_time{$b} <=> $idle_time{$a}}   @w;
+
+
+## print the entries
+if (!SHOW_FULL_USERNAME) {
+    print @w;
+} else {
+    foreach (@w) {
+        chomp;
+        printf "%-85s %s\n",  $_,  (getpwnam((split)[0]))[6];
+    }
+}
