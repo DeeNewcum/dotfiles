@@ -72,35 +72,5 @@ sub last_logout {
 
 
 
-sub parse_wtmp {
-    my ($fnames, $ftypes) = unzip(qw[
-        type    l
-        pid     i
-        line    Z32
-        id      Z4
-        user    Z32
-        host    A256
-        exit    l
-        session l
-        tv_sec  i
-        tv_usec i
-        addr_v6 a16
-        unused  Z20
-    ]);
-    $ftypes = join(" ", @$ftypes);
-    open my $fin, '<', '/var/log/wtmp'  or die $!;
-    local $/ = \(length pack $ftypes);       # read fixed-length records
-    while (<$fin>) {
-        my %ent;
-        @ent{@$fnames} = unpack $ftypes, $_;
-        $ent{tv} = ~~localtime $ent{tv_sec};
-        $ent{addr_v6} = join ':', unpack 'H4H4H4H4H4H4H4H4', $ent{addr_v6};
-        print Dumper \%ent;
-    }
-    exit;
-}
-
-
-
 # split [1,'a',2,'b',3,'c'] into [[1,2,3],['a','b','c']]
 sub unzip {my($i,$j)=(0,0); [grep{++$i%2}@_],[grep{$j++%2}@_]}
