@@ -24,13 +24,21 @@ My own ~/.sudo_bashrc will pull in a variety of other .rc settings from the orig
 
 I sometimes work on older Un*x variants (eg. Solaris 9), so I prefer to use tools that have a bare-minimum of dependencies.  Generally, this means older versions of Perl (using minimal non-core modules) and Bash scripts.  Sometimes it means a non-GNU toolset, or KSH-88 scripts.
 
-I work on ~5 different machines on a daily basis, and ~10 on a monthly basis.  Even when modern toolsets are available, I prefer to minimize the number of extra tools I need to build, and to minimize the number of non-core Perl modules my tools use.
+I work on ~5 different machines on a daily basis, and ~10 on a monthly basis.
 
 ## My environment ##
 
 I frequently work in Ubuntu, RHEL, and Solaris 9.
 
 My personal preferences are: Vim or Vi, Perl, Bash, and Screen.  (I want to try out tmux and zsh soon)
+
+## TODO ##
+
+There are several other large pieces of live-config-files that aren't checked in yet, that I would like to.  These may take some work to figure out:
+
+* Firefox profile (ie. ~/.mozilla/firefox/$profiledir), particularly the Greasemonkey scripts.
+* Android Tasker "programs"
+* my Tropo.com scripts
 
 ## Similar projects ##
 
