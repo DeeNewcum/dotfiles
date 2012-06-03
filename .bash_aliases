@@ -52,6 +52,22 @@ function lesswhich() { less $(type -P $1); }
 function go() { xdg-open "$@"; }
 #function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "scp", $ARGV[0], "."; system "xdg-open *"' "$@"; }
 
+# List all executable files in a package.  Param#1: package name (apt-get).
+# Useful in combination with dmenu.
+# Possible future enhancements:
+#   - sort by likelihood that the executable is the "main" one for that package, based on:
+#           - which ones are in $PATH
+#           - which ones have menu entries:
+#                   http://standards.freedesktop.org/menu-spec/menu-spec-1.0.html#paths
+#   - work for other package managers than apt-get
+function execs() { dpkg -L "$1" | perl -nle 'print if -f && -x'; }
+if type _comp_dpkg_installed_packages 2>/dev/null >/dev/null; then
+    function execs_complete() {
+        COMPREPLY=( $( _comp_dpkg_installed_packages "${COMP_WORDS[COMP_CWORD]}" ) )
+    }
+    complete -F execs_complete execs
+fi
+
 
 # Do ANSI-coloring of text, based on arbitrary regexps.
 # see documentation:  https://github.com/DeeNewcum/individual_scripts/blob/master/hil.README.md
