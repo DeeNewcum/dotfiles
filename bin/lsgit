@@ -4,6 +4,9 @@
 # 
 # This is essentially a wrapper around:
 #       locate -br '^HEAD$'
+#
+# This has minimal dependencies, it should JUST WORK on any machine that can run Git.
+# (requires only an old version of Perl, v5.8.4, and it doesn't require any non-core modules)
 
     use strict;
     use warnings;
