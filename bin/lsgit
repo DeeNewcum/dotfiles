@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# List ALL Git repositories on the current machine, clumped by related repositories.
+# List ALL Git repositories on the current machine, grouped by cloned repositories.
 # 
 # This is essentially a wrapper around:
 #       locate -br '^HEAD$'
@@ -13,8 +13,9 @@
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
-my ($cmdline_view_all) = grep /^--all$/, @ARGV;     # display everything, despite lsgit.hide
-my ($cmdline_raw)      = grep /^--raw$/, @ARGV;     # don't cluster things, display only the directory list
+my ($cmdline_view_all) = grep /^(-a|--all)$/,    @ARGV;     # display everything, despite lsgit.hide
+my ($cmdline_raw)      = grep /^(-r|--raw)$/,    @ARGV;     # don't cluster things, display only the directory list
+my ($cmdline_status)   = grep /^(-s|--status)$/, @ARGV;     # show status too   (may be slow if there are any large repos)
 
 
 my %repos;
@@ -122,6 +123,17 @@ sub display_repo {
     my $name = $repo{work_tree} || $git_dir;
     #my $when = scalar(localtime($repo{latest_change}));
     print "$name/   $repo{latest_change_human}\n";
+    if ($cmdline_status) {
+        my @cmd = ('git', "--git-dir=$git_dir", 'status', '--short');
+        splice(@cmd, 1, 0, "--work-tree=$repo{work_tree}")  if exists $repo{work_tree};
+        splice(@cmd, 1, 0, '-c', 'color.ui=always')   if (-t STDOUT);       # force color
+        my $status = readpipe_ultimate( sub {
+                    open STDERR, '>', '/dev/null';
+                },
+                @cmd);
+        $status =~ s/^(?=.)/  /mg;
+        print "$status";
+    }
 }
 
 
