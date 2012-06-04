@@ -80,7 +80,7 @@ HISTCONTROL=ignoreboth      # don't put duplicate lines or lines starting with s
 shopt -s histappend         # append to the history file, don't overwrite it
 HISTSIZE=1000
 HISTFILESIZE=2000
-HISTIGNORE="&:[ \t]*:ls:ls *:clear*"
+HISTIGNORE="&:ls:clear"
 
 
 alias rel2abs='perl -MCwd -e "print Cwd::abs_path shift"'
