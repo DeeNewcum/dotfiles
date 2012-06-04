@@ -69,6 +69,13 @@ if type _comp_dpkg_installed_packages 2>/dev/null >/dev/null; then
 fi
 
 
+# hed / tal -- head/tail that fit your screen's size
+#function hed { head -$(perl -MTerm::ReadKey -e 'print((GetTerminalSize)[1] - 2)'); }
+#function tal { tail -$(perl -MTerm::ReadKey -e 'print((GetTerminalSize)[1] - 2)'); }
+function hed { head -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d+)/'); }
+function tal { tail -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d+)/'); }
+
+
 # Do ANSI-coloring of text, based on arbitrary regexps.
 # see documentation:  https://github.com/DeeNewcum/individual_scripts/blob/master/hil.README.md
 function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=grep{$j++%2}@ARGV;@ARGV=()}s/$p/for($i=0;$i<@c&&!defined$-[$i+1];$i++){}"\e[$c[$i]m$+\e[0m"/gome' "$@"; }
