@@ -44,8 +44,8 @@ fi
 function mmboxgrep() { local tmp=$(mktemp); mboxgrep "$@" > $tmp; mutt -f $tmp; rm -f $tmp; }
 
 # run 'which' on the specified program, and then vim or less it
-function vimwhich()  { vim  $(type -P $1); }
-function lesswhich() { less $(type -P $1); }
+function vimwhich()  { vim  $(type -p $1); }
+function lesswhich() { less $(type -p $1); }
 
 
 # gnome-open, kde-open, etc

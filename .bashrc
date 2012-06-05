@@ -23,13 +23,13 @@ bind -m vi-insert \\C-l:clear-screen        # make Ctrl-L work the same as it do
 
 
 # $EDITOR and $PAGER
-if type -P vim >/dev/null; then
+if type -p vim >/dev/null; then
     export EDITOR=vim
     #export PAGER=vimpager
 #else
-#    type -P less >/dev/null && export PAGER='less -i'
+#    type -p less >/dev/null && export PAGER='less -i'
 fi
-type -P less >/dev/null && export PAGER='less -i'
+type -p less >/dev/null && export PAGER='less -i'
 
 
 # history
