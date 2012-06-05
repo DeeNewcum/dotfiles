@@ -1,59 +1,65 @@
 # .bashrc is for interactive non-login shells, .bash_profile is for login shells
-
-# If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
-# Make less be able to open up tar files and gzip files
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-[ -f ~/.bash_aliases ] && source ~/.bash_aliases
-
-[ -d ~/bin/ ] && export PATH=$HOME/bin:$PATH
-
-# custom-compiled apps that override the system ones
-[ -d ~/apps/bin/ ] && export PATH=~/apps/bin/:$PATH
+# $PATH
+[ -d ~/bin/ ]      && export PATH=$HOME/bin:$PATH
+[ -d ~/apps/bin/ ] && export PATH=~/apps/bin/:$PATH     # custom-compiled apps that override the system ones
 
 
-# avoid having to use sux/sudox when changing to root    (this line cooperates with /etc/sudoers env_keep)
-[ -z "$XAUTHORITY" -a -n "$DISPLAY" -a -e "$HOME/.Xauthority" ] && export XAUTHORITY="$HOME/.Xauthority"
-
-
-# Note: As suggested by
-#           http://tldp.org/HOWTO/Bash-Prompt-HOWTO/xterm-title-bar-manipulations.html
-#       we should only update the Xterm title when we're SURE that the end-user's terminal
-#       supports this feature.  Currently, all of mine do, and also my $TERM is an unreliable way to 
-#       check if the end-user's terminal does.  So, for now, I'm always sending this.
+# prompt
 XTERM_TITLE='\[\033]0;\h\007\]'
 PS1=$XTERM_TITLE'\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    # Note: As suggested by:
+    #           http://tldp.org/HOWTO/Bash-Prompt-HOWTO/xterm-title-bar-manipulations.html
+    #       we should only update the Xterm title when we're SURE that the end-user's terminal
+    #       supports this feature.  Currently, all of mine do, and also my $TERM is an unreliable
+    #       way to check if the end-user's terminal does.  So, for now, I'm always sending this.
 
 
+# vi mode
 set -o vi
-bind -m vi-insert "\C-l":clear-screen       # make Ctrl-L work the same as it does in emacs mode
-if [ "$(type -P vim)" ];  then
+bind -m vi-insert \\C-l:clear-screen        # make Ctrl-L work the same as it does in emacs mode
+
+
+# $EDITOR and $PAGER
+if type -P vim > /dev/null; then
     export EDITOR=vim
     #export PAGER=vimpager
-else
-    if [ "$(type -P less)" ]; then export PAGER='less -i'; fi
+#else
+#    type -P less >/dev/null && export PAGER='less -i'
 fi
-if [ "$(type -P less)" ]; then export PAGER='less -i'; fi
+type -P less >/dev/null && export PAGER='less -i'
 
 
-
-if [ "`tput -Tgnome-256color colors 2>/dev/null`" = "256" ]; then 
-    export TERM=gnome-256color 
-elif [ "`tput -Txterm-256color colors 2>/dev/null`" = "256" ]; then 
-    export TERM=xterm-256color 
-elif [ "`tput -Txterm colors 2>/dev/null`" ]; then 
-    export TERM=xterm
-elif [ "`tput -Tvt100 colors 2>/dev/null`" ]; then 
-    export TERM=vt100
-fi 
+# history
+HISTCONTROL=ignoreboth      # don't put duplicate lines or lines starting with space in the history.
+shopt -s histappend         # append to the history file, don't overwrite it
+HISTSIZE=1000
+HISTFILESIZE=2000
+HISTIGNORE="&:ls:clear"
 
 
+# find the most capable entry available in the local termcap
+for term in    gnome-256color  xterm-256color  xterm  vt100
+do
+    if tput -T$term colors >/dev/null 2>/dev/null; then 
+        export TERM=$term
+        break
+    fi
+done
+# TODO: some terminals respond to     echo -e '\005'
+#           see ENQ/answerback at  http://paperlined.org/apps/terminals/queries.html
 
-### enable color for as many things as possible ###
+
+###################################################
+#################  COLOR  #########################
+###################################################
+# enable color for as many things as possible
 
 export GREP_OPTIONS='--color=auto' 
+
+alias ls='ls --color=auto -F'
 
 # man pages
 export GROFF_NO_SGR=1
@@ -64,8 +70,7 @@ export LESS_TERMCAP_so=$'\E[01;44;33m'      # begin standout (hilighted) mode
 export LESS_TERMCAP_se=$'\E[0m'             # end standout mode
 export LESS_TERMCAP_us=$'\E[01;32m'         # begin underline
 export LESS_TERMCAP_ue=$'\E[0m'             # end underline
-
-alias ls='ls --color=auto -F'
+###################################################
 
 
 if [ $USER = "root" ]; then
@@ -75,16 +80,21 @@ if [ $USER = "root" ]; then
     alias mv='mv -i'
 fi
 
-## history settings
-HISTCONTROL=ignoreboth      # don't put duplicate lines or lines starting with space in the history.
-shopt -s histappend         # append to the history file, don't overwrite it
-HISTSIZE=1000
-HISTFILESIZE=2000
-HISTIGNORE="&:ls:clear"
+
+# make X apps work properly when changing to root, without having to use sux/sudox
+[ -z "$XAUTHORITY" -a -n "$DISPLAY" -a -e "$HOME/.Xauthority" ] && export XAUTHORITY="$HOME/.Xauthority"
+    # Note: For this to work, you also have to add the following to /etc/sudoers:
+    #           Defaults env_keep += "DISPLAY XAUTHORIZATION XAUTHORITY"
+
+
+# make less be able to open up tar files and gzip files
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+
+[ -f ~/.bash_aliases ] && source ~/.bash_aliases
 
 
 alias rel2abs='perl -MCwd -e "print Cwd::abs_path shift"'
-
 mkdir -p ~/apps/stow/
 mkdir -p ~/apps/build/
 [ -d ~/apps/stow ]                 && export STOW_DIR=$(rel2abs $HOME/apps/stow)
@@ -108,7 +118,6 @@ function local_lib_disable {
 function local_lib_enable {
     eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 }
-
 
 
 # workaround for menu not appearing:
