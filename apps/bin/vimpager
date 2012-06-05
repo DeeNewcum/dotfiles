@@ -1,8 +1,8 @@
-#!/usr/bin/env perl
+#!/bin/sh
 
 # Script for using ViM as a PAGER.
 # Based on Bram's less.sh.
-# Version 1.6.7
+# Version 1.6.8
 # git://github.com/rkitover/vimpager.git
 
 # Just pass through if not on a tty
@@ -42,9 +42,9 @@ less_vim() {
 		# the echo "foo" is to skip the color codes and make matching the first line easier
 
 		if [ -n "$vimrc" ]; then
-			(vim -u "$vimrc" -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
+			(vim -u "$vimrc" -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif | echo 0' -c q < /dev/tty) > /tmp/vimpager_opts_$$
 		else
-			(vim -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif' -c q < /dev/tty) > /tmp/vimpager_opts_$$
+			(vim -X -e -c 'echo "foo"' -c 'if exists("vimpager_use_gvim") | echo vimpager_use_gvim | else | echo 0 | endif' -c 'if exists("vimpager_disable_x11") | echo vimpager_disable_x11 | else | echo 0 | endif' -c 'if exists("vimpager_scrolloff") | echo vimpager_scrolloff | else | echo 5 | endif | echo 0' -c q < /dev/tty) > /tmp/vimpager_opts_$$
 		fi
 
 		head -2 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^1/ {t=1} END {exit 1-t}' && \
@@ -54,7 +54,7 @@ less_vim() {
 			disable_x11=1
 
 		head -4 < /tmp/vimpager_opts_$$ | tail -1 | awk '$1 ~ /^[0-9]+/ {t=1} END {exit 1-t}' && \
-			scrolloff="$(head -4 < /tmp/vimpager_opts_$$ | tail -1|sed -e 's/[^0-9]//g')"
+			scrolloff=`head -4 < /tmp/vimpager_opts_$$ | tail -1 | sed -e 's/.*//'`
 
 		rm -f /tmp/vimpager_opts_$$
 	else
@@ -272,7 +272,7 @@ extra_cmd="let vimpager_ptree=[$(do_ptree | awk '{ print "\"" $2 "\"" }' | tr '\
 
 trap "rm -rf /tmp/vimpager_$$" HUP INT QUIT ILL TRAP KILL BUS TERM
 
-mkdir /tmp/vimpager_$$
+mkdir -m 0700 /tmp/vimpager_$$
 
 command -v perl > /dev/null && \
 	perl -le 'exit($] >= 5.008001 ? 0 : 1)' && have_perl=1
@@ -346,5 +346,8 @@ less_vim -c "${extra_c:-echo}" --cmd "${extra_cmd:-echo}" "$filename" </dev/tty
 # Peter Fern <github@obfusc8.org>
 # Wei Dai <x@wei23.net>
 # Iftekharul Haque <iftekharul.haque@gmail.com>
+# Anselm Strauss <amsibamsi@gmail.com>
+# Anisse Astier <anisse@astier.eu>
+# Simon Olofsson <simon@olofsson.de>
 
-# vim:noet ts=8 sts=8 sw=8:
+# vim:noet ts=8 sts=8 sw=8 tw=0:
