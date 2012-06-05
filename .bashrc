@@ -59,7 +59,7 @@ done
 
 export GREP_OPTIONS='--color=auto' 
 
-if [ "$(ls --color 2>&1 >/dev/null)" ]; then
+if [ "$(command ls --color 2>&1 >/dev/null)" ]; then
     alias ls='ls -F'
 else
     alias ls='ls -F --color=auto'
@@ -77,7 +77,7 @@ export LESS_TERMCAP_ue=$'\E[0m'             # end underline
 ###################################################
 
 
-if [ $USER = "root" ]; then
+if [ "$LOGNAME" = "root" ]; then
     # take care when overwriting things, if root
     alias rm='rm -i'
     alias cp='cp -i'

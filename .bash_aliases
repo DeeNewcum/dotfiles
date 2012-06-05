@@ -85,7 +85,7 @@ function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=gre
 alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
 
 
-if [ "$(type -P apt-get)" ];  then
+if [ "$(type -p apt-get)" ];  then
     alias upup='sudo apt-get update; sudo apt-get upgrade'
 fi
 
