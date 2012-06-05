@@ -40,7 +40,7 @@ HISTFILESIZE=2000
 HISTIGNORE="&:ls:clear"
 
 
-# find the most capable entry available in the local termcap
+# find the most capable termcap entry
 for term in    gnome-256color  xterm-256color  xterm  vt100
 do
     if tput -T$term colors >/dev/null 2>/dev/null; then 
