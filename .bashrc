@@ -23,7 +23,7 @@ bind -m vi-insert \\C-l:clear-screen        # make Ctrl-L work the same as it do
 
 
 # $EDITOR and $PAGER
-if type -P vim > /dev/null; then
+if type -P vim >/dev/null; then
     export EDITOR=vim
     #export PAGER=vimpager
 #else
@@ -103,7 +103,6 @@ mkdir -p ~/apps/build/
 # apply PerlBrew and local::lib settings, if available
 [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
 [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
-    # apply local::lib bash variables   (using the copy of local::lib that's fatpacked inside cpanm)
 [ -f ~/perl5/lib/perl5/local/lib.pm ] && eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
 
