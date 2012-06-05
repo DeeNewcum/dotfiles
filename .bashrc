@@ -59,7 +59,11 @@ done
 
 export GREP_OPTIONS='--color=auto' 
 
-alias ls='ls --color=auto -F'
+if [ "$(ls --color 2>&1 >/dev/null)" ]; then
+    alias ls='ls -F'
+else
+    alias ls='ls -F --color=auto'
+fi
 
 # man pages
 export GROFF_NO_SGR=1
