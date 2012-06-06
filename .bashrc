@@ -23,13 +23,9 @@ bind -m vi-insert \\C-l:clear-screen        # make Ctrl-L work the same as it do
 
 
 # $EDITOR and $PAGER
-if type -p vim >/dev/null; then
-    export EDITOR=vim
-    #export PAGER=vimpager
-#else
-#    type -p less >/dev/null && export PAGER='less -i'
-fi
-type -p less >/dev/null && export PAGER='less -i'
+type -p vim >/dev/null   &&   export EDITOR=vim
+type -p less >/dev/null   &&   export PAGER='less -i'
+#type -p vimpager >/dev/null   &&   type -p vim >/dev/null   &&   export PAGER=vimpager
 
 
 # history
@@ -50,13 +46,13 @@ do
 done
 # TODO: some terminals respond to     echo -e '\005'
 #           see ENQ/answerback at  http://paperlined.org/apps/terminals/queries.html
+#       try to be a little more intelligent about auto-detecting $TERM
 
 
 ###################################################
 #################  COLOR  #########################
 ###################################################
 # enable color for as many things as possible
-
 export GREP_OPTIONS='--color=auto' 
 
 if [ "$(command ls --color 2>&1 >/dev/null)" ]; then
@@ -75,6 +71,7 @@ export LESS_TERMCAP_se=$'\E[0m'             # end standout mode
 export LESS_TERMCAP_us=$'\E[01;32m'         # begin underline
 export LESS_TERMCAP_ue=$'\E[0m'             # end underline
 ###################################################
+###################################################
 
 
 if [ "$LOGNAME" = "root" ]; then
@@ -92,19 +89,20 @@ fi
 
 
 # make less be able to open up tar files and gzip files
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+type -p lesspipe >/dev/null   &&   eval "$(SHELL=/bin/sh lesspipe)"
 
 
-[ -f ~/.bash_aliases ] && source ~/.bash_aliases
+[ -f ~/.bash_aliases ]   &&   source ~/.bash_aliases
 
 
+# GNU stow
 alias rel2abs='perl -MCwd -e "print Cwd::abs_path shift"'
 mkdir -p ~/apps/stow/
 mkdir -p ~/apps/build/
 [ -d ~/apps/stow ]                 && export STOW_DIR=$(rel2abs $HOME/apps/stow)
 
 
-# apply PerlBrew and local::lib settings, if available
+# PerlBrew and local::lib
 [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
 [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
 [ -f ~/perl5/lib/perl5/local/lib.pm ] && perl -le 'exit 1 unless $^V ge v5.8.1' && eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
@@ -123,7 +121,7 @@ function local_lib_enable {
 }
 
 
-# workaround for menu not appearing:
+# workaround for menu not appearing
 #   https://bugs.launchpad.net/ubuntu/+source/vim/+bug/771810
 #   https://bugs.launchpad.net/ubuntu/+source/vim/+bug/776499
 function gvim {
