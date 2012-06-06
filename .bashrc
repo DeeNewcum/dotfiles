@@ -107,7 +107,7 @@ mkdir -p ~/apps/build/
 # apply PerlBrew and local::lib settings, if available
 [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
 [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
-[ -f ~/perl5/lib/perl5/local/lib.pm ] && perl -le 'exit 1 unless $^V gt v5.8.1' && eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
+[ -f ~/perl5/lib/perl5/local/lib.pm ] && perl -le 'exit 1 unless $^V ge v5.8.1' && eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
 
 
