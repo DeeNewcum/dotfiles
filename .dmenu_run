@@ -27,16 +27,24 @@ cmdline=$(~/apps/bin/pydmenu.py)
 
 set -- $cmdline
 if [ "$1" = "error" ]; then
-    if perl -nle 'exit 1 if $.>1' /tmp/$USER.dmenu; then
-        zenity --info --text="the last command ($(cat /tmp/$USER.dmenu)) produced no output"
+    #if perl -nle 'exit 1 if $.>1' /tmp/$USER.dmenu; then
+    if [ "$(cat /tmp/$USER.dmenu.output)" ]; then
+        zenity --info --text="the output from last command was:\n\n$(cat /tmp/$USER.dmenu.cmd)\n==============================================\n$(cat /tmp/$USER.dmenu.output)"
     else
-        zenity --info --text="the output from last command was:\n\n$(perl -ple 'print q[=]x50 if $.==2' /tmp/$USER.dmenu)"
+        zenity --info --text="the last command ($(cat /tmp/$USER.dmenu.cmd)) produced no output"
     fi
     exit
 fi
 
-echo $cmdline   >  /tmp/$USER.dmenu
-eval "$cmdline" >> /tmp/$USER.dmenu 2>&1
+echo $cmdline   >  /tmp/$USER.dmenu.cmd
+eval "$cmdline" >  /tmp/$USER.dmenu.output  2>&1
+
+if [ "$(cat /tmp/$USER.dmenu.output)" ]; then
+    # "notify-send" is Gnome-specific.  For KDE, use "kdialog --passivepopup"
+    notify-send "$(cat /tmp/$USER.dmenu.cmd)"  "$(cat /tmp/$USER.dmenu.output)"
+            # note: the above doesn't let you adjust the timeout, or let you replace an existing dialog.  For that:
+            #           google  "dbus-send" "org.freedesktop.Notifications.Notify" 
+fi
 
 #zenity --info --text="$(cat /tmp/$USER.dmenu)"
 
