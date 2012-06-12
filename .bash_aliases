@@ -43,9 +43,11 @@ fi
 # Arguments are EXACTLY the same as mboxgrep's arguments.
 function mmboxgrep() { local tmp=$(mktemp); mboxgrep "$@" > $tmp; mutt -f $tmp; rm -f $tmp; }
 
-# run 'which' on the specified program, and then vim or less it
-function vimwhich()  { vim  $(type -p $1); }
-function lesswhich() { less $(type -p $1); }
+# combinations of 'which' with other programs
+function vimwhich()  { vim  $(type -p "$1"); }
+function lesswhich() { less $(type -p "$1"); }
+    # fully dereference and canonicalize a file...  should work on anything, not just symlinks
+function rlw() { readlink -e $(which "$1"); }
 
 
 # gnome-open, kde-open, etc
