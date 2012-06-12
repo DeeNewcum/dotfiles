@@ -36,8 +36,9 @@ My personal preferences are: Vim or Vi, Perl, Bash, and Screen.  (I want to try 
 
 There are several other large pieces of live-config-files that aren't checked in yet, that I would like to.  These may take some work to figure out:
 
-* Firefox profile (ie. ~/.mozilla/firefox/$profiledir), particularly the Greasemonkey scripts.
-* Android Tasker "programs"
+* my [Firefox profile](https://github.com/DeeNewcum/dotfiles/issues/15), particularly the Greasemonkey scripts
+* my Thunderbird message filters
+* my Android Tasker "programs"
 * my Tropo.com scripts
 
 ## Similar projects ##
