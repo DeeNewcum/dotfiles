@@ -12,7 +12,7 @@ This is my personal dotfile repo.  There are [many like it](https://github.com/s
 
 ## [DeeDot](https://github.com/DeeNewcum/deedot) ##
 
-DeeDot is a script I wrote that installs/maintains the symlinks, and it's well-documented [over there](https://github.com/DeeNewcum/deedot).
+DeeDot is a [separate project](https://github.com/DeeNewcum/deedot) I maintain.  It's a tool that installs/maintains symlinks for people's dotfile repostories.  It's well-documented [over there](https://github.com/DeeNewcum/deedot).
 
 ## Shared root ##
 
