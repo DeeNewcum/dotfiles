@@ -36,8 +36,11 @@ if [ "$1" = "error" ]; then
     exit
 fi
 
-echo $cmdline   >  /tmp/$USER.dmenu.cmd
-eval "$cmdline" >  /tmp/$USER.dmenu.output  2>&1
+output=$(eval "$cmdline"  2>&1)
+
+# do all logfile-writing at once, to avoid race conditions
+cat <<< "$output"  >/tmp/$USER.dmenu.output 
+cat <<< "$cmdline" >/tmp/$USER.dmenu.cmd    
 
 if [ "$(cat /tmp/$USER.dmenu.output)" ]; then
     # "notify-send" is Gnome-specific.  For KDE, use "kdialog --passivepopup"
