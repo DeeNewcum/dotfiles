@@ -17,6 +17,11 @@
  */
 
 
+// TODO:
+//      - find out if the Google Search API will let me do "feeling lucky" searches without bothering with frame-busting Google searches?
+//              https://developers.google.com/custom-search/v1/overview
+
+
 // Browser Keymarks.
 //
 // If you append "+" to a command that's a Google query, it upgrades it to "I'm feeling lucky"
@@ -29,12 +34,18 @@ var commands = {
     // development
     perl     : "http://perldoc.perl.org/search.html?q=%s",
     perlfunc : "http://perldoc.perl.org/functions/%s.html",
-    cpan     : "https://metacpan.org/search?q=%s",
+    cpan     : [
+                    ["metacpan", "https://metacpan.org/search?q=%s"],
+                    ["search.cpan.org", "http://search.cpan.org/search?query=%s&mode=all"],
+               ],
     js       : google("site:developer.mozilla.org"),
     git      : google("site:schacon.github.com/git/"),
 
     // sysadmin
-    man      : "http://man.cx/%s",
+    man      : [
+                    ["man.cx",         "http://man.cx/%s"],
+                    ["linux.die.net",  google("site:linux.die.net")],
+               ],
     deb      : google("site:packages.debian.org"),
 
     // ubuntu
@@ -60,65 +71,125 @@ function main() {
     if (window.location.search.match(/^\??$/)) {
         // if the page is loaded directly, display the help text in <script language="ignore"> below
         show_help_text();
+    } else if (window.location.search.match(/^\?in_frame&q=/)) {
+        show_diggbar();
     } else {
-        parse_search();
+        do_search(window.location.search);
     }
 }
 
 
 function show_help_text() {
-    document.write( document.getElementById("really_html").innerHTML );
+    document.write( document.getElementById("really_html__HELP").innerHTML );
 }
 
 
-function parse_search() {
-    var search = decodeURIComponent(
-                    window.location.search
-                        .replace(/^\?/, "")
-                        .replace(/\+/g, "%20"));
-    var cmd = search.match(/^(\S+)/)[0];
-    search = search.replace(/^\S+\s+/, "");
-    do_search(cmd, search);
-}
+function do_search(window_location_search) {
+    var p    = parse_search(window.location.search);
+            // "p" = "parsed"
 
-
-function do_search(cmd, args) {
-    //alert(cmd + "\n" + args);
-    var lucky_upgrade = false;
-    if (!commands[cmd]) {
-        // check if this is a Feeling Lucky upgrade
-        var cmd_unlucky;
-        if ((cmd_unlucky = cmd.replace(/\+$/, "")) != cmd && commands[cmd_unlucky]) {
-            lucky_upgrade = true;
-            cmd = cmd_unlucky;
-        } else {
-            //alert("unknown command: " + cmd);
-            //show_help_text();
-            //return;
-
-            // fallback to just googling the whole thing
-            args = cmd + " " + args;
-            cmd = "google";
-        }
-    }
-    var redirectto = commands[cmd];
-    if (typeof(redirectto) == "string") {
-        redirectto = redirectto.replace(/%s/, encodeURIComponent(args));
-            // reasons why this should be "encodeURIComponent":
-            //      - so the plus-symbol in  [g 2+3=] gets sent to Google
-            // reasons why this should be "encodeURI":
-            //      - ...
-    } else if (typeof(redirectto) == "function") {
-        redirectto = redirectto(args);
+    var cmdtype = typeof(commands[p.cmd]);
+    if (cmdtype == "string" || cmdtype == "function") {
+        window.location = interpolate_keymark( commands[p.cmd], p.args, p.lucky );
+    } else if (cmdtype == "object") {        // array
+        create_diggbar_frameset(p.cmd, p.args);
+        return;
     } else {
         alert("oops");
         return;
     }
-    if (lucky_upgrade && redirectto.match(/^https?:\/\/([^\/]*\.)google\.com\//)) {
+}
+
+
+function parse_search(search) {
+    search = decodeURIComponent(
+                    search
+                        .replace(/^\?/, "")
+                        .replace(/\+/g, "%20"));
+    var parsed = { };
+    parsed.cmd   = search.match(/^(\S+)/)[0];
+    parsed.args  = search.replace(/^\S+\s+/, "");
+    parsed.lucky = false;
+
+    var lucky_upgrade = false;
+    if (!commands[parsed.cmd]) {
+        // check if this is a Feeling Lucky upgrade
+        var cmd_unlucky;
+        if ((cmd_unlucky = parsed.cmd.replace(/\+$/, "")) != parsed.cmd && commands[cmd_unlucky]) {
+            parsed.lucky = true;
+            parsed.cmd = cmd_unlucky;
+        } else {
+            //alert("unknown command: " + parsed.cmd);
+            //show_help_text();
+            //return;
+
+            // fallback to just googling the whole thing
+            parsed.args = parsed.cmd + " " + parsed.args;
+            parsed.cmd  = "google";
+        }
+    }
+    //alert(p.cmd + "\n" + p.args);
+    return parsed;
+}
+
+
+// the frameset with:
+//      - the diggbar on a small top strip
+//      - the main content on the rest of the page
+function create_diggbar_frameset(cmd, args) {
+
+    var base_url = window.location.href.substring(0, window.location.href.length -  window.location.search.length);
+    var diggbar_url = base_url + "?" + "in_frame&q=" + encodeURIComponent(window.location.search.substr(1));
+
+    var first_redirectto = interpolate_keymark( commands[cmd][0][1], args, false );
+
+    document.write( "<frameset rows='50,*'>" +
+                    "<frame name=diggbar  src='" + diggbar_url + "'>" +
+                    "<frame name=content  src='" + first_redirectto + "'>" +
+                    "</frameset>");
+    document.close();       // this is critical
+}
+
+
+// content displayed in the top frame...   see also create_diggbar_frameset()
+function show_diggbar() {
+    var base_url = window.location.href.substring(0, window.location.href.length -  window.location.search.length);
+    var search = decodeURIComponent(window.location.search.replace(/^\?in_frame&q=/, ""));
+    var p = parse_search(search);
+            // "p" = "parsed"
+
+    document.write( document.getElementById("really_html__diggbar").innerHTML );
+
+    //document.write("searching for >>" + search + "<< inside a frame");
+    var first = true;
+    for (var n in commands[ p.cmd ]) {
+        link = commands[ p.cmd ][n];
+        //alert(link[0]);
+        if (!first) {
+            document.write("<span></span>");
+        }
+        first = false;
+        var url = interpolate_keymark(link[1], p.args, p.lucky);
+        document.write("<a target='content' href='" + url + "'>" + link[0] + "</a>");
+    }
+}
+
+
+function interpolate_keymark(keymark, args, feeling_lucky) {
+    var redirectto;
+    if (typeof(keymark) == "string") {
+        redirectto = keymark.replace(/%s/, encodeURIComponent(args));
+            // reasons why this should be "encodeURIComponent":
+            //      - so the plus-symbol in  [g 2+3=] gets sent to Google
+            // reasons why this should be "encodeURI":
+            //      - ...
+    } else if (typeof(keymark) == "function") {
+        redirectto = keymark(args);
+    }
+    if (feeling_lucky && redirectto.match(/^https?:\/\/([^\/]*\.)google\.com\//)) {
         redirectto = redirectto + "&btnI=1";
     }
-    //alert("redirecting to\n" + redirectto); // return;
-    window.location = redirectto;
+    return redirectto;
 }
 
 
@@ -127,7 +198,8 @@ function feeling_lucky(args) {
 }
 
 function google(args) {
-    return "https://www.google.com/search?q=" + encodeURI(args) + "+%s&ie=utf-8&oe=utf-8";
+    //return "https://www.google.com/search?q=" + encodeURI(args) + "+%s&ie=utf-8&oe=utf-8";
+    return "http://www.google.com/search?q=" + encodeURI(args) + "+%s&ie=utf-8&oe=utf-8";
 }
 
 
@@ -137,7 +209,7 @@ function google(args) {
 
 
 <!-- if we're doing a search, we don't want to spend any time trying to parse or render HTML -->
-<script id="really_html" language="ignore">
+<script id="really_html__HELP" language="ignore">
 
 <style>
     /* --==##  links aren't underlined unless you :hover  ##==-- */
@@ -201,6 +273,23 @@ This allows you to replace the default search engine in Firefox + Chrome with on
 
 
 
+
+<script id="really_html__diggbar" language="ignore">
+    <style>
+        body {background-color:#000; font-size:16pt; color:#fff}
+        span {padding:0 1em}
+
+        /* --==##  links aren't underlined unless you :hover  ##==-- */
+        a:link {color:#99f}
+        a:link:hover {text-decoration:underline; background-color:#aaf; color:#000}
+
+        a:visited {color:#faf}
+        a:visited:hover {background-color:#c6c; color:#000}
+
+        a {text-decoration:none}
+    </style>
+    <center>
+</script>
 
 
 
