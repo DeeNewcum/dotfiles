@@ -16,7 +16,7 @@ DeeDot is the tool that installs symlinks from ~/dotfiles/ to the live version o
 
 ## Shared root feature ##
 
-On some of my boxes, several different people have root access.  To avoid stepping on each other other's toes, I [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L1-5) so that it loads a ~/.sudo_bashrc from the original user's home directory. 
+On some of my boxes, several different people have root access.  To avoid stepping on each other other's toes, I [set up root's ~/.bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc#L1-5) so that it loads a ~/.sudo_bashrc from the original user's home directory, so that each user can have personalized settings despite using a shared account.
 
 [My personal ~/.sudo_bashrc](https://github.com/DeeNewcum/dotfiles/blob/master/.sudo_bashrc) has code that pulls in other .rc settings from the original home directory, including ~/.vimrc, ~/.inputrc, ~/.less, ~/.ackrc, and ~/.perltidyrc.
 
@@ -40,7 +40,7 @@ There are several other large pieces of live-config-files that aren't checked in
 * my [Thunderbird profile](https://github.com/DeeNewcum/dotfiles/issues/15#issuecomment-6276610), particularly the message filters
 * my [Android Tasker](http://lifehacker.com/5599116/how-to-turn-your-android-phone-into-a-fully+automated-superphone) scripts
 * my [Tropo.com](http://www.tropo.com/) scripts
-  * Despite the fact that Tropo.com's main use-case is large-scale applications, it "[is always free for developer use, it's not a limited time offer](https://www.tropo.com/docs/scripting/faq.htm)".  This makes it very handy for building personal utilities. (eg. the [Google Voice enhancement that allows forwarding to a number with an extension](http://blog.tropo.com/2011/05/13/extending-googevoice-with-tropo/))
+  * Despite the fact that Tropo.com's main use-case is large-scale applications, it "[is always free for developer use, it's not a limited time offer](https://www.tropo.com/docs/scripting/faq.htm)".  This makes it very handy for building personal utilities. (eg. the [Google Voice enhancement that makes it possible for Google Voice to forward to a number that requires an extension](http://blog.tropo.com/2011/05/13/extending-googevoice-with-tropo/))
 
 ## Similar projects ##
 
@@ -65,4 +65,4 @@ There are a [TON of other people](https://github.com/search?utf8=%E2%9C%93&q=dot
 
 Unless otherwise noted, files here are available under the [CC0 1.0](http://creativecommons.org/publicdomain/zero/1.0/) license.  (ie. public domain)
 
-Some files are authored by other folks and have author/licensing information at the top that supersedes this.
+Some files are authored by other folks and have author/licensing information at the top that supersedes this license.
