@@ -20,7 +20,7 @@
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
 
-    use constant CLEANUP => 0;      # 0 means "don't cleanup files...  leave them sitting in /tmp"
+    use constant CLEANUP => 1;      # 0 means "don't cleanup files...  leave them sitting in /tmp"
                                     # 1 means "try to cleanup files"     (note: this currently
                                     #                   doesn't work well, and makes OpenOffice crash)
     
@@ -59,8 +59,17 @@ if (&CLEANUP) {
     sleep(10);
 
         ### acquiring exclusive lock
-    flock($final_fh, LOCK_EX)   or die "Unable to exclusively lock $final_file: $!\n";
+    #flock($final_fh, LOCK_EX)   or die "Unable to exclusively lock $final_file: $!\n";
         ### exclusive lock acquired
+
+    ### waiting for lockfiles to be removed
+    my $final_temp_dir = File::Basename::dirname($final_file);
+    while (1) {
+        my @g = grep {!m#/\.\.?$# && $_ ne $final_file} glob("$final_temp_dir/*"), glob("$final_temp_dir/.*");
+        last if (scalar(@g) == 0);      # only one file found (the original file)...  no lock files found
+        sleep 1;
+    }
+    ### all lockfiles removed
 }
 
 
