@@ -24,10 +24,14 @@
                                     # 1 means "try to cleanup files"     (note: this currently
                                     #                   doesn't work well, and makes OpenOffice crash)
     
+    use constant DETACH => 1;       # true/false...   should we detach from the terminal, and
+                                    #           let the CLEANUP process work in the background?
+
 
 
 my @temp_dirs;
 my $cur_dir;
+our $child_pid = 0;
 
 
 my $scp_path = shift
@@ -53,7 +57,13 @@ system "xdg-open", $final_file;
 open my $final_fh, '<', $final_file;
 
 
-if (&CLEANUP) {
+if (&CLEANUP && &DETACH) {
+    $child_pid = fork();
+}
+
+
+
+if (&CLEANUP && !$child_pid) {
     ## wait around for 1 minute, to let the user interact with the file
     #sleep(1 * 60);
     sleep(10);
@@ -75,7 +85,7 @@ if (&CLEANUP) {
 
 ## cleanup
 END {
-    if (&CLEANUP) {
+    if (&CLEANUP && !(&DETACH && $child_pid)) {
         ### cleaning up
         chdir '/';      # make sure CWD isn't inside one of the tempdirs
         File::Path::remove_tree(@temp_dirs);
