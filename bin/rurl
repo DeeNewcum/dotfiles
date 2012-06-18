@@ -14,7 +14,7 @@
     use File::Path qw(mkpath);
 
     use Data::Dumper;
-    use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
 my $url = shift or die "usage: $0 <url>\n";
 
@@ -22,6 +22,7 @@ my @url_mapping = read_url_mappings();
 #die Dumper \@url_mapping;
 
 foreach my $map (@url_mapping) {
+    #printf STDERR "comparing:\n\t%s\n\t%s\t\t( %s )\n", substr($url, 0, length($map->[0])), @$map;
     if (substr($url, 0, length($map->[0])) eq $map->[0]) {
         my $file_path = catdir $map->[1], substr($url, length($map->[0]));
         print "$file_path\n";
@@ -37,7 +38,6 @@ exit 1;
 
 sub read_url_mappings {
     my @url_mapping;
-    #foreach my $doturl_file (readpipe q[locate -r '/\.url$']) {
     foreach my $doturl_file (locate_doturl()) {
         chomp $doturl_file;
         my $dir = dirname($doturl_file);
@@ -46,13 +46,23 @@ sub read_url_mappings {
             push @url_mapping, [$url, $dir];
         }
     }
+    
+    # Within the mappings, sometimes URLs overlap
+    #   (eg. http://example.com/ and http://example.com/cgi-bin/)
+    # but the paths they map to DON'T.  Give priority to longer (more specific) URLs.
+    @url_mapping = sort {length($b->[0]) <=> length($a->[0])} @url_mapping;
+
     return @url_mapping;
 }
 
 
 
 # cache the output of    `locate -r '\.url$'`
+#       (slocate can be pretty slow)
 sub locate_doturl {
+    ## bypass all caching functionality
+    #return readpipe q[locate -r '/\.url$'];
+
     $ENV{XDG_CACHE_HOME} ||= catdir($ENV{HOME}, ".cache");
     my $rurl_cache = catfile($ENV{XDG_CACHE_HOME}, "rurl");
     #die "$rurl_cache\n\t";
