@@ -47,7 +47,7 @@ if (!$foundit) {
 }
 
 
-my $starting_URL = slurp($foundit);
+my ($starting_URL) = slurp($foundit);
 chomp $starting_URL;
 
 # escape a few characters

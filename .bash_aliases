@@ -49,6 +49,10 @@ function lesswhich() { less $(type -p "$1"); }
     # fully dereference and canonicalize a file...  should work on anything, not just symlinks
 function rlw() { readlink -e $(which "$1"); }
 
+# combinations of 'rurl' with other programs
+function vimurl()    { vim $(rurl "$1"); }
+function lessurl()   { less $(rurl "$1"); }
+
 
 # gnome-open, kde-open, etc
 function go() { xdg-open "$@"; }

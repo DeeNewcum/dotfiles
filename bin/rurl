@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+
+# Do the reverse of the 'url' script -- take in a URL, and output its corresponding filename.
+# 
+# Each .url file can contain multiple lines, to handle instances where multiple URLs map to the same
+# directory.
+
+
+    use strict;
+    use warnings;
+
+    use File::Spec::Functions;
+    use File::Basename;
+    use File::Path qw(mkpath);
+
+    use Data::Dumper;
+    use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+my $url = shift or die "usage: $0 <url>\n";
+
+my @url_mapping = read_url_mappings();
+#die Dumper \@url_mapping;
+
+foreach my $map (@url_mapping) {
+    if (substr($url, 0, length($map->[0])) eq $map->[0]) {
+        my $file_path = catdir $map->[1], substr($url, length($map->[0]));
+        print "$file_path\n";
+        exit 0;
+    }
+}
+
+print STDERR "No matching path found.\n";
+exit 1;
+
+
+
+
+sub read_url_mappings {
+    my @url_mapping;
+    #foreach my $doturl_file (readpipe q[locate -r '/\.url$']) {
+    foreach my $doturl_file (locate_doturl()) {
+        chomp $doturl_file;
+        my $dir = dirname($doturl_file);
+        foreach my $url (slurp($doturl_file)) {
+            chomp $url;
+            push @url_mapping, [$url, $dir];
+        }
+    }
+    return @url_mapping;
+}
+
+
+
+# cache the output of    `locate -r '\.url$'`
+sub locate_doturl {
+    $ENV{XDG_CACHE_HOME} ||= catdir($ENV{HOME}, ".cache");
+    my $rurl_cache = catfile($ENV{XDG_CACHE_HOME}, "rurl");
+    #die "$rurl_cache\n\t";
+    if (-e $rurl_cache && -M $rurl_cache < 1.0) {         # expire after 1.0 day(s)
+        return slurp($rurl_cache);
+    } else {
+        my @output = readpipe q[locate -r '/\.url$'];
+        mkpath($ENV{XDG_CACHE_HOME});
+        open my $pout, '>', $rurl_cache     or die $!;
+        print $pout @output;
+        return @output;
+    }
+}
+
+
+
+# quickly read a whole file
+sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
