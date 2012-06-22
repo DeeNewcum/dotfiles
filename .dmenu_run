@@ -36,15 +36,22 @@ if [ "$1" = "error" ]; then
     exit
 fi
 
+STARTED=$(date +%s)     # in seconds
 output=$(eval "$cmdline"  2>&1)
+ELAPSED=$(( $(date +%s) - $STARTED ))
 
 # do all logfile-writing at once, to avoid race conditions
 cat <<< "$output"  >/tmp/$USER.dmenu.output 
 cat <<< "$cmdline" >/tmp/$USER.dmenu.cmd    
 
-if [ "$(cat /tmp/$USER.dmenu.output)" ]; then
+# when should we display the output?
+#   - if there's output to display
+#   - if the command took less than 5 seconds to complete
+#           (because some long-running processes are needlessly noisy...   ahem, Firefox)
+#           For the most part, we're only interested in startup errors.
+if [ "$(cat /tmp/$USER.dmenu.output)" -a $ELAPSED -le 5 ]; then
     # "notify-send" is Gnome-specific.  For KDE, use "kdialog --passivepopup"
-    notify-send "$(cat /tmp/$USER.dmenu.cmd)"  "$(cat /tmp/$USER.dmenu.output)"
+    notify-send "$(cat /tmp/$USER.dmenu.cmd)"  "$(cat /tmp/$USER.dmenu.output) -- took $ELAPSED seconds"
             # note: the above doesn't let you adjust the timeout, or let you replace an existing dialog.  For that:
             #           google  "dbus-send" "org.freedesktop.Notifications.Notify" 
 fi
