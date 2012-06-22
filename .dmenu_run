@@ -51,7 +51,7 @@ cat <<< "$cmdline" >/tmp/$USER.dmenu.cmd
 #           For the most part, we're only interested in startup errors.
 if [ "$(cat /tmp/$USER.dmenu.output)" -a $ELAPSED -le 5 ]; then
     # "notify-send" is Gnome-specific.  For KDE, use "kdialog --passivepopup"
-    notify-send "$(cat /tmp/$USER.dmenu.cmd)"  "$(cat /tmp/$USER.dmenu.output) -- took $ELAPSED seconds"
+    notify-send "$(cat /tmp/$USER.dmenu.cmd)"  "$(cat /tmp/$USER.dmenu.output)"
             # note: the above doesn't let you adjust the timeout, or let you replace an existing dialog.  For that:
             #           google  "dbus-send" "org.freedesktop.Notifications.Notify" 
 fi
