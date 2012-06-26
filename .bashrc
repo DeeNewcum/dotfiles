@@ -74,6 +74,18 @@ export LESS_TERMCAP_ue=$'\E[0m'             # end underline
 ###################################################
 
 
+###################################################
+############  MINIMAL COMPLETION  #################
+###################################################
+if [ "$(type -t _filedir_xspec)" != "function" ]; then
+    # Hopefully we have the Bash Completion project installed.
+    # But if not, here are a few simplified fallbacks.
+    complete -o nospace -d cd
+fi
+###################################################
+###################################################
+
+
 if [ "$LOGNAME" = "root" ]; then
     # take care when overwriting things, if root
     alias rm='rm -i'
