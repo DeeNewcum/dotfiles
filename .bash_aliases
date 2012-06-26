@@ -87,6 +87,13 @@ function tal { tail -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d
 function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=grep{$j++%2}@ARGV;@ARGV=()}s/$p/for($i=0;$i<@c&&!defined$-[$i+1];$i++){}"\e[$c[$i]m$+\e[0m"/gome' "$@"; }
 
 
+# I tend to store a LOT of random notes under /var/tmp/, with gibberish filenames...   this lets me quickly scan them, to find
+# the one I wanted
+#       (they have gibberish filenames on the same theory that GMail doesn't have folders --
+#        searching is more important than organizing)
+alias lasttmp='ls -1td /var/tmp/* | head | perl -nle "print if -f && -T" | xargs less'
+                        # once in less, use '[' and ']' (or :n and :p) to quickly scan the files
+
 
 alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
 
