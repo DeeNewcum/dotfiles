@@ -91,7 +91,7 @@ function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=gre
 # the one I wanted
 #       (they have gibberish filenames on the same theory that GMail doesn't have folders --
 #        searching is more important than organizing)
-alias lasttmp='ls -1td /var/tmp/* | head | perl -nle "print if -f && -T" | xargs less'
+alias lasttmp='ls -1td /var/tmp/* | perl -nle "print if -f && -O" | head | perl -nle "print if -T" | xargs less'
                         # once in less, use '[' and ']' (or :n and :p) to quickly scan the files
 
 
