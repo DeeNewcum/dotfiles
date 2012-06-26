@@ -57,7 +57,7 @@ sub read_url_mappings {
 
 
 
-# cache the output of    `locate -r '\.url$'`
+# cache the output of    `locate -r '/\.url$'`
 #       (slocate can be pretty slow)
 sub locate_doturl {
     ## bypass all caching functionality
