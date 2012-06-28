@@ -2,12 +2,28 @@
 
 # Pass this a filename/directory, and this will return the equivalent URL for that file.
 #
-# This relies on a file named '.url' located somewhere in the directory (or any of its
-# parents) of the specified file, that tells what that specific directory=>URL mapping is.
+# This relies on a file named '.url' located somewhere in the directory structure above the
+# specified file, that indicates what that specific directory=>URL mapping is.  (see example below)
 #
-# While there are MANY things that might make it confusing to figure out where a given file is
-# actually served at (eg. Apache mod_rewrite, web framework routes, ...), it's hoped that these
-# manually-created files, sprinkled in a few places, may do the trick in many cases.
+# It's true that there are MANY things that can make it complex to figure out what URL a specific
+# phyical file is actually served at (eg. Apache mod_rewrite, web framework routes, ...).  However,
+# it's hoped that these manually-created .url files, carefully constructed and sprinkled around
+# in the right places, may do the trick in many cases.
+#
+#
+# For example, on a default install of Ubuntu + Apache:
+#
+#       /var/www/.url contains:
+#               http://localhost/
+#
+#       /usr/lib/cgi-bin/.url contains:
+#               http://localhost/cgi-bin/
+#
+#       > cd /usr/lib/cgi-bin/awstats/
+#
+#       > url ./awstats.pl
+#               http://localhost/cgi-bin/awstats/awstats.pl
+#
 
     use strict;
     use warnings;
