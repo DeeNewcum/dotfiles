@@ -39,24 +39,29 @@ else
     function large_txtfiles() { /bin/find $PWD ! -local -prune -o -type f -print | perl -nle 'print if -T' | xargs_newline /bin/ls -l | filesize_sort | tail -100; }
 fi
 
-# Do an mboxgrep search, and display the results in mutt.
-# Arguments are EXACTLY the same as mboxgrep's arguments.
-function mmboxgrep() { local tmp=$(mktemp); mboxgrep "$@" > $tmp; mutt -f $tmp; rm -f $tmp; }
+
+# just like 'cd', except that it can also accept filenames, in which case it will CD to the directory *containing* that file
+function cdd { if [ -f "$1" ]; then cd $(dirname "$1"); else cd "$1"; fi; }
+
 
 # combinations of 'which' with other programs
 function vimwhich()  { vim  $(type -p "$1"); }
 function lesswhich() { less $(type -p "$1"); }
-    # fully dereference and canonicalize a file...  should work on anything, not just symlinks
-function rlw() { readlink -e $(which "$1"); }
+
+    # fully dereference and canonicalize a file...  should work on anything:  stuff in $PATH, symlinks, whatever
+#function abs() { readlink -e $(which "$1"); }
+function abs() { perl -MCwd=abs_path -e 'print abs_path(shift), "\n"' "$( [ -e "$1" ] && echo "$1" || which "$1" )"; }
 
 # combinations of 'rurl' with other programs
-function vimurl()    { vim $(rurl "$1"); }
-function lessurl()   { less $(rurl "$1"); }
+function vimu()      { vim $(rurl "$1"); }
+function lessu()     { less $(rurl "$1"); }
+function cdu()       { cdd $(rurl "$1"); }
 
 
 # gnome-open, kde-open, etc
 function go() { xdg-open "$@"; }
 #function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "scp", $ARGV[0], "."; system "xdg-open *"' "$@"; }
+
 
 # List all executable files in a package.  Param#1: package name (apt-get).
 # Useful in combination with dmenu.
@@ -93,6 +98,11 @@ function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=gre
 #        searching is more important than organizing)
 alias lasttmp='ls -1td /var/tmp/* | perl -nle "print if -f && -O" | head | perl -nle "print if -T" | xargs less'
                         # once in less, use '[' and ']' (or :n and :p) to quickly scan the files
+
+
+# Do an mboxgrep search, and display the results in mutt.
+# Arguments are EXACTLY the same as mboxgrep's arguments.
+function mmboxgrep() { local tmp=$(mktemp); mboxgrep "$@" > $tmp; mutt -f $tmp; rm -f $tmp; }
 
 
 alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
