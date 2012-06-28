@@ -24,6 +24,8 @@ On some of my boxes, several different people have root access.  To avoid steppi
 
 I sometimes work on older Un*xes, so I prefer to use scripting languages that are widely available, and use scripts that have a bare-minimum of dependencies.  Generally, this means older versions of Perl (using minimal extra modules) and Bash/sh scripts.
 
+I believe in [using URLs whenever possible](https://github.com/DeeNewcum/dotfiles/wiki/URL-centric).
+
 I work on ~5 different machines on a daily basis, so checking in dotfiles is very valuable to me.
 
 ## Tools I work with ##
