@@ -10,14 +10,17 @@
 # it's hoped that these manually-created .url files, carefully constructed and sprinkled around
 # in the right places, may do the trick in many cases.
 #
+# Format of .url files:
+#       - each URL is on a separate line
+#       - multiple URLs can be given, if there are several alternate URLs that point to the same content
+#       - when there are multiple URLs, the URL on the first line is the default/canonical URL
 #
-# For example, on a default install of Ubuntu + Apache:
 #
-#       /var/www/.url contains:
-#               http://localhost/
+# Example:    (on a default install of Ubuntu + Apache)
 #
-#       /usr/lib/cgi-bin/.url contains:
-#               http://localhost/cgi-bin/
+#       > echo "http://localhost/"  > /var/www/.url
+#
+#       > echo "http://localhost/cgi-bin/"  > /usr/lib/cgi-bin/.url
 #
 #       > cd /usr/lib/cgi-bin/awstats/
 #

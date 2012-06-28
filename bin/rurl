@@ -2,8 +2,9 @@
 
 # Do the reverse of the 'url' script -- take in a URL, and output its corresponding filename.
 # 
-# Each .url file can contain multiple lines, to handle instances where multiple URLs map to the same
-# directory.
+#
+# Having multiple URLs listed in a .url file isn't used at all for the 'url' script.  However, 
+# you'll find that multiple URLs ARE very useful for this one.
 
 
     use strict;
