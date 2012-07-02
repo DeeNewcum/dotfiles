@@ -51,14 +51,19 @@ else
     endif
 endif
 
+if has("spell")             " spell-check settings
+    set spelllang=en_us
+    hi clear SpellBad
+    hi link SPellBad ErrorMsg
+endif
+
+nnoremap <leader>s :setl spell!<CR>|            " toggle spell-check
 
 " we don't enable spell-checking here...  rather, it gets enabled on a per-filetype basis
 " in the ~/.vim/ftplugin/ files   (see :help ftplugin-overrule)
 function! Enable_Spell_Check()
     if has("spell") && !&diff
-        set spell spelllang=en_us                                   " enable spell-checking
-        hi clear SpellBad
-        hi link SPellBad ErrorMsg
+        set spell                                                   " enable spell-checking
     endif
 endfunction
 
@@ -73,7 +78,7 @@ autocmd BufEnter *.md set textwidth=0
 autocmd BufEnter *.creole set textwidth=0
 
 
-" Take care of forgetting to use sudo with :w!!
+" take care of forgetting to use sudo with :w
 cmap w!! w !sudo tee % > /dev/null
 
 
