@@ -49,13 +49,19 @@ else
         "colorscheme desert
         colorscheme pablo
     endif
+endif
 
-    if has("spell")
+
+" we don't enable spell-checking here...  rather, it gets enabled on a per-filetype basis
+" in the ~/.vim/ftplugin/ files   (see :help ftplugin-overrule)
+function! Enable_Spell_Check()
+    if has("spell") && !&diff
         set spell spelllang=en_us                                   " enable spell-checking
         hi clear SpellBad
         hi link SPellBad ErrorMsg
     endif
-endif
+endfunction
+
 
 set notitle     " don't change the xterm title -- the one set by ~/.bashrc is the one I prefer
 
