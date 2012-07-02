@@ -15,9 +15,6 @@ set clipboard=unnamed                                           " default to the
 set textwidth=100
 set noerrorbells visualbell t_vb=                               " quiet!!!
 let mapleader = ","
-if has("spell")
-    set spell spelllang=en_us                                   " enable spell-checking
-endif
 
 filetype plugin on                                              " http://vim.wikia.com/wiki/Keep_your_vimrc_file_clean
 set wildmenu wildmode=list:longest,full                         " http://paperlined.org/apps/vim/wildmenu.html
@@ -33,10 +30,11 @@ if $LOGNAME != "root"       " modeline can compromise security
     set modeline
 endif
 
-
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
 set t_Co=256
 if &diff
+    " TODO: make these settings override the 'loadview' command below
+    "       (for instance, some of the views have spelling set)
     syntax off
     colorscheme evening
     set nospell
@@ -50,6 +48,12 @@ else
     else
         "colorscheme desert
         colorscheme pablo
+    endif
+
+    if has("spell")
+        set spell spelllang=en_us                                   " enable spell-checking
+        hi clear SpellBad
+        hi link SPellBad ErrorMsg
     endif
 endif
 
