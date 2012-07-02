@@ -15,6 +15,9 @@ set clipboard=unnamed                                           " default to the
 set textwidth=100
 set noerrorbells visualbell t_vb=                               " quiet!!!
 let mapleader = ","
+if has("spell")
+    set spell spelllang=en_us                                   " enable spell-checking
+endif
 
 filetype plugin on                                              " http://vim.wikia.com/wiki/Keep_your_vimrc_file_clean
 set wildmenu wildmode=list:longest,full                         " http://paperlined.org/apps/vim/wildmenu.html
@@ -36,6 +39,7 @@ set t_Co=256
 if &diff
     syntax off
     colorscheme evening
+    set nospell
 else
     syntax on
     if v:version >= 700
