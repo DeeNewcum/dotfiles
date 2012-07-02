@@ -68,12 +68,12 @@ while (my ($git_dir, $data) = each %repos) {
     $data->{latest_change} = 0;
     $data->{latest_change_human} = '';
     if (!$cmdline_raw) {
-        foreach my $l (split /\n\n/s, git(qw[rev-list --all --walk-reflogs --pretty=%ct%n%cr%n], $git_dir)) {
+        foreach my $l (split /\n(?=commit )/s, git(qw[rev-list --all --walk-reflogs --pretty=%ct%n%cr%n], $git_dir)) {
             my @F = split /\n/, $l;
             splice @F, 0, scalar(@F) - 3;
             my ($revision, $datetime, $datetime_human) = @F;
             push( @{$revisions{$revision}}, $git_dir);
-            if ($datetime > $data->{latest_change}) {
+            if (defined($datetime) && $datetime > $data->{latest_change}) {
                 $data->{latest_change}       = $datetime;
                 $data->{latest_change_human} = $datetime_human;
             }
