@@ -63,6 +63,14 @@ There are a [TON of other people](https://github.com/search?utf8=%E2%9C%93&q=dot
 * [sontek](https://github.com/sontek/dotfiles)
 * [sharad](https://github.com/sharad/rc) (uses m4 to customize files that have no 'source' capability)
 
+[Vim-specific ones](https://www.google.com/search?hl=en&q=site%3Agithub.com+vim+configuration+OR+vimrc+OR+settings+OR+plugins):
+
+* [**janus** by carlhuda](https://github.com/carlhuda/janus/) — the most well-known...  it has been compared to the venerable [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh/), in terms of providing a good starting base, allowing you to avoid a lot of work just to get a modern environment working quickly
+* [amix](https://github.com/amix/vimrc)
+* [krisleech](https://github.com/krisleech/vimfiles)
+* [nvie](https://github.com/nvie/vimrc)
+* [trinitum](https://github.com/trinitum/vimrc)
+
 ## License ##
 
 Unless otherwise noted, files here are available under the [CC0 1.0](http://creativecommons.org/publicdomain/zero/1.0/) license.  (ie. public domain)

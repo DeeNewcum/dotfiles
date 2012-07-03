@@ -56,6 +56,12 @@ else
 
     if exists("&colorcolumn")
         set colorcolumn=+1        " highlight column after 'textwidth'
+            " NOTE: colorcolumn has a negative side-effect:  when you copy-n-paste things
+            "       using the terminal-emulator's functionality (instead of Vim's internal features)
+            "       a bunch of extraneous spaces get appended to each line.
+            "       TODO: research ways to avoid this side-effect
+            "             or, failing that, use a different method to hilight the 'textwidth'
+            "             point:    http://vim.wikia.com/wiki/Highlight_long_lines
     endif
 endif
 
