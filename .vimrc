@@ -40,6 +40,7 @@ if &diff
     syntax off
     colorscheme evening
     set nospell
+    set colorcolumn=
 else
     syntax on
     if v:version >= 700
