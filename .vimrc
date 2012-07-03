@@ -37,8 +37,6 @@ endif
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
 set t_Co=256
 if &diff
-    " TODO: make these settings override the 'loadview' command below
-    "       (for instance, some of the views have spelling set)
     syntax off
     colorscheme evening
     set nospell
@@ -213,9 +211,14 @@ endif
 
 " ======================== persistence ======================
 
-" http://vim.wikia.com/wiki/Make_views_automatic
-autocmd BufWinLeave ?* mkview
-autocmd BufWinEnter ?* silent loadview
+
+" If we're doing a diff, we DON'T want any fancy colors or settings.
+" We want the colors to be EXACTLY as specified in the 'if &diff' section above.
+if ! &diff
+    " http://vim.wikia.com/wiki/Make_views_automatic
+    autocmd BufWinLeave ?* mkview
+    autocmd BufWinEnter ?* silent loadview
+endif
 
 
 " http://vimbits.com/bits/242
