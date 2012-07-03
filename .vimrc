@@ -2,6 +2,10 @@
     "###
     "###  TODO: read http://learnvimscriptthehardway.stevelosh.com/
     "###
+    
+    "###  for tips on making sure your centralized .vimrc works across many different versions of
+    "###  Vim -- old and new -- see:
+    "###        http://blog.sanctum.geek.nz/gracefully-degrading-vimrc/
 
 
 set nocompatible encoding=utf8 nobackup                         " sane defaults
@@ -48,6 +52,10 @@ else
     else
         "colorscheme desert
         colorscheme pablo
+    endif
+
+    if exists("&colorcolumn")
+        set colorcolumn=+1        " highlight column after 'textwidth'
     endif
 endif
 
