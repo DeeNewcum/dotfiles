@@ -49,8 +49,8 @@ function cdd { if [ -f "$1" ]; then cd $(dirname "$1"); else cd "$1"; fi; }
 function abs() { perl -MCwd=abs_path -e 'print abs_path(shift), "\n"' "$( [ -e "$1" ] && echo "$1" || which "$1" )"; }
 
 # combinations of 'which' with other programs
-function vimwhich()  { vim  $(type -p "$1"); }
-function lesswhich() { less $(type -p "$1"); }
+function vimw()      { vim  $(type -p "$1"); }
+function lessw()     { less $(type -p "$1"); }
 function cdw()       { cdd $(abs $(type -p "$1" )); }      # more like "cduaw", but whatever
 
 # combinations of 'rurl' with other programs
