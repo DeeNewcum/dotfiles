@@ -41,6 +41,7 @@ if &diff
     colorscheme evening
     set nospell
     set colorcolumn=
+    set nolist
 else
     syntax on
     if v:version >= 700
@@ -52,6 +53,12 @@ else
         "colorscheme desert
         colorscheme pablo
     endif
+
+    " make tabs visible
+    set list listchars=tab:› 
+
+    " hilight tabs that are used for alignment -- we only want to use them for indenting
+    match ErrorMsg /\(	\|^\)\@<!	\+/
 
     if exists("&colorcolumn")
         set colorcolumn=+1        " highlight column after 'textwidth'
@@ -146,16 +153,10 @@ nnoremap <leader>L :call clearmatches()<cr>
 
 " Use 'smart tabs'  -- tabs for indenting, spaces for aligning
 
-" make tabs visible
-set list listchars=tab:› 
 
 " toggle between spaces and tabs  (to do a manual form of "smart tabs")
 nnoremap <C-t> :set et!<cr>
 vnoremap <C-t> :set et!<cr>
-
-" hilight tabs that are used for alignment -- we only want to use them for indenting
-match ErrorMsg /\(	\|^\)\@<!	\+/
-
 
 
 " Originally from http://www.noah.org/engineering/dotfiles/.vimrc
