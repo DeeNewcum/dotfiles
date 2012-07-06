@@ -98,6 +98,10 @@ has_complete fg          || complete -j -P '%' fg jobs disown
 has_complete shopt       || complete -A shopt shopt
 has_complete unalias     || complete -a unalias
 has_complete unset       || complete -v unset
+has_complete su          || complete -u su
+has_complete telnet      || complete -A hostname rsh telnet rlogin ftp ping xping host traceroute nslookup
+has_complete ssh         || complete -A hostname ssh
+has_complete viencrypt   || complete -f -o default -X '!*.+(gpg|GPG)'  viencrypt
 
 has_complete zip         || complete -f -o default -X '*.+(zip|ZIP)'  zip
 has_complete unzip       || complete -f -o default -X '!*.+(zip|ZIP)' unzip
@@ -108,9 +112,6 @@ has_complete gunzip      || complete -f -o default -X '!*.+(gz|GZ)'   gunzip
 has_complete bzip2       || complete -f -o default -X '*.+(bz2|BZ2)'  bzip2
 has_complete bunzip2     || complete -f -o default -X '!*.+(bz2|BZ2)' bunzip2
 
-has_complete su          || complete -u su
-has_complete telnet      || complete -A hostname rsh telnet rlogin ftp ping xping host traceroute nslookup
-has_complete ssh         || complete -A hostname ssh
 
 ###################################################
 ###################################################
