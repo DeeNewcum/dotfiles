@@ -40,7 +40,7 @@ if &diff
     syntax off
     colorscheme evening
     set nospell
-    set colorcolumn=
+    silent! set colorcolumn=
     set nolist
 else
     syntax on
