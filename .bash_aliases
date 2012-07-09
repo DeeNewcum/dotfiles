@@ -54,9 +54,10 @@ function lessw()     { less $(type -p "$1"); }
 function cdw()       { cdd $(abs $(type -p "$1" )); }      # more like "cduaw", but whatever
 
 # combinations of 'rurl' with other programs
-function vimu()      { vim $(rurl "$1"); }
-function lessu()     { less $(rurl "$1"); }
-function cdu()       { cdd $(rurl "$1"); }
+function vimu()      { vim   $(rurl "$1"); }
+function lessu()     { less  $(rurl "$1"); }
+function cdu()       { cdd   $(rurl "$1"); }
+function touchu()    { touch $(rurl "$1"); }
 
 
 # gnome-open, kde-open, etc
@@ -86,6 +87,13 @@ fi
 #function tal { tail -$(perl -MTerm::ReadKey -e 'print((GetTerminalSize)[1] - 2)'); }
 function hed { head -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d+)/'); }
 function tal { tail -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d+)/'); }
+
+
+# reattach to the screen named 'main'
+alias   srm='screen -U -dr main'                                                                     
+# create a screen session named 'main'
+alias   screen.main='screen -U -S main'  
+
 
 
 # Do ANSI-coloring of text, based on arbitrary regexps.

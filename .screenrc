@@ -1,0 +1,26 @@
+# Set up the last two lines to:
+#  1) show all the windows, and the time
+#  2) show the hardstatus that's updated every time I change directories
+caption always "%H         %n     %w                 %D %M %d  %c"
+hardstatus alwayslastline "%h"
+
+
+# don't display the copyright page
+startup_message off
+
+# use ` for the escape key
+escape ``
+
+# use a bigger scrollback buffer!
+defscrollback 1000
+
+# How long to display temporary messages for.
+msgwait 1
+
+
+
+attrcolor b ".I"    # allow bold colors - necessary for some reason
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'   # tell screen how to set colors. AB = background, AF=foreground
+defbce on    # use current bg color for erased chars
+
+
