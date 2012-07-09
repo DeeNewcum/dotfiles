@@ -9,6 +9,7 @@
 
 # prompt
 XTERM_TITLE='\[\033]0;\h\007\]'
+[ "$IS_VIRTUAL_CONSOLE" ] && XTERM_TITLE=''         # don't use the Xterm title when at the Linux Virtual Console
 PS1=$XTERM_TITLE'\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
     # Note: As suggested by:
     #           http://tldp.org/HOWTO/Bash-Prompt-HOWTO/xterm-title-bar-manipulations.html
