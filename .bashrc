@@ -30,7 +30,7 @@ type -p less >/dev/null   &&   export PAGER='less -i'
 
 
 # history
-HISTCONTROL=ignoreboth      # don't put duplicate lines or lines starting with space in the history.
+HISTCONTROL=ignoredups      # don't put duplicate lines in history
 shopt -s histappend         # append to the history file, don't overwrite it
 HISTSIZE=1000
 HISTFILESIZE=2000
