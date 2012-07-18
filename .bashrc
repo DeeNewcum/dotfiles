@@ -132,6 +132,15 @@ fi
     #           Defaults env_keep += "DISPLAY XAUTHORIZATION XAUTHORITY"
 
 
+# make ssh-agent work properly when inside tmux
+if [[ -z "$TMUX" && ! -z "$SSH_TTY" && ! -z "SSH_AUTH_SOCK" ]]; then
+    ORIG_SSH_AUTH_SOCK="$(readlink ~/.ssh/ssh_auth_sock)"
+    ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
+    # restore the original value when this shell exits
+    trap 'ln -sf "$ORIG_SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock' EXIT
+fi
+
+
 # make less be able to open up tar files and gzip files
 type -p lesspipe >/dev/null   &&   eval "$(SHELL=/bin/sh lesspipe)"
 
