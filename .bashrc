@@ -137,7 +137,12 @@ if [[ -z "$TMUX" && ! -z "$SSH_TTY" && ! -z "SSH_AUTH_SOCK" ]]; then
     ORIG_SSH_AUTH_SOCK="$(readlink ~/.ssh/ssh_auth_sock)"
     ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
     # restore the original value when this shell exits
-    trap 'ln -sf "$ORIG_SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock' EXIT
+    trap restore_orig_ssh_auth_sock EXIT
+    function restore_orig_ssh_auth_sock() {
+        # There are lots of different scenarios, when there are concurrent logins.
+        # It's not always clear which is the newest/best $SSH_AUTH_SOCK to use.
+        [ -e "$ORIG_SSH_AUTH_SOCK" ] && ln -sf "$ORIG_SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
+    }
 fi
 
 
