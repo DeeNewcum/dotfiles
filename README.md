@@ -39,6 +39,7 @@ My personal preferences are: Vim, Perl, Bash, and Screen.  (I'm going to try out
 There are several other large pieces of live-config-files that aren't checked in yet, that I would like to.  These may take some work to figure out:
 
 * my [Firefox profile](https://github.com/DeeNewcum/dotfiles/issues/15)
+  * **particularly my Greasemonkey scripts**
 * my [Thunderbird profile](https://github.com/DeeNewcum/dotfiles/issues/15#issuecomment-6276610), particularly the message filters
 * my [Android Tasker](http://lifehacker.com/5599116/how-to-turn-your-android-phone-into-a-fully+automated-superphone) scripts
 * my [Tropo.com](http://www.tropo.com/) scripts
