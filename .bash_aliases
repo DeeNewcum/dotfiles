@@ -100,6 +100,9 @@ alias   screen.main='screen -U -S main'
 # see documentation:  https://github.com/DeeNewcum/individual_scripts/blob/master/hil.README.md
 function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=grep{$j++%2}@ARGV;@ARGV=()}s/$p/for($i=0;$i<@c&&!defined$-[$i+1];$i++){}"\e[$c[$i]m$+\e[0m"/gome' "$@"; }
 
+# remove ANSI hilighting from text
+alias ansistrip="perl -ple 's/\e[^a-z]*[a-z]//ig'"
+
 
 # I tend to store a LOT of random notes under /var/tmp/, with gibberish filenames...   this lets me quickly scan them, to find
 # the one I wanted
