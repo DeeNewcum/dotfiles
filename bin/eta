@@ -14,14 +14,9 @@
 
 
 
-    # A good way to test this is to:
+    # For development, a simple way to test this is to:
     # 
-    #   > perl -le 'print time'
-    #   1341514127
-    #
-    #   > eta 500 'perl -le "print time-1341514127"|'
-    #
-    #   > eta -500 'perl -le "print 1341514127-time"|'
+    #       eta 500 "perl -le 'print time-$(perl -le 'print time')'|"
 
 
 ## process the cmdline
@@ -49,11 +44,16 @@ while (1) {
     my $this_time = time();
     my $current = trim($measure->());
     my $bps = ($current - $last_reading) / ($this_time - $last_time);
-    my $eta = ($target - $current) * $bps;
+                # ^ bytes per second
     printf "currently: %-20s", commify($current);
-    printf "ETA:  %s%d:%02d:%02d\n",
-                sign_str($eta), abs($eta)/3600, (abs($eta)/60) % 60,  abs($eta) % 60, 
-    #print "BPS:  $bps\n";
+    if ($bps > 0) {
+        my $eta = ($target - $current) / $bps;
+        printf "remaining:  %s%d:%02d:%02d (HH:MM:SS)\n", sign_str($eta), abs($eta)/3600, (abs($eta)/60) % 60, abs($eta) % 60;
+    } else {
+        print "(stalled)\n";
+    }
+    #print "remaining:   ", commify($target - $current), " bytes -- ", int(100 * $current / $target), "%\n";
+    #print "bytes per second:  ", commify(int($bps)), "\n";
     $| = 1;
     sleep 2;
 }
