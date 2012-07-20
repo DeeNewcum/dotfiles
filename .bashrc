@@ -133,7 +133,7 @@ fi
 
 
 # make ssh-agent work properly when inside tmux
-if [[ -z "$TMUX" && ! -z "$SSH_TTY" && ! -z "SSH_AUTH_SOCK" ]]; then
+if [[ -z "$TMUX" && ! -z "$SSH_TTY" && ! -z "$SSH_AUTH_SOCK" ]]; then
     ORIG_SSH_AUTH_SOCK="$(readlink ~/.ssh/ssh_auth_sock)"
     ln -sf "$SSH_AUTH_SOCK" ~/.ssh/ssh_auth_sock
     # restore the original value when this shell exits
