@@ -163,3 +163,7 @@ measure
         
         To indicate a shell command, append a pipe character ('|') to the end
         of the command.
+
+        For example, to measure the amount of space used on a filesystem, via df:
+
+                eta  1gb  "df -B 1 . | awk 'NR==2 {print \$3}' |"
