@@ -16,7 +16,9 @@
 
     # For development, a simple way to test this is to:
     # 
-    #       eta 500 "perl -le 'print time-$(perl -le 'print time')'|"
+    #       eta  500 "perl -le 'print time-$(perl -le 'print time')'|"
+    #
+    #       eta -500 "perl -le 'print $(perl -le 'print time')-time'|"
 
 
 ## process the cmdline
@@ -25,7 +27,7 @@ my $target = parse_size(shift @ARGV);
 my $measure_string = shift @ARGV;        ## what/how to measure
 my $measure;
 if ($measure_string =~ s/\|$//s) {
-    $measure = sub {readpipe($measure_string)};
+    $measure = sub {readpipe $measure_string};
 } elsif (-f $measure_string) {
     $measure = sub {-s $measure_string};
 } elsif (-d $measure_string) {
@@ -46,7 +48,7 @@ while (1) {
     my $bps = ($current - $last_reading) / ($this_time - $last_time);
                 # ^ bytes per second
     printf "currently: %-20s", commify($current);
-    if ($bps > 0) {
+    if ($bps > 0.1 || $bps < -0.1) {
         my $eta = ($target - $current) / $bps;
         printf "remaining:  %s%d:%02d:%02d (HH:MM:SS)\n", sign_str($eta), abs($eta)/3600, (abs($eta)/60) % 60, abs($eta) % 60;
     } else {
