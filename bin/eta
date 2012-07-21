@@ -12,6 +12,8 @@
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
+    use constant {LATEST => -1, EARLIER => 0, TIME => 0, MEAS => 1};
+
 
 
     # For development, a simple way to test this is to:
@@ -27,7 +29,7 @@ my $target = parse_size(shift @ARGV);
 my $measure_string = shift @ARGV;        ## what/how to measure
 my $measure;
 if ($measure_string =~ s/\|$//s) {
-    $measure = sub {readpipe $measure_string};
+    $measure = sub {trim(readpipe $measure_string)};
 } elsif (-f $measure_string) {
     $measure = sub {-s $measure_string};
 } elsif (-d $measure_string) {
@@ -38,15 +40,16 @@ if ($measure_string =~ s/\|$//s) {
 }
 
 
-## loop, and estimate how long until completion
-my $last_time = time();
-my $last_reading = $measure->();
+## main loop -- estimate how long until completion
+my @meas = ([time, $measure->()]);      # recent measurements
 sleep(1);
 while (1) {
-    my $this_time = time();
-    my $current = trim($measure->());
-    my $bps = ($current - $last_reading) / ($this_time - $last_time);
-                # ^ bytes per second
+    push @meas,   [time, my $current = $measure->()];
+    ## only keep the most recent 10.0 seconds of measurements
+    @meas = grep {$meas[-1][0] - $_->[0] < 10} @meas;
+    #print "\t", join(" ", map {$_->[MEAS]} @meas), "\n";       
+    ## bytes per second
+    my $bps = ($meas[LATEST][MEAS] - $meas[EARLIER][MEAS]) / ($meas[LATEST][TIME] - $meas[EARLIER][TIME]);
     printf "currently: %-20s", commify($current);
     if ($bps > 0.1 || $bps < -0.1) {
         my $eta = ($target - $current) / $bps;
