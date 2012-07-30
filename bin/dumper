@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+
+# pretty-prints JSON, XML, and other data formats
+# 
+#   (outputs everything in Data::Dumper format, not in its original format)
+
+    use strict;
+    use warnings;
+
+    use Getopt::Long;
+    use Data::Dumper;
+
+    
+    # TODO:
+    #       - add syntax-hilighting, to higlight the key names
+
+
+
+## process command line
+our %ARGV;
+process_cmdline();
+
+
+## parse the file
+my $parser = function_exists("parse_$ARGV{format}")     or die;
+my $file_contents = slurp($ARGV{file});
+my $parsed = $parser->($file_contents);
+
+
+## output the parsed data
+$Data::Dumper::Quotekeys = 0;
+$Data::Dumper::Sortkeys  = 1;
+if (can_use("Data::Dumper::Perltidy")) {
+    print Dumper $parsed;
+} elsif (can_use("Perl::Tidy")) {
+    my $tidy_dumper;
+    perltidy(source=>\(Data::Dumper::Dumper $parsed),destination=>\$tidy_dumper);
+    print $tidy_dumper;
+} else {
+    print Dumper $parsed;
+}
+
+exit;
+
+
+
+sub parse_json {
+    my ($file_contents) = @_;
+
+    if (can_use("JSON::XS") || can_use("JSON")) {
+        return decode_json($file_contents);
+    }
+
+    die_modules_required("JSON", "JSON::XS");
+}
+
+
+sub parse_xml {
+    my ($file_contents) = @_;
+
+    if (can_use("XML::Simple")) {
+        return XMLin($file_contents);
+    }
+
+    die_modules_required("XML::Simple");
+}
+
+
+
+
+sub process_cmdline {
+    GetOptions( \%ARGV,
+        'json|j',           # format: JSON
+        'xml|x',            # format: XML
+        '', 'args', 'help',
+    ) or usage();
+    %ARGV = map {length()?$_:1} %ARGV;      # arguments are optional
+    $ARGV{help} and usage();
+
+    foreach my $format (qw( json xml )) {
+        if (exists $ARGV{$format}) {
+            delete $ARGV{$format};
+            $ARGV{format} = $format;
+            last;
+        }
+    }
+    die "Please specify a format.\n"    unless $ARGV{format};
+
+    if (@ARGV && -e $ARGV[0]) {
+        $ARGV{file} = shift @ARGV;
+    }
+    die "Please specify a file to dumper.\n"    unless $ARGV{file};
+
+    $ARGV{args} and die Dumper {'%ARGV' => \%ARGV, '@ARGV' => \@ARGV};
+    #die Dumper {'%ARGV' => \%ARGV, '@ARGV' => \@ARGV};
+}
+
+
+
+
+sub usage {
+    print "Usage:  dumper <format> <filename>\n";
+    usage_getopt();
+    exit;
+}
+
+
+sub die_modules_required {
+    die join("\n\t",
+        "to parse " . uc($ARGV{format}) . ", you must install one of these modules:",
+        @_)     . "\n";
+}
+
+
+
+# Poor-man's self-documenting arguments, like Getopt::Lazy or Getopt::Long::Descriptive,
+# but works with the stock Getopt::Long.
+# The per-argument documentation comes from the source code comments.
+#
+# It greps the source code, so it's somewhat brittle and relies on a specific format:
+#       - the first line starts with "GetOptions("
+#       - arguments should be on separate lines
+#       - the last line starts with ")"
+sub usage_getopt {
+    @ARGV = ($0);
+    while (<>) {
+        next if !(/^\s*GetOptions/ .. /^\s*\)/) || /^\s*(GetOptions|\)|map)/;
+        printf "  %-30s", /['"](.*?)['"]/ ? join( ", ", map { s/[=:][sif]$//; /../ ? "--$_" : "-$_" } split /\|/, $1 ) : '';
+        s/.*#/#/ and print or print "\n";
+    }
+}
+
+
+
+# tries to 'use' the specified module; returns true/false, whether the module was loaded
+sub can_use {eval "use $_[0];"; !$@}
+
+# check if the given function exists  (and, if so, it returns a pointer to it)
+no strict 'refs';
+sub function_exists {defined&{$_[0]}?\&{$_[0]}:undef}
+use strict 'refs';
+
+# quickly read a whole file
+sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
