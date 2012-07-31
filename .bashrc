@@ -94,6 +94,7 @@ has_complete rmdir       || complete -d rmdir
 has_complete pushd       || complete -d pushd
 has_complete ln          || complete -f ln
 has_complete exec        || complete -c nohup exec nice eval trace truss strace sotruss gdb type
+has_complete which       || complete -c which
 has_complete bg          || complete -A stopped -P '%' bg
 has_complete fg          || complete -j -P '%' fg jobs disown
 has_complete shopt       || complete -A shopt shopt
