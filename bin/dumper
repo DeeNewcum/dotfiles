@@ -30,15 +30,17 @@ my $parsed = $parser->($file_contents);
 ## output the parsed data
 $Data::Dumper::Quotekeys = 0;
 $Data::Dumper::Sortkeys  = 1;
+my $output;
 if (can_use("Data::Dumper::Perltidy")) {
-    print Dumper $parsed;
+    $output = Dumper $parsed;
 } elsif (can_use("Perl::Tidy")) {
-    my $tidy_dumper;
-    perltidy(source=>\(Data::Dumper::Dumper $parsed),destination=>\$tidy_dumper);
-    print $tidy_dumper;
+    perltidy(source=>\(Data::Dumper::Dumper $parsed),destination=>\$output);
 } else {
-    print Dumper $parsed;
+    $output = Dumper $parsed;
 }
+
+# use vim to view the file, so there's minimal syntax hilighting
+vim('set syntax=perl', $output);
 
 exit;
 
@@ -139,6 +141,9 @@ sub can_use {eval "use $_[0];"; !$@}
 no strict 'refs';
 sub function_exists {defined&{$_[0]}?\&{$_[0]}:undef}
 use strict 'refs';
+
+# display a string to the user, via vim    (note: first arg is a .vimrc command;  use the empty-string if it's unneeded)
+sub vim {my$pid=open my$vim,"|-",'vim','-R','-c',shift,'-';print$vim @_;close$vim;waitpid$pid,0}
 
 # quickly read a whole file
 sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
