@@ -30,17 +30,26 @@ my $parsed = $parser->($file_contents);
 ## output the parsed data
 $Data::Dumper::Quotekeys = 0;
 $Data::Dumper::Sortkeys  = 1;
-my $output;
-if (can_use("Data::Dumper::Perltidy")) {
-    $output = Dumper $parsed;
+my $dumper;
+if (can_use("YAML::Tiny")) {
+    # Although this script is named 'dumper', Vim's syntax hilighting for YAML is much nicer
+    # than Data::Dumper or JSON output.
+    my $yaml = YAML::Tiny::Dump($parsed);
+    $yaml =~ s/^(\s+)/$1$1/gm;      # double the indent level
+    vim('set syntax=yaml', $yaml);
+    exit;
+} elsif (can_use("Data::Dumper::Perltidy")) {
+    $dumper = Dumper $parsed;
 } elsif (can_use("Perl::Tidy")) {
-    perltidy(source=>\(Data::Dumper::Dumper $parsed),destination=>\$output);
+    perltidy(source=>\(Data::Dumper::Dumper $parsed),destination=>\$dumper);
 } else {
-    $output = Dumper $parsed;
+    $dumper = Dumper $parsed;
 }
 
 # use vim to view the file, so there's minimal syntax hilighting
-vim('set syntax=perl', $output);
+if ($dumper) {
+    vim('set syntax=perl', $dumper);
+}
 
 exit;
 
