@@ -15,7 +15,6 @@ if [ "`uname`" != "SunOS" ]; then
     # xgrep = pipe a list of filenames in, and it greps only those files
     function lgrep()  { grep -Zls  "$@" | xargs -0 less    -p "$1"; }
     function lgrepi() { grep -Zlsi "$@" | xargs -0 less -i -p "$1"; }
-    function xgrep() { xargs -i grep "$@" /dev/null {} ; }              # Solaris version only, needed for its underpowered find/xargs/grep arguments
 
     ## identify excessively large files
     function largefiles() { find ${1:-~} -type f -print0 | xargs -0 ls -l | sort -n -k 5 | tail -100 | perl -ple 's/^(?:\S+\s+){4}//; s/$ENV{HOME}/~/; $_=reverse;s/(\d\d\d)(?=\d)(?!\d*\.)(?=[\d,]*$)/$1,/g;$_=reverse'; }
@@ -29,8 +28,6 @@ else
     # xgrep = pipe a list of filenames in, and it greps only those files
     function lgrep()  { grep -ls  "$@" | xargs_newline less    -p "$1"; }
     function lgrepi() { grep -lsi "$@" | xargs_newline less -i -p "$1"; }
-    function xgrep()  { xargs_newline grep "$@" /dev/null; }              # Solaris version only, needed for its underpowered find/xargs/grep arguments
-    function xlgrep() { xargs_newline grep -l "$@" /dev/null | xargs less; }        # Solaris version only, needed for its underpowered find/xargs/grep arguments
 
     ## identify excessively large files
     function largefiles() { /bin/find ${1:-$PWD}  ! -local -prune -o -type f -print | xargs_newline /bin/ls -l | filesize_sort | tail -100; }
@@ -38,6 +35,9 @@ else
     function largedirs_onelevel() { /bin/ls -1 | perl -nle 'print qq[$ENV{PWD}/$_] if -d' | xargs_newline du -sk | sort -n | perl -ple 's/^(\d+?)\d\d\d\s/\1mb\t/'; }
     function large_txtfiles() { /bin/find $PWD ! -local -prune -o -type f -print | perl -nle 'print if -T' | xargs_newline /bin/ls -l | filesize_sort | tail -100; }
 fi
+function xgrep()   { xargs_newline -i grep "$@" /dev/null {} ; }
+function xlgrep()  { xargs_newline grep -l "$@" /dev/null    | xargs less    -p "$1"; }
+function xlgrepi() { xargs_newline grep -l -i "$@" /dev/null | xargs less -i -p "$1"; }
 
 
 # just like 'cd', except that it can also accept filenames, in which case it will CD to the directory *containing* that file
