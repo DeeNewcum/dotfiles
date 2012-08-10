@@ -18,9 +18,7 @@
 
 [core]
     # see: https://github.com/github/gitignore/tree/master/Global
-    excludesfile = $HOME/.gitignore
-            #      ^^^^^ this DOES NOT WORK
-            #            see https://github.com/DeeNewcum/deedot/issues/6
+    excludesfile = <<$HOME>>/.gitignore
 
 [alias]
     # credit: http://www.jukie.net/bart/blog/pimping-out-git-log
