@@ -45,9 +45,13 @@ do
         break
     fi
 done
-# TODO: some terminals respond to     echo -e '\005'
+# TODO:
+#     - some terminals respond to     echo -e '\005'
 #           see ENQ/answerback at  http://paperlined.org/apps/terminals/queries.html
 #       try to be a little more intelligent about auto-detecting $TERM
+#
+#     - possible ways to detect 256 colors:
+#       http://www.mudpedia.org/wiki/Xterm_256_colors#Detection
 
 
 ###################################################
