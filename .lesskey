@@ -12,3 +12,7 @@
 #env
 
 LESS = -iR
+
+# make UTF8 characters display properly
+LESSCHARSET = utf-8
+LESSUTFBINFMT = *n      #  go ahead and output to the terminal even those characters that it does not consider safe
