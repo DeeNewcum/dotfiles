@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 
 # pretty-prints JSON, XML, and other data formats
-# 
-#   (outputs everything in Data::Dumper format, not in its original format)
 
     use strict;
     use warnings;
@@ -10,73 +8,41 @@
     use Getopt::Long;
     use Data::Dumper;
 
-    
-    # TODO:
-    #       - add syntax-hilighting, to higlight the key names
-
-
 
 ## process command line
 our %ARGV;
 process_cmdline();
 
 
-## parse the file
-my $parser = function_exists("parse_$ARGV{format}")     or die;
+## pretty-print the file
+my $pretty = function_exists("pretty_$ARGV{format}")     or die;
 my $file_contents = $ARGV{file} eq '-'
         ? do {local $/=undef; <STDIN>}
         : slurp($ARGV{file});
-my $parsed = $parser->($file_contents);
-
-
-## output the parsed data
-$Data::Dumper::Quotekeys = 0;
-$Data::Dumper::Sortkeys  = 1;
-my $dumper;
-if (can_use("YAML::Tiny")) {
-    # Although this script is named 'dumper', Vim's syntax hilighting for YAML is much nicer
-    # than Data::Dumper or JSON output.
-    my $yaml = YAML::Tiny::Dump($parsed);
-    $yaml =~ s/^(\s+)/$1$1/gm;      # double the indent level
-    vim('set syntax=yaml', $yaml);
-    exit;
-} elsif (can_use("Data::Dumper::Perltidy")) {
-    $dumper = Dumper $parsed;
-} elsif (can_use("Perl::Tidy")) {
-    perltidy(source=>\(Data::Dumper::Dumper $parsed),destination=>\$dumper);
-} else {
-    $dumper = Dumper $parsed;
-}
-
-# use vim to view the file, so there's minimal syntax hilighting
-if ($dumper) {
-    vim('set syntax=perl', $dumper);
-}
-
-exit;
+my $parsed = $pretty->($file_contents);
 
 
 
-sub parse_json {
+sub pretty_json {
     my ($file_contents) = @_;
 
-    if (can_use("JSON::XS") || can_use("JSON")) {
-        return decode_json($file_contents);
+    my $json;
+    if (can_use("JSON::XS")) {
+        $json = new JSON::XS;
+    } elsif (can_use("JSON")) {
+        $json = new JSON;
+    } else {
+        die_modules_required("JSON", "JSON::XS");
     }
 
-    die_modules_required("JSON", "JSON::XS");
+    $json->utf8->pretty;
+
+    my $decoded = $json->decode($file_contents);
+    my $reencoded = $json->encode($decoded);
+
+    vim('set syntax=javascript', $reencoded);
 }
 
-
-sub parse_xml {
-    my ($file_contents) = @_;
-
-    if (can_use("XML::Simple")) {
-        return XMLin($file_contents);
-    }
-
-    die_modules_required("XML::Simple");
-}
 
 
 
@@ -125,7 +91,6 @@ sub die_modules_required {
 }
 
 
-
 # Poor-man's self-documenting arguments, like Getopt::Lazy or Getopt::Long::Descriptive,
 # but works with the stock Getopt::Long.
 # The per-argument documentation comes from the source code comments.
@@ -142,6 +107,8 @@ sub usage_getopt {
         s/.*#/#/ and print or print "\n";
     }
 }
+
+
 
 
 
