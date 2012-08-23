@@ -44,6 +44,18 @@ sub pretty_json {
 }
 
 
+sub pretty_xml {
+    my ($file_contents) = @_;
+
+    if (can_use("XML::Simple")) {
+        my $xml = XMLin($file_contents);
+        my $reencoded = XMLout($xml);
+        vim('set syntax=xml', $reencoded);
+    } else {
+        die_modules_required("XML::Simple");
+    }
+}
+
 
 
 
