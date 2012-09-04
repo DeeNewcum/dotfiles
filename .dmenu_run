@@ -54,6 +54,7 @@ if [ "$(cat /tmp/$USER.dmenu.output)" -a $ELAPSED -le 5 ]; then
     notify-send "$(cat /tmp/$USER.dmenu.cmd)"  "$(cat /tmp/$USER.dmenu.output)"
             # note: the above doesn't let you adjust the timeout, or let you replace an existing dialog.  For that:
             #           google  "dbus-send" "org.freedesktop.Notifications.Notify" 
+            # see more at: http://www.reddit.com/r/programming/comments/zam55/linus_torvalds_responds_to_what_killed_the_linux/c635eof?context=1
 fi
 
 #zenity --info --text="$(cat /tmp/$USER.dmenu)"
