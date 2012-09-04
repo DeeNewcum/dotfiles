@@ -95,6 +95,11 @@ alias   srm='screen -U -dr main'
 alias   screen.main='screen -U -S main'  
 
 
+# same as above, but for tmux instead of screen
+alias   trm='tmux attach -t main || tmux new -s main'
+
+
+
 
 # Do ANSI-coloring of text, based on arbitrary regexps.
 # see documentation:  https://github.com/DeeNewcum/individual_scripts/blob/master/hil.README.md
