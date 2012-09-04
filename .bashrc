@@ -67,6 +67,14 @@ fi
 #       http://www.mudpedia.org/wiki/Xterm_256_colors#Detection
 
 
+# display
+if [ -z "$DISPLAY" ]; then
+    # avoid problems with git fetch / git pull on RHEL when $DISPLAY isn't set
+    #           see more:  http://git.661346.n2.nabble.com/git-calls-SSH-ASKPASS-even-if-DISPLAY-is-not-set-td5825303.html
+    unset SSH_ASKPASS
+fi
+
+
 ###################################################
 #################  COLOR  #########################
 ###################################################
