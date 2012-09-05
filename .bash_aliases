@@ -89,14 +89,11 @@ function hed { head -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d
 function tal { tail -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d+)/'); }
 
 
-# reattach to the screen named 'main'
-alias   srm='screen -U -dr main'                                                                     
-# create a screen session named 'main'
-alias   screen.main='screen -U -S main'  
-
-
-# same as above, but for tmux instead of screen
-alias   trm='tmux attach -t main || tmux new -s main'
+####[ screen + tmux ]####
+# reattach to the screen named 'main'   (or create it if it doesn't exist)
+alias   srm='screen -U -dr main || screen -U -S main'
+# reattach to the screen named 'main'   (or create it if it doesn't exist)
+alias   tmx='tmux attach -t main || tmux new -s main'
 
 
 
