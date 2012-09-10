@@ -1,0 +1,87 @@
+#!/bin/sh
+filename="passwords.gpg"
+if [ $EDITOR ]
+then
+    editor=$EDITOR
+elif [ -f /usr/bin/editor ]
+then
+    editor=/usr/bin/editor
+else
+    editor=vi
+fi
+
+# more security for vi
+if [ $editor = "vi" -o $editor = "vim" ]
+then
+    # -n is for noswap and -i NONE is for no .viminfo
+    editor="$editor -n -i NONE"
+fi
+
+if [ $# -eq 0 ] 
+then
+    echo "No filename specified. Using default $filename"
+elif [ $# -gt 1 ]
+then
+    echo "$0 [filename.gpg]"
+    exit 2
+else
+    filename=$1
+fi
+
+if [ -f `which shred` ]
+then
+    rm='shred -u'
+else
+    rm=rm
+fi
+
+tmp=`mktemp` || exit 1
+
+if [ ! -f $filename ]
+then 
+    echo "$filename doesn't exist. Starting from empty file."
+elif [ ! -r $filename ]
+then
+    echo "$filename isn't readable."
+    exit 1
+fi
+
+# prompt for password; don't show typing
+stty -echo
+read -p "Password: " passw; echo
+stty echo
+
+# decrypt into the tmp file
+if [ -f $filename ]
+then
+    echo "$passw" | gpg -q -d --batch --passphrase-fd 0 $filename > $tmp
+    if [ $? != 0 ]; then
+        # if gpg didn't work, exit
+        $rm $tmp
+        exit $?;
+    fi
+    # if original is unwritable, hint to the editor that the file shouldn't/can't be updated
+    if [ ! -w $filename ]
+    then
+        chmod -w $tmp
+        echo "$filename isn't writable, so any modifications will be discarded"
+    fi
+fi
+
+# edit the file
+$editor $tmp
+
+# write changes back out
+if [ -e $filename -a ! -w $filename ]
+then
+    # the original file is unwritable, and can't be updated
+    chmod +w $tmp
+    $rm $tmp
+else
+    echo "$passw" | gpg -q -c --batch --passphrase-fd 0 --output $filename --yes --force-mdc $tmp
+    $rm $tmp
+    if [ $? != 0 ]; then
+        # if gpg didn't work, exit
+        exit $?;
+    fi
+fi
