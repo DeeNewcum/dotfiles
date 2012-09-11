@@ -18,6 +18,7 @@ command! Q q
 set clipboard=unnamed                                           " default to the * clipboard when yanking/pasting
 set textwidth=100
 set noerrorbells visualbell t_vb=                               " quiet!!!
+set lazyredraw                                                  " don't redraw while in macros
 let mapleader = ","
 
 filetype plugin on                                              " http://vim.wikia.com/wiki/Keep_your_vimrc_file_clean
