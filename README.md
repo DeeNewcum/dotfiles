@@ -8,7 +8,15 @@
 
     # Your dotfiles are safe.  DeeDot won't overwrite anything.
 
-This is my config file repo.  There are [many like it](https://github.com/search?utf8=%E2%9C%93&q=dotfiles&repo=&langOverride=&start_value=1&type=Repositories&language=), but this one is mine.
+This is my config file repo.  There are [many like it](https://www.google.com/search?channel=fs&q=site%3Agithub.com+dotfiles&ie=utf-8&oe=utf-8), but this one is mine.
+
+## Dotfile repos generally
+
+Before we get into the details of my dotfiles, I'd like to point out that MANY people have done dotfiles, and there are some good references out there:
+
+* [dotfiles.github.com](http://dotfiles.github.com/)
+* [dotfiles.org](http://dotfiles.org/)
+* good articles: [(1)](http://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/)
 
 ## [DeeDot](https://github.com/DeeNewcum/deedot) ##
 
