@@ -16,14 +16,19 @@
 #       (scratch this, it got moved)  http://www.vim.org/tips/tip.php?tip_id=709
 #       http://vim.wikia.com/wiki/VimTip709
 
-sub TEMP_DIR {"$ENV{HOME}/tmp/pl/"}
+    use strict;
+    use warnings;
 
-#$ENV{EDITOR} = "vi" unless $ENV{EDITOR};
-$ENV{EDITOR} = q{vim +999 -c startinsert};
+    use File::Temp;
+    use Text::ParseWords;
+
+    sub TEMP_DIR {"$ENV{HOME}/tmp/pl/"}
+
+    #$ENV{EDITOR} = "vi" unless $ENV{EDITOR};
+    $ENV{EDITOR} = q{vim +999 -c startinsert};
 
 
-use File::Temp;
-use Text::ParseWords;
+
 
 # Create random filename
 system "mkdir -p " . TEMP_DIR;
@@ -39,14 +44,13 @@ close $fh;
 # Fire up the editor
 my @cmd = Text::ParseWords::shellwords($ENV{EDITOR}) or die "Unable to parse \$EDITOR\n";
 push(@cmd, $filename);
-exec @cmd;
-print "Unable to run \"", join('" "', @cmd), "\": $!\n";
+exec @cmd       or die;
 
 __DATA__
 
-   use strict;
-   use warnings;
+    use strict;
+    use warnings;
 
-   use Data::Dumper;
+    use Data::Dumper;
 
 
