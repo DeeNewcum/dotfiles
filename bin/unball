@@ -1,0 +1,147 @@
+#!/usr/bin/perl
+
+# Intended for quickly downloading and unpacking a tarball/gz/bzip/zip/etc.  Intended for situations
+# where you're exploring a lot of different tarballs, and don't really care what the subdirectory is
+# named, you just want the files unpacked easily and quickly.
+#
+# This has some specialized routines for downloading files from SourceForge and Github.
+
+
+# Note: this outputs the name of the directory that it's been unpacked to, so you should call it
+#       like this:
+#
+#                   eval $(unball http://blahblah)
+#
+#       or, better yet, use this Bash alias:
+#
+#                   function unball { eval $(command unball "$@"); }
+
+    use strict;
+    use warnings;
+
+    use File::Temp qw[tempdir tempfile];
+    use File::Basename;
+    use Cwd;
+    use File::Spec;
+
+    use Data::Dumper;
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+
+my $url = shift
+    or die "specify a URL to download and unpack\n";
+
+
+# if the user is capturing our output, via Bash output-capture, then we actually want to display
+# most of our data to STDERR
+my $shell_capture;
+if (! -t STDOUT) {
+    open $shell_capture, '>&STDOUT';
+    open STDOUT, '>&STDERR';
+} else {
+    $shell_capture = *STDOUT;
+}
+
+
+# create a tempdir off of the current directory, where we'll do our work
+my $tempdir = tempdir(DIR => '.');
+my $start_dir = Cwd::getcwd;
+my $full_tempdir = Cwd::abs_path($tempdir);
+chdir $tempdir;
+our $final_directory;
+
+
+# if we die, cleanup after ourselves
+END {
+    if (!$final_directory || $final_directory ne $tempdir) {
+                    # ^^ don't nuke the directory if it's the one we want to show the user
+        chdir $start_dir;
+        system 'rm', '-rf', '--', $tempdir;
+    }
+}
+
+
+# modify the URL for sourceforge downloads
+#               (the user should give us the 'direct link' to download)
+my $add_filename_suffix;
+my $is_github_zip = 0;
+if ($url =~ m#downloads\.sourceforge\.net/#) {
+    $url =~ s/\?.*//;
+} elsif ($url =~ m#github\.com/.*/zipball/[^/]+$#) {
+    # it's a Github zip file
+    $add_filename_suffix = '.zip';
+    $is_github_zip = 1;
+}
+
+
+my $file_downloaded = undef;
+system 'wget', $url;
+if ($? == -1) {     # wget isn't installed
+    $file_downloaded = basename($url);
+    system 'curl', '-o', $file_downloaded, $url;
+    if ($? == -1) {
+        die "neither wget or curl are installed\n";
+    }
+}
+
+if (!defined($file_downloaded)) {
+    # there should be only one file in the tempdir now
+    ($file_downloaded) = glob "*";
+}
+
+if($add_filename_suffix) {
+    system "mv", $file_downloaded, "$file_downloaded$add_filename_suffix";
+    $file_downloaded = "$file_downloaded$add_filename_suffix";
+}
+
+
+# unpack the file
+if ($file_downloaded =~ /\.tar\.gz$|\.tgz$/i) {
+    system "tar", "-xvzf", $file_downloaded;
+} elsif ($file_downloaded =~ /\.tar\.bz2$/i) {
+    system "tar", "-xvjf", $file_downloaded;
+} elsif ($file_downloaded =~ /\.zip$/i) {
+    system "unzip", $file_downloaded;
+} else {
+    warn "unable to unpack the file\n";
+    $final_directory = $tempdir;
+}
+
+my @unpacked_files = grep {$_ ne $file_downloaded} glob "*";
+#print "unpacked files:  ", Dumper \@unpacked_files;
+if (@unpacked_files == 1 && -d $unpacked_files[0]) {
+    # the pack-file had all its files under one subdirectory
+
+    if ($is_github_zip) {
+        my $rename = $unpacked_files[0];
+        $rename =~ s/^[^-]*-//;
+        $rename =~ s/-[^-]*$//;
+        rename $unpacked_files[0], $rename;
+        $unpacked_files[0] = $rename;
+    }
+
+    my $target = "../$unpacked_files[0]";
+    if (-e $target) {
+        # avoid a naming conflict
+        (undef, $target) = tempfile("$unpacked_files[0].XXXX", DIR => $start_dir);
+        unlink $target;
+    }
+    system "mv", $unpacked_files[0], $target;
+    $final_directory = $target;
+}
+unlink $file_downloaded if (@unpacked_files);
+
+
+if (defined $final_directory) {
+    # make the path relative to the starting directory
+    $final_directory = File::Spec->abs2rel($final_directory, $start_dir);
+    chdir $start_dir;
+    $final_directory = Cwd::abs_path($final_directory);     # canonicalize it  (remove any ..s)
+
+    # tell the shell where to go
+    print $shell_capture "cd '$final_directory'\n";
+    print STDERR "cd '$final_directory'\n";
+
+    # "touch" the directory, so it shows up easily with "ls -lrt"
+    utime time, time, $final_directory;
+}
