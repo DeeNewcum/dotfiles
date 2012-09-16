@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+# When using DeeDot, if you rename files, or especially directories, you get a LOT of dangling
+# symlinks, pointing to the old location.  This script is a band-aid that tries to clean these up.
+
+    use strict;
+    use warnings;
+
+    use File::Find;
+    use File::Spec;
+    use File::Basename;
+    use Cwd;
+
+    use Data::Dumper;
+
+
+
+# usage notes:
+# 
+#   - it works starting at the current directory
+#   - there is an optional argument:   give a directory name, and this will only list 
+#           dangling symlinks that point to somewhere under that directory
+
+
+my $go = getopt_flag("--go");
+my $target_dir;
+if (@ARGV) {
+    $target_dir = File::Spec->rel2abs(shift @ARGV);
+}
+
+
+our $any_found;
+find( {wanted => \&wanted, no_chdir => 1},  ".");
+if ($any_found && !$go) {
+    print "\nrun again with the --go flag to actually remove these symlinks\n";
+}
+
+
+sub wanted {
+    if (-l $_) {
+        my $relative_to = $_;
+        if (-f $_) { 
+            $relative_to = dirname($_);
+        }
+        my $target = readlink($_);
+        $target = File::Spec->rel2abs($target, $relative_to);
+        if (!-e $target) {
+            return if (defined($target_dir) && substr($target, 0, length($target_dir)) ne $target_dir);
+            $any_found = 1;
+            print "$_\t\t\t$target\n";
+            if ($go) {
+                unlink($File::Find::name);
+            }
+        }
+    }
+}
+
+
+sub getopt_flag {my($a,$b)=(shift,~~@ARGV);@ARGV=grep{$_ ne$a}@ARGV;$b!=~~@ARGV}
