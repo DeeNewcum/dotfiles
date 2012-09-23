@@ -53,12 +53,11 @@ while (1) {
     printf "currently: %-20s", commify($current);
     if ($bps > 0.1 || $bps < -0.1) {
         my $eta = ($target - $current) / $bps;
+        printf "rate: %-20s", human_readable_rate($bps);
         printf "remaining:  %s%d:%02d:%02d (HH:MM:SS)\n", sign_str($eta), abs($eta)/3600, (abs($eta)/60) % 60, abs($eta) % 60;
     } else {
         print "(stalled)\n";
     }
-    #print "remaining:   ", commify($target - $current), " bytes -- ", int(100 * $current / $target), "%\n";
-    #print "bytes per second:  ", commify(int($bps)), "\n";
     $| = 1;
     sleep 2;
 }
@@ -91,6 +90,22 @@ sub parse_size {
         die "Unable to parse number: $string\n";
     }
 }
+
+
+sub human_readable_rate {
+    my $bps = shift;
+
+    if ($bps > 5 * 1024) {
+        if ($bps > 5 * 1024 * 1024) {
+            return sprintf('%d mbps', $bps/(1024*1024));
+        } else {
+            return sprintf('%d kbps', $bps/1024);
+        }
+    } else {
+        return $bps . " bps";
+    }
+}
+
 
 
 
