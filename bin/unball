@@ -16,6 +16,14 @@
 #
 #                   function unball { eval $(command unball "$@"); }
 
+
+# TODO:
+#   - add the ability to do a git-clone:
+#           - we can automatically detect if the URL is a Git URL by the fact that 
+#             download the URL with "info/refs" on the end returns a file that has a fairly obvious
+#             signature      (lots of lines, each with "md5, <tab>, refs/, ...")
+
+
     use strict;
     use warnings;
 
