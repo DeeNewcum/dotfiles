@@ -103,7 +103,9 @@ alias   tmx='tmux attach -t main || tmux new -s main'
 function hil { perl -0777pe'BEGIN{$p=join"|",map{"($_)"}grep{++$i%2}@ARGV;@c=grep{$j++%2}@ARGV;@ARGV=()}s/$p/for($i=0;$i<@c&&!defined$-[$i+1];$i++){}"\e[$c[$i]m$+\e[0m"/gome' "$@"; }
 
 # remove ANSI hilighting from text
-alias ansistrip="perl -ple 's/\e[^a-z]*[a-z]//ig'"
+#           note: this is based on the gem of a document:
+#           http://www.vt100.net/emu/dec_ansi_parser
+alias ansistrip="perl -000 -pe 's/\e(?:\[\??)?[\x20-\x3f]*[\x40-\x7e]//ig; while (s/[^\x08]\x08//s) {}'"
 
 
 # I tend to store a LOT of random notes under /var/tmp/, with gibberish filenames...   this lets me quickly scan them, to find
