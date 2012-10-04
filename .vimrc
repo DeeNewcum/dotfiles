@@ -109,6 +109,8 @@ command! PP        !PATH=.:$PATH %
 command! PPL       !PATH=.:$PATH % | less
 command! CC        !perl -c % 2>&1 | head -20
 
+" :Q    forcibly quit everything, and don't worry about saving changes
+command! Q         qa!
 
 " ========================= http://vimbits.com/ ===================
 " ========================= vvvvvvvvvvvvvvvvvvv ===================
