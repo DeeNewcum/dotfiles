@@ -95,6 +95,9 @@ if ($? == -1) {     # wget isn't installed
 if (!defined($file_downloaded)) {
     # there should be only one file in the tempdir now
     ($file_downloaded) = glob "*";
+    if (!defined($file_downloaded)) {           # no file here...  apparently the download failed...?
+        die "Couldn't download the file.\n";
+    }
 }
 
 if($add_filename_suffix) {
