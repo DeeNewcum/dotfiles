@@ -179,6 +179,7 @@ augroup BufNewFileFromTemplate
 
 
 autocmd BufWrite *.pl silent !chmod a+x %
+autocmd BufWrite *.py silent !chmod a+x %
 
 
 
