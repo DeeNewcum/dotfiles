@@ -108,6 +108,9 @@ cmap w!! w !sudo tee % > /dev/null
 command! PP        !PATH=.:$PATH %
 command! PPL       !PATH=.:$PATH % | less
 command! CC        !perl -c % 2>&1 | head -20
+    " TODO: use  "python -m py_compile %"   for Python scripts
+    "       and  "ruby -c %"   for Ruby scripts
+    "       or just use this?   https://github.com/tomtom/checksyntax_vim
 
 " :Q    forcibly quit everything, and don't worry about saving changes
 command! Q         qa!
