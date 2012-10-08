@@ -115,11 +115,6 @@ alias ansistrip="perl -000 -pe 's/\e(?:\[\??)?[\x20-\x3f]*[\x40-\x7e]//ig; while
 alias lasttmp='ls -1td /var/tmp/* | perl -nle "print if -f && -O" | head | perl -nle "print if -T" | xargs less'
                         # once in less, use '[' and ']' (or :n and :p) to quickly scan the files
 
-# look through ALL 'tpl' scripts, starting with the most recent
-function tpla {
-    $EDITOR $(ls -1t ~/tmp/pl/ | perl -ple 's#^#$ENV{HOME}/tmp/pl/#')
-}
-
 
 # Do an mboxgrep search, and display the results in mutt.
 # Arguments are EXACTLY the same as mboxgrep's arguments.
