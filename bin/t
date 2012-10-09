@@ -3,30 +3,19 @@
 # Scratchpad for various languages
 #
 #       $ t pl
-#               create a new scratchpad file, insert a basic Perl header in it, and open up the #               editor to it
+#               create a new scratchpad file, insert a basic Perl header in it, and open up the editor to it
 #
 #       $ t py
 #               same, but for Python
 #
 #       $ t pl -
-#               edit ALL recent Perl scratchpad files, most recent first
-#               (without creating a new file)
+#               edit ALL recent Perl scratchpad files, most recent first   (don't create a new file)
 #               (in Vim, use :n and :prev to move between them)
 #
 # Creates a temporary file in a specific directory, chmod +x's it, adds the appropriate she-bang at the top,
-
 # and opens it up with ${EDITOR}.
 #
 # Doesn't delete the file afterwards, as these are small, and may contain insights that I want to revisit.
-#
-# Tip: really should be used with an editor's ability to execute the current script in a sub-shell, so that the
-#       random filename never has to be messed with.
-#
-# TODO: add a "-l" flag to edit the most recently-created (NOT modified) perl script
-#
-# Actually, a fair bit of this functionality can be done within Vim itself:
-#       (scratch this, it got moved)  http://www.vim.org/tips/tip.php?tip_id=709
-#       http://vim.wikia.com/wiki/VimTip709
 
     use strict;
     use warnings;
