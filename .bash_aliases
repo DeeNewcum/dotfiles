@@ -97,6 +97,11 @@ alias   tmx='tmux attach -t main || tmux new -s main'
 
 
 
+# uperl makes it easier to write command-line one-liners that output UTF-8 characters
+#        for example,    uperl -le 'print "\x{221e}"'    displays the infinity symbol
+alias uperl="perl -Muperl"
+
+
 
 # Do ANSI-coloring of text, based on arbitrary regexps.
 # see documentation:  https://github.com/DeeNewcum/individual_scripts/blob/master/hil.README.md
