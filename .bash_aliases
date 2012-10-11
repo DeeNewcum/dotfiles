@@ -101,6 +101,10 @@ alias   tmx='tmux attach -t main || tmux new -s main'
 #        for example,    uperl -le 'print "\x{221e}"'    displays the infinity symbol
 alias uperl="perl -Muperl"
 
+# The settings in ~/.lesskey are difficult to override  (particularly -R).  This fixes that.
+# This lets you run 'less' with an empty slate, with nothing in the lesskey.
+alias less.default='LESSKEY=$HOME/.less.empty less'
+
 
 
 # Do ANSI-coloring of text, based on arbitrary regexps.

@@ -1,5 +1,8 @@
-# to regenerate:
+# to regenerate this file:
 #       lesskey -o .less .lesskey
+#
+# to regenerate the .less.empty:
+#       lesskey -o .less.empty <(echo)
 
 
 #command
