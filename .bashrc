@@ -37,31 +37,34 @@ HISTFILESIZE=2000
 HISTIGNORE="&:ls:clear"
 
 
-# find the most capable termcap entry
-if [ "$TMUX" ]; then
-    # per the Tmux manual, when running inside tmux, the terminal *MUST* be set to
-    # "screen" or "screen-256color"
-    for term in    screen-256color screen
-    do
-        if tput -T$term colors >/dev/null 2>/dev/null; then 
-            export TERM=$term
-            break
-        fi
-    done
-
+if [ -e ~/git/termdetect/src/termdetect ]; then
+    export TERM=$(~/git/termdetect/src/termdetect -t)
 else
-    for term in    gnome-256color  xterm-256color  xterm  vt100
-    do
-        if tput -T$term colors >/dev/null 2>/dev/null; then 
-            export TERM=$term
-            break
-        fi
-    done
+    export TERM=$(termdetect -t)
 fi
+
+
+#if [ "$TMUX" ]; then
+#    # per the Tmux manual, when running inside tmux, the terminal *MUST* be set to
+#    # "screen" or "screen-256color"
+#    for term in    screen-256color screen
+#    do
+#        if tput -T$term colors >/dev/null 2>/dev/null; then 
+#            export TERM=$term
+#            break
+#        fi
+#    done
+#
+#else
+#    for term in    gnome-256color  xterm-256color  xterm  vt100
+#    do
+#        if tput -T$term colors >/dev/null 2>/dev/null; then 
+#            export TERM=$term
+#            break
+#        fi
+#    done
+#fi
 # TODO:
-#     - some terminals respond to     echo -e '\005'
-#           see ENQ/answerback at  http://paperlined.org/apps/terminals/queries.html
-#       try to be a little more intelligent about auto-detecting $TERM
 #
 #     - possible ways to detect 256 colors:
 #       http://www.mudpedia.org/wiki/Xterm_256_colors#Detection
