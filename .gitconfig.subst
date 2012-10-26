@@ -1,5 +1,10 @@
         #   vim: set syntax=gitconfig:
 
+[push]
+    # this is the default starting with Git v1.8.0, but in case we're not there yet...
+    # http://longair.net/blog/2011/02/27/an-asymmetry-between-git-pull-and-git-push/
+    default = tracking
+
 [color]
     ui = auto
 
