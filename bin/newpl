@@ -59,17 +59,17 @@ __DATA__
     use strict;
     use warnings;
 >>    use CGI::Carp qw(fatalsToBrowser);
->>    BEGIN {\$ENV{HOME} ||= (getpwuid(\$<))[7]}       # in case \$HOME isn't set
->>    BEGIN {require "\$ENV{HOME}/.cgiEnvVars.pm"}
+>>    BEGIN {$ENV{HOME} ||= (getpwuid($<))[7]}       # in case $HOME isn't set
+>>    BEGIN {require "$ENV{HOME}/.cgiEnvVars.pm"}
 
 >>    use CGI;
-    use Const::Fast;
+    #use Const::Fast;
 
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
->>print "Content-Type: text/html; charset=utf-8\\n\\n";
->>print "<h3>Hello world</h3>\\n";
+>>print "Content-Type: text/html; charset=utf-8\n\n";
+>>print "<h3>Hello world</h3>\n";
 
 
 
