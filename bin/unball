@@ -61,7 +61,7 @@ our $final_directory;
 
 # if we die, cleanup after ourselves
 END {
-    if (!$final_directory || $final_directory ne $tempdir) {
+    if (!$final_directory || $final_directory ne $full_tempdir) {
                     # ^^ don't nuke the directory if it's the one we want to show the user
         chdir $start_dir;
         system 'rm', '-rf', '--', $tempdir;
@@ -115,7 +115,7 @@ if ($file_downloaded =~ /\.tar\.gz$|\.tgz$/i) {
     system "unzip", $file_downloaded;
 } else {
     warn "unable to unpack the file\n";
-    $final_directory = $tempdir;
+    $final_directory = $full_tempdir;
 }
 
 my @unpacked_files = grep {$_ ne $file_downloaded} glob "*";
