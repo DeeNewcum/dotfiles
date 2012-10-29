@@ -5,6 +5,7 @@
 # See termmatch.md for more info.
 
 vte|gnome-terminal|xfce4-terminal|libVTE - used in GNOME Terminal etc,
+    fallback=gnome-256color,
     m_c1=%x+3,
     m_cancel=%x+4,
     m_esc=%x+5,
@@ -217,7 +218,8 @@ mrxvt,
     r_window_title=,
     s_ff_clears=false,
 
-screen,
+screen_4.00.02,
+    fallback=screen,
     m_c1=,
     m_cancel=,
     m_esc=,
@@ -238,9 +240,16 @@ screen,
     r_window_pos=,
     r_window_size_char=,
     r_window_size_px=,
+    r_window_state=,
+    r_window_title=,
+    s_ff_clears=false,
+
+# in v4.00.03jw4 (git change b4aa8750b45e7b75ab5a837503dc0a6b2e177bf9),
+# support was added for CSI 11t, 7t, and 21t
+screen_4.00.03jw4,
+    use=screen_4.00.02,
     r_window_state=\E[1t,
     r_window_title=\E]l%*\E\\,
-    s_ff_clears=false,
 
 securecrt,
     fallback=vt100,

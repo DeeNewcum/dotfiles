@@ -98,7 +98,7 @@ $fatpacked{"Termdetect_Encoding.pm"} = <<'TERMDETECT_ENCODING';
       my %still_matching = map {$_ => 1}
                                keys %encoding_tests;
       foreach my $encoding_test (@encoding_tests) {
-          print "encoding $encoding_test\n"       if ($Termdetect_IO::DEBUG);
+          debug_log("encoding $encoding_test\n");
           my $bytes = join "",
                       map {bytes::chr(hex($_))}
                           split ' ', $encoding_test;
@@ -189,11 +189,14 @@ $fatpacked{"Termdetect_IO.pm"} = <<'TERMDETECT_IO';
       use Exporter 'import';
   
       our @EXPORT = qw(   run_test  read_phase  read_ansi_reply  output  cooked_mode
-                          do_queued_async_reads  );
+                          do_queued_async_reads debug_log );
   
   
       # constants
       our $DEBUG = 0;     # turns on lots of debugging
+  
+          # To watch the debug logs, run this command in another window:
+          #     tail -fs0 --retry /var/tmp/termdetect.debug\n";
   
       our $ASYNC = 1;     # Should reads be done asynchronously?
                           # If things are confusing AT ALL, just set this to 0 and debug from there.
@@ -208,6 +211,11 @@ $fatpacked{"Termdetect_IO.pm"} = <<'TERMDETECT_IO';
                           #
                           # While testing, do NOT press any keys on the keyboard.
   
+      our $EXTRA_DELAY = 0.20;            # (seconds)
+                          # Add this much extra delay in between each test.
+                          # Good choices range from 0.1 to 2.0.
+                          # This is inactive unless $DEBUG is true.
+  
       if ($DEBUG) {
           # turn on maximum debugging
           $CHECK_ALIGNMENT = 1;
@@ -219,7 +227,10 @@ $fatpacked{"Termdetect_IO.pm"} = <<'TERMDETECT_IO';
   
       # globals
       our @read_queue;
+      our $debug_fh;
   
+  
+  debug__open_log();
   
   
   # From the outside, this routine merely sends an ANSI query, and reads the reply.
@@ -275,9 +286,18 @@ $fatpacked{"Termdetect_IO.pm"} = <<'TERMDETECT_IO';
               $replies .=  $reply;
   
               if ($replies =~ /.*\e\[(\d+);(\d+)R(.*)\e\[(\d+);(\d+)R/s) {
-                  $test_result->{x_delta}  = $5 - $2     if ($5 - $2);
-                  $test_result->{y_delta}  = $4 - $1     if ($4 - $1);
+                  $test_result->{x_delta}  = $5 - $2;
+                  $test_result->{y_delta}  = $4 - $1;
                   $test_result->{received} = $3;
+  
+                  if ($test_result->{y_delta} > 0) {
+                      # if this test caused us to move down some lines, then
+                      # move back up, to ensure that all "gibberish" is confined to a single line
+                      output(("\r"        # move to the beginning of the line
+                            . "\e[K"      # erase to end of line
+                            . "\e[A")     # move up one line
+                                  x $test_result->{y_delta});
+                  }
   
                   @_ = $test_result;  goto &$cps;    # continuation-passing style
               }
@@ -372,7 +392,7 @@ $fatpacked{"Termdetect_IO.pm"} = <<'TERMDETECT_IO';
   sub output {
       my $all = join "", @_;
       if ($DEBUG && $all ne "\r" && $all ne "\n" && $all ne "\r\e[K") {
-          print "    sending: ", ansi_escape($all), "\n";
+          print $debug_fh "    sending: ", ansi_escape($all), "\n";
       }
       print STDERR $all;
   }
@@ -430,9 +450,9 @@ $fatpacked{"Termdetect_IO.pm"} = <<'TERMDETECT_IO';
       alarm 0;
       if ($DEBUG) {
           if ($@ eq "alarm\n" && (!defined($reply) || length($reply) == 0)) {
-              print "    timeout\n";
+              print $debug_fh "    timeout\n";
           } else {
-              print "    read response:  ", ansi_escape($reply), "\n";
+              print $debug_fh "    read response:  ", ansi_escape($reply), "\n";
           }
       }
       return $reply;
@@ -446,6 +466,45 @@ $fatpacked{"Termdetect_IO.pm"} = <<'TERMDETECT_IO';
           $a =~ s/\x9B/\\x9B/g;
           $a =~ s/([\x00-\x1f\x7f-\xff])/"\\x" . sprintf "%02X", ord($1)/ge;
           $a} @_ }
+  
+  ##########################################################################################
+  #####################################[ debugging ]########################################
+  ##########################################################################################
+              # this code should maybe be split off into its own package?
+  
+  # public method -- used by other modules to print to the debug log
+  sub debug_log {
+      if ($DEBUG) {
+          # add extra delay in between each test
+          select undef, undef, undef, $EXTRA_DELAY;
+  
+          print $debug_fh @_;
+      }
+  }
+  
+  
+  sub debug__open_log {
+      if ($DEBUG) {
+          open $debug_fh, '>', '/var/tmp/termdetect.debug'        or die $!;
+          print $debug_fh "\n" x 10;
+  
+          # autoflush
+          my $prev_fh = select $debug_fh;
+          $| = 1;
+          select $prev_fh;
+      } else {
+          open $debug_fh, '>', '/dev/null';
+      }
+  }
+  
+  
+  END {
+      if ($DEBUG) {
+          # indicate that the program is finished
+          print $debug_fh "-"x80, "\n";
+      }
+  }
+  
   
   
   
@@ -828,7 +887,8 @@ $fatpacked{"Termdetect_Tests.pm"} = <<'TERMDETECT_TESTS';
   
               if ($all_results{s_ff_clears}{received} eq 'false') {
                   # if the screen wasn't cleared, move back up one line
-                  output("\e[A");
+                  output("\r\e[K"         # clear current line
+                       . "\e[A");         # move up one line
               }
           });
   }
@@ -963,11 +1023,13 @@ $fatpacked{"Termdetect_Tests.pm"} = <<'TERMDETECT_TESTS';
       # This is the only place in the code that we have terminal-specific code.  This really
       # out to be moved to termmatch.src in some way.
       if ($matched_term eq 'vte') {
-          my ($lasttwo) = ($da2 =~ s/(\d\d)$//);
-          $all_results->{s_term_version}{received} = sprintf "libvte v%0.2f.%d", $da2 / 100, $lasttwo;
-      } elsif ($matched_term eq 'screen') {
-          my ($lasttwo) = ($da2 =~ s/(\d\d)$//);
-          $all_results->{s_term_version}{received} = sprintf "v%0.2f.%02d", $da2 / 100, $lasttwo;
+          $da2 =~ s/(\d\d)$//;
+          my $last2digits = $1;
+          $all_results->{s_term_version}{received} = sprintf "libvte v%0.2f.%d", $da2 / 100, $last2digits;
+      } elsif ($matched_term =~ /^screen(?:_.*)?$/) {
+          $da2 =~ s/(\d\d)$//;
+          my $last2digits = $1;
+          $all_results->{s_term_version}{received} = sprintf "v%0.2f.%02d", $da2 / 100, $last2digits;
       } elsif ($matched_term eq 'mrxvt') {
           # mrxvt's version number already has dots in it, which is a total violation of the spec
           $all_results->{s_term_version}{received} = "v$da2";     
@@ -1011,7 +1073,7 @@ $fatpacked{"Termdetect_Tests.pm"} = <<'TERMDETECT_TESTS';
               $caller_sub =~ s/^.*:://;
               @_ = ($caller_sub);
           }
-          print "test ", @_, "\n";
+          debug_log("test ", @_, "\n");
       }
   }
   
