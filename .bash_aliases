@@ -149,3 +149,8 @@ fi
 
 
 function unball { cd /var/tmp; eval $(command unball "$@"); }
+
+# do a color-test in Vim
+function vim16 { vim "+set t_Co=16   | runtime syntax/colortest.vim"; }
+function vim88  { vim "+set t_Co=88  | so $HOME/.vim/VimColorTest.vim"; }
+function vim256 { vim "+set t_Co=256 | so $HOME/.vim/VimColorTest.vim"; }

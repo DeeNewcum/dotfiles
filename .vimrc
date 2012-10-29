@@ -36,7 +36,7 @@ if $LOGNAME != "root"       " modeline can compromise security
 endif
 
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
-set t_Co=256
+"set t_Co=256
 if &diff
     syntax off
     colorscheme evening
@@ -59,7 +59,7 @@ else
     set list listchars=tab:› 
 
     " hilight tabs that are used for alignment -- we only want to use them for indenting
-    match ErrorMsg /\(	\|^\)\@<!	\+/
+    "match ErrorMsg /\(	\|^\)\@<!	\+/
 
     if exists("&colorcolumn")
         set colorcolumn=+1        " highlight column after 'textwidth'
