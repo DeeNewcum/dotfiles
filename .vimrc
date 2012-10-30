@@ -45,13 +45,20 @@ if &diff
     set nolist
 else
     syntax enable
-    if &t_Co > 16 || has('gui_running')
+    if &t_Co == 256 || has('gui_running')
         let g:solarized_termcolors=&t_Co    " terminfo knows how many colors are available
         set background=light
         colorscheme solarized
     else
         " Solarized looks ugly in 16 colors, so fallback to something else
+        " Also, Solarized doesn't work in 88 colors  (urxvt)
         colorscheme pablo
+        " pablo doesn't include a ctermbg, which mucks things up in some terminals
+        highlight normal ctermfg=15 ctermbg=0 guifg=#ffffff guibg=#000000
+        if match($TERM, "rxvt-unicode")!=-1
+            silent !echo -ne "\033]12;white\007"
+            autocmd VimLeave * silent !echo -ne "\033]12;black\007"
+        endif
     endif
 
     " make tabs visible
