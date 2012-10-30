@@ -44,15 +44,13 @@ if &diff
     silent! set colorcolumn=
     set nolist
 else
-    syntax on
-    if (v:version >= 700) && (&t_Co >= 88)
-        " let termdetect + terminfo tell us how many colors are available
-        let g:solarized_termcolors=&t_Co
-        syntax enable
+    syntax enable
+    if &t_Co > 16 || has('gui_running')
+        let g:solarized_termcolors=&t_Co    " terminfo knows how many colors are available
         set background=light
         colorscheme solarized
     else
-        "colorscheme desert
+        " Solarized looks ugly in 16 colors, so fallback to something else
         colorscheme pablo
     endif
 
