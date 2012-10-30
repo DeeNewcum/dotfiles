@@ -45,8 +45,9 @@ if &diff
     set nolist
 else
     syntax on
-    if v:version >= 700
-        let g:solarized_termcolors=256
+    if (v:version >= 700) && (&t_Co >= 88)
+        " let termdetect + terminfo tell us how many colors are available
+        let g:solarized_termcolors=&t_Co
         syntax enable
         set background=light
         colorscheme solarized
