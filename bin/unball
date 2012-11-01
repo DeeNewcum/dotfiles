@@ -7,6 +7,11 @@
 # This has some specialized routines for downloading files from SourceForge and Github.
 
 
+# Similar programs:
+#       dtrx --     http://manpages.ubuntu.com/manpages/precise/man1/dtrx.1.html
+#       unp --      http://manpages.ubuntu.com/manpages/precise/man1/unp.1.html
+
+
 # Note: this outputs the name of the directory that it's been unpacked to, so you should call it
 #       like this:
 #
