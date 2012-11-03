@@ -810,6 +810,7 @@ $fatpacked{"Termdetect_Tests.pm"} = <<'TERMDETECT_TESTS';
       run_and_store_test(m_esc                => "\e[?\eK");
   
       synthetic__ff_clears();
+      synthetic__window_size();
   
       Termdetect_Encoding::do_encoding_tests(\%all_results);
   
@@ -870,7 +871,7 @@ $fatpacked{"Termdetect_Tests.pm"} = <<'TERMDETECT_TESTS';
   #
   #       See:  http://www.aivosto.com/vbtips/control-characters.html#FF
   sub synthetic__ff_clears {
-      return if ($::ARGV{'nose'});        # side effect: clears the screen
+      return if ($::ARGV{nose});        # side effect: clears the screen
   
       DEBUG_test_name();
   
@@ -891,6 +892,27 @@ $fatpacked{"Termdetect_Tests.pm"} = <<'TERMDETECT_TESTS';
                        . "\e[A");         # move up one line
               }
           });
+  }
+  
+  
+  # figure out the window size by moving the cursor all the way to the right, and then all the
+  # way down
+  sub synthetic__window_size {
+      DEBUG_test_name();
+  
+      output("\e7");          # save cursor position
+      output("\e[9999C");     # move all the way right
+      output("\e[9999B");     # move all the way down
+      output("\e[6n");        # request cursor position
+      output("\e8");          # restore cursor
+  
+      read_phase {
+          our %all_results;           # pull this in from the 'local'ized copy in perform_all_tests()
+          my $reply = read_ansi_reply(1.0, 'R');
+          if (defined($reply) && $reply =~ /\e\[(\d+);(\d+)R$/s) {
+              $all_results{s_window_size}{received} = "$2 x $1";
+          }
+      };
   }
   
   
@@ -1081,7 +1103,7 @@ $fatpacked{"Termdetect_Tests.pm"} = <<'TERMDETECT_TESTS';
   sub summarize_result {
       my ($test_result) = @_;
       #print ansi_escape_no_nl(Dumper $test_result); exit;
-      if (exists $test_result->{x_delta}) {
+      if ($test_result->{x_delta}) {
           return "%x+$test_result->{x_delta}";
       } else {
           return (ansi_escape($test_result->{received}))[0];
@@ -1568,6 +1590,475 @@ $fatpacked{"Terminfo_Parser.pm"} = <<'TERMINFO_PARSER';
   # version 2 of the License, or (at your option) any later version.
 TERMINFO_PARSER
 
+$fatpacked{"Termmatch.pm"} = <<'TERMMATCH';
+  package Termmatch; sub termmatch {join '', <DATA>}; 1
+  __DATA__
+  # The database that termdetect is built around.
+  #
+  # This file's syntax is exactly the same as terminfo's in most places, with a few slight changes.
+  #
+  # For more info, see:
+  #       https://github.com/DeeNewcum/termdetect/blob/master/doc/termmatch.md
+  
+  vte-256color|gnome-terminal|xfce4-terminal|libVTE - used in GNOME Terminal etc,
+      fallback=gnome-256color,
+      m_c1=%x+3,
+      m_cancel=%x+4,
+      m_esc=%x+5,
+      m_null_inside=%x+2,
+      m_pad_null=,
+      m_sub=%x+4,
+      r_device_attr=\E[?62;9;c,
+      r_device_attr2=\E[>1;%+;0c,
+      r_device_attr3=,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=\E[%+R,
+      r_printer_status=\E[?11n,
+      r_screen_size=\E[9;%+t,
+      r_term_id=\E[?62;9;c,
+      r_term_param=%x+3,
+      r_window_icon_label=\E]L%*\E\\,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=\E[1t,
+      r_window_title=\E]l%*\E\\,
+      s_ff_clears=false,
+  
+  linux-16color|Linux console,
+      m_c1=%x+3,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?6c,
+      r_device_attr2=%x+1,
+      r_device_attr3=%x+1,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=\E[?6c,
+      r_term_param=,
+      r_window_icon_label=,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  # The xterm from http://invisible-island.net/ (specifically version #271)
+  xterm+256color,
+  #    m_c1=%x+2,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=\E[>0;%+;0c,
+      r_device_attr3=,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=\E%+R,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=\E[?1;2c,
+      r_term_param=\E[2;1;1;128;128;1;0x,
+      r_window_icon_label=,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  
+  # The xterm that comes with X11 release 6.
+  #   (specifically, this data comes from Solaris 10, and X11 release 6.4)
+  xterm-r6,
+      m_c1=%x+3,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=\E[?1;2c,
+      r_device_attr3=\E[?1;2c,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=\E[?1;2c,
+      r_term_param=\E[2;1;1;112;112;1;0x,
+      r_window_icon_label=,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  putty-256color,
+      m_c1=,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?6c,
+  # it ALWAYS reports version 136
+      r_device_attr2=\E[>0;136;0c,
+      r_device_attr3=,
+      r_device_status=\E[0n,
+      r_enquiry=PuTTY,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=\E[?6c,
+      r_term_param=\E[2;1;1;112;112;1;0x,
+      r_window_icon_label=\E]L%*\E\\,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=\E[1t,
+      r_window_title=\E]l%*\E\\,
+      s_ff_clears=true,
+  
+  rxvt-256color,
+      m_c1=%x+3,
+      m_cancel=%x+1,
+      m_esc=,
+      m_null_inside=%x+1,
+      m_pad_null=,
+      m_sub=%x+1,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=\E[?1;2c,
+      r_device_attr3=\E[?1;2c,
+      r_device_status=\E[0n,
+      r_enquiry=\E[?1;2c,
+      r_ext_cursor_pos=\E[%+R,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=\E[?1;2c,
+      r_term_param=,
+      r_window_icon_label=,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=\E[1t,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  aterm,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=\E]l%*\E\\,
+      use=rxvt-256color,
+  
+  rxvt-unicode,
+  # the $TERM name of "rxvt-unicode" is a patch added by Debian, in package 'ncurses-base'
+      fallback=rxvt-88color|rxvt,
+      m_c1=%x+2,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=%x+1,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=\E[>85;95;0c,
+      r_device_attr3=,
+      r_device_status=\E[0n,
+      r_enquiry=\E[?1;2c,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=\E[9;%+t,
+      r_term_id=\E[?1;2c,
+      r_term_param=\E[2;1;1;128;128;1;0x,
+      r_window_icon_label=%+,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=\E[1t,
+      r_window_title=%+,
+      s_ff_clears=false,
+  
+  mrxvt-256color,
+      m_c1=%x+3,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=%x+1,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=\E[>82;%+;0c,
+      r_device_attr3=,
+      r_device_status=\E[0n,
+      r_enquiry=\E[?1;2c,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=\E[?1;2c,
+      r_term_param=\E[2;1;1;112;112;1;0x,
+      r_window_icon_label=,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=\E[1t,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  screen_4.00.02,
+      fallback=screen-256color,
+      m_c1=,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=%x+1,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=\E[>83;%+;0c,
+      r_device_attr3=,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=\E[?1;2c,
+      r_term_param=\E[2;1;1;112;112;1;0x,
+      r_window_icon_label=,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  # in v4.00.03jw4 (git change b4aa8750b45e7b75ab5a837503dc0a6b2e177bf9),
+  # support was added for CSI 11t, 7t, and 21t
+  screen_4.00.03jw4,
+      use=screen_4.00.02,
+      r_window_state=\E[1t,
+      r_window_title=\E]l%*\E\\,
+  
+  securecrt,
+      fallback=vt100,
+  #    ^^ this REALLY varies, based on what its "emulation" setting is
+  #    ^^ TODO: do some work to see what the closest match actually is
+  #
+  #   online suggestions:
+  #       - http://tech.groups.yahoo.com/group/mutt-users/message/37609
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=%x+1,
+      r_device_attr3=%x+1,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=\E[?10n,
+      r_screen_size=,
+      r_term_id=\E[?1;2c,
+      r_term_param=\E[2;1;1;120;120;1;0x,
+      r_window_icon_label=,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  tmux,
+      fallback=xterm-new|screen-256color|screen,
+      m_c1=%x+3,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=,
+      r_device_attr3=,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=,
+      r_term_param=,
+      r_window_icon_label=,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  mosh,
+      fallback=xterm-256color,
+  #            ^^ this is the value that's automatically set by the Mosh server
+      m_c1=%x+3,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?62c,
+      r_device_attr2=\E[>1;10;0c,
+      r_device_attr3=,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=,
+      r_term_param=,
+      r_window_icon_label=,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  teraterm,
+      m_c1=%x+1,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=\E[>32;100;2c,
+  # TeraTerm has a curious response to DA3:    http://ttssh2.sourceforge.jp/manual/en/setup/teraterm-term.html#TerminalUID
+      r_device_attr3=\EP!|%*\E\\,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=\E[9;%+t,
+      r_term_id=\E[?1;2c,
+      r_term_param=,
+      r_window_icon_label=\E]L%*\E\\,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=\E[1t,
+      r_window_title=\E]l%*\E\\,
+      s_ff_clears=false,
+  
+  dtterm,
+      m_c1=,
+      m_cancel=,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=,
+      r_device_attr=\E[?62;1;2;6;7;8;9c,
+      r_device_attr2=%x+1,
+      r_device_attr3=%x+1,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=\E[?13n,
+      r_screen_size=,
+      r_term_id=\E[?62;1;2;6;7;8;9c,
+      r_term_param=\E[2;1;1;112;112;1;0x,
+      r_window_icon_label=\E]L%*\E\\,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=\E[1t,
+      r_window_title=\E]l%*\E\\,
+      s_ff_clears=false,
+  
+  konsole-256color,
+      m_c1=,
+      m_cancel=%x+1,
+      m_esc=,
+      m_null_inside=,
+      m_pad_null=,
+      m_sub=%x+1,
+      r_device_attr=\E[?1;2c,
+      r_device_attr2=\E[>0;115;0c,
+      r_device_attr3=%x+1,
+      r_device_status=\E[0n,
+      r_enquiry=,
+      r_ext_cursor_pos=,
+      r_printer_status=,
+      r_screen_size=,
+      r_term_id=\E[?1;2c,
+      r_term_param=\E[2;1;1;112;112;1;0x,
+      r_window_icon_label=,
+      r_window_pos=,
+      r_window_size_char=,
+      r_window_size_px=,
+      r_window_state=,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  nsterm-256color|Terminal.app as found in OS/X,
+      m_c1=%x+3,
+      m_cancel=%x+0,
+      m_esc=%x+0,
+      m_null_inside=%x+0,
+      m_pad_null=%x+0,
+      m_sub=%x+0,
+      r_device_attr=%x+0,
+      r_device_attr2=%x+0,
+      r_device_attr3=%x+0,
+      r_device_status=%x+0,
+      r_enquiry=%x+0,
+      r_ext_cursor_pos=,
+      r_printer_status=%x+0,
+      r_screen_size=,
+      r_term_id=%x+0,
+      r_term_param=%x+0,
+      r_window_icon_label=,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=%x+0,
+      r_window_title=,
+      s_ff_clears=false,
+  
+  iTerm2.app,
+      m_c1=%x+3,
+      m_cancel=%x+0,
+      m_esc=%x+0,
+      m_null_inside=%x+1,
+      m_pad_null=%x+0,
+      m_sub=%x+0,
+      r_device_attr=%x+0,
+      r_device_attr2=\E[>0;%+;c,
+      r_device_attr3=%x+2,
+      r_device_status=%x+0,
+      r_enquiry=%x+0,
+      r_ext_cursor_pos=,
+      r_printer_status=%x+0,
+      r_screen_size=\E[9;%+t,
+      r_term_id=%x+0,
+      r_term_param=%x+0,
+      r_window_icon_label=\E]L%*\E\\,
+      r_window_pos=\E[3;%+t,
+      r_window_size_char=\E[8;%+t,
+      r_window_size_px=\E[4;%+t,
+      r_window_state=%x+0,
+      r_window_title=\E]l%*\E\\,
+      s_ff_clears=false,
+TERMMATCH
+
 s/^  //mg for values %fatpacked;
 
 unshift @INC, sub {
@@ -1611,17 +2102,21 @@ unshift @INC, sub {
 
     
     # constants
-    use constant VERSION => "0.10";
+    use constant VERSION => "0.11a";
 
 
 our %ARGV;
 process_cmdline();
 
+# we can't detect the terminal type if there's no terminal connected in the first place
+if (!-t STDERR || !-t STDIN) {       # isatty(3)
+    die "Not connected to a terminal.\n";
+}
 
 my $termmatch_file = locate_termmatch_file();
 
 ## read in the termmatch database
-my $termmatch_db = parse_terminfo(scalar(slurp($termmatch_file)));
+my $termmatch_db = parse_terminfo($termmatch_file);
     #print ti_dump_terminal(values %$termmatch_db);      exit;
 
 ## read in the test results from the current terminal
@@ -1751,9 +2246,19 @@ sub locate_termmatch_file {
         "$FindBin::Bin/termmatch.src",      # in the same directory as this script
         "$ENV{HOME}/.termmatch.src",
         "/etc/termmatch.src",
+        "<internal>",
         );
     foreach my $loc (@possible_locations) {
-        return $loc if (-e $loc);
+        if ($loc eq '<internal>') {
+            # When fatpacked, we include the termmatch file as Termmatch.pm.
+            # But it's not available when we're not fatpacked.
+            my $internal = eval q{
+                use Termmatch;
+                Termmatch::termmatch();
+            };
+            return $internal if (defined $internal);
+        }
+        return scalar(slurp($loc)) if (-e $loc);
     }
     print STDERR <<"EOF";
 Error: File 'termmatch.src' not found.
@@ -1876,36 +2381,40 @@ sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wanta
 __END__
 termdetect
 
-  -t    only display the matched $TERM
+  -t    Display only the matched $TERM.  Intended to be used like this:
+                export TERM=$(termdetect -t)
 
-  --check=<term>
-        Used to debug termmatch.src.  Displays extra information about how the
-        current terminal matches up to the specified entry in termmatch.src.
-
-  --check
-        Displays extra information about EVERY entry in termmatch.src.
+  --result=<test_id>
+        Display the result of a single test.  To get a list of test_ids you
+        can use, run      termdetect --dump
 
   --nose
-        "No Side Effects".  Doesn't run tests that may have side-effects.
-        Gibberish may still be displayed on your screen, but they will be
-        (mostly) erased before exiting.  Most tests don't have side-effects, so
-        using this option doesn't greatly reduce the chances of correctly
-        identifying your terminal.
+        "No Side Effects".  Doesn't run tests that have significant side-effects.
+        Most tests don't have side-effects, so using this option doesn't greatly
+        reduce the chances of correctly identifying your terminal.
+        Note that there are some smaller side-effects that are unavoidable,
+        even when --nose is used.  Read more at:
+            https://github.com/DeeNewcum/termdetect/blob/master/doc/side-effects.md
+
+  --dump
+        Dumps the result of all tests run.
+        Similar to --snapshot, but gives a little more detailed information.
+        See here for details on what each line means:
+            https://github.com/DeeNewcum/termdetect/blob/master/doc/termmatch.md
+
+  --check=<term>
+        In the case of a mismatch, this tells you which specific tests gave
+        different answers than were expected.  This helps suggest changes that
+        may need to be made to the termmatch.src database.
+        If no terminal name is given, it displays information about EVERY entry
+        in the database.
 
   --snapshot
         Outputs the current tests results in a form that's suitable for 
         cut-n-pasting into termmatch.src.
 
-  --dump
-        Dumps the result of all tests run.
-        Similar to --snapshot, but gives a little more detailed information.
-
   --version
         Show version number.
-
-  --result=<test_id>
-        Display the result of a single test.  To get a list of test_ids you
-        can use, run   termdetect --dump
 
   --help-submit
         A guide for submitting test results to the developer, so that more
