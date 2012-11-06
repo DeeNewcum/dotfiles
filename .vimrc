@@ -40,7 +40,7 @@ endif
 if &diff
     syntax off
     colorscheme evening
-    set nospell
+    au BufNewFile,BufRead,BufEnter * set nospell
     silent! set colorcolumn=
     set nolist
 else
