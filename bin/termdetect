@@ -467,6 +467,18 @@ $fatpacked{"Termdetect_IO.pm"} = <<'TERMDETECT_IO';
           $a =~ s/([\x00-\x1f\x7f-\xff])/"\\x" . sprintf "%02X", ord($1)/ge;
           $a} @_ }
   
+  # like ansi_escape, but don't escape newlines
+  sub ansi_escape_no_nl {
+      my $text = join('', @_);
+      my @lines = split /[\n\r]+/, $text;
+      @lines = map {ansi_escape($_)} @lines;
+      return join("\n", @lines), "\n";
+  }
+  
+  
+  
+  
+  
   ##########################################################################################
   #####################################[ debugging ]########################################
   ##########################################################################################
@@ -583,12 +595,16 @@ $fatpacked{"Termdetect_Match.pm"} = <<'TERMDETECT_MATCH';
           }
       } elsif (@no_mismatches == 0) {
           if ($die_if_not_one) {
-              print STDERR "Error: No terminals matched exactly.  Terminals that were close:\n";
-              my $closest_match = show_match_percentages($match_stats, 5);
-              print STDERR "\nRun this for more info:\n    $0 --check=$closest_match\n";
-              print STDERR "\n\nIt would help out greatly if you could submit data about this.\n";
-              print STDERR "See       termdetect --help-submit\n";
-              exit 1;
+              if (keys %$match_stats) {
+                  print STDERR "Error: No terminals matched exactly.  Terminals that were close:\n";
+                  my $closest_match = show_match_percentages($match_stats, 5);
+                  print STDERR "\nRun this for more info:\n    $0 --check=$closest_match\n";
+                  print STDERR "\n\nIt would help out greatly if you could submit data about this.\n";
+                  print STDERR "See       termdetect --help-submit\n";
+                  exit 1;
+              } else {
+                  die "Error: Termmatch.src is blank; there are no entries to match to.\n";
+              }
           }
       } elsif (@no_mismatches == 1) {
           Termdetect_Tests::calculate_derived_values_after_match($test_results, $termmatch_db, $highest_match);
@@ -1167,6 +1183,7 @@ $fatpacked{"Terminfo_Parser.pm"} = <<'TERMINFO_PARSER';
       use Exporter 'import';
   
       our @EXPORT = qw( parse_terminfo ti_dump_terminal );
+      our @EXPORT_OK = qw( terminfo_unescape );
   
   
   # terminfo(5) says of terminfo's syntax:
@@ -2102,7 +2119,7 @@ unshift @INC, sub {
 
     
     # constants
-    use constant VERSION => "0.11a";
+    use constant VERSION => "0.11";
 
 
 our %ARGV;
@@ -2135,9 +2152,12 @@ if ($ARGV{snapshot}) {
     show_snapshot($test_results);
 
 } elsif ($ARGV{dump}) {
-    # Does this overlap with --snapshot too much?  If so, then we'll get rid of this.
     foreach my $cap (sort keys %$test_results) {
-        printf "%25s  %s\n", $cap, summarize_result($test_results->{$cap});
+        if (-t STDOUT) {
+            printf "%25s  %s\n", $cap, summarize_result($test_results->{$cap});
+        } else {
+            print "$cap\t", summarize_result($test_results->{$cap}), "\n";
+        }
     }
 
 } elsif ($ARGV{result}) {
@@ -2151,9 +2171,13 @@ if ($ARGV{snapshot}) {
             my $final_term = TERM_fallback($term, $termmatch_db);
             if ($final_term) {
                 print "$final_term\n";
+                # to deal with the problem of the keyboard-buffer being cleared, we indicate to the
+                # user when it's safe to start typing   (see doc/side-effects.md)
+                print STDERR "-\n";     
             } else {
-               print STDERR "The suggested \$TERM \"$term\" wasn't found.\n";
+                print STDERR "The suggested \$TERM \"$term\" wasn't found.\n";
                 print STDERR "        \n";
+                print STDERR "\nTo install the full set of terminfo files:\n";
                 help_install_terminfos();
             }
         } else {
@@ -2162,10 +2186,10 @@ if ($ARGV{snapshot}) {
                     ['terminal',            $all_aliases],
                     ['version',             $test_results->{s_term_version}],
                     ['encoding',            $test_results->{s_encoding}],
-                    ['terminal size',       $test_results->{s_window_size}],
-                    ['font size',           $test_results->{s_font_size}],
-                    ['window position',     $test_results->{s_window_pos}],
-                    ['screen size',         $test_results->{s_screen_size}],
+                    ['terminal size',       $test_results->{s_window_size},         '(characters)'  ],
+                    ['font size',           $test_results->{s_font_size},           '(pixels)'  ],
+                    ['window position',     $test_results->{s_window_pos},          '(pixels)'  ],
+                    ['screen size',         $test_results->{s_screen_size},         '(pixels)'  ],
             );
             foreach my $field (@fields) {
                 next unless defined($field->[1]);
@@ -2173,12 +2197,17 @@ if ($ARGV{snapshot}) {
                 if (ref($disp) eq 'HASH' && exists $disp->{received}) {
                     $disp = $disp->{received};
                 }
-                printf "%20s:   %s\n", $field->[0], $disp;
+                printf "%20s:   %s", $field->[0], $disp;
+                if (@$field == 3) {         # print the suffix, if any
+                    print "  ", $field->[2];
+                }
+                print "\n";
             }
 
             if (!does_terminfo_exist("vt100-putty")) {
-                print "\nThe full set of terminfo entries haven't been installed,\n",
-                        "see --help-terminfo for info on installing them.\n";
+                print STDERR "\nThe full set of terminfo entries haven't been installed.\n",
+                               "To install them:\n";
+                help_install_terminfos();
             }
         }
     } else {
@@ -2194,12 +2223,11 @@ sub process_cmdline {
     GetOptions( \%ARGV,
                     map {"$_:s"}        # all options have optional arguments, like Getopt::Casual
         "help|h|?",
-        qw( check nose t snapshot result dump help-submit help-terminfo version ),
+        qw( check nose t snapshot result dump help-submit version ),
     ) or usage();
     %ARGV = map {length()?$_:1} %ARGV;      # arguments are optional
     $ARGV{help} and usage();
     $ARGV{'help-submit'} and help_submit();
-    $ARGV{'help-terminfo'} and help_install_terminfos();
     if ($ARGV{version}) {
         print "termdetect, version ", VERSION, "\n";
         exit;
@@ -2208,7 +2236,7 @@ sub process_cmdline {
 
 
 sub usage {
-    print STDERR <DATA>;
+    print <DATA>;
     exit;
 }
 
@@ -2318,19 +2346,20 @@ sub does_terminfo_exist {
 
 
 sub help_install_terminfos {
-    die <<'EOF';
-Instructions for installing the full set of terminfo entries:
+    if (`which apt-get`) {
+        # Debian/Ubuntu/et al don't come with the full set of terminfo entries
+        # installed by default, but they're easy to install
+        die "    sudo apt-get install ncurses-term\n";
+    } else {
+        die <<'EOF';
 
-On Debian or Ubuntu:
-    sudo apt-get install ncurses-term
-                        
-Otherwise:
     TMP=$(mktemp);
     curl http://invisible-island.net/datafiles/current/terminfo.src.gz | gzip -dc > $TMP;
     tic $TMP; rm $TMP
-            (run that as root if you want, otherwise it will install things
-             in ~/.terminfo/ )
+
+Run this as root if you can, but running as a normal user is fine, files will go in ~/.terminfo/
 EOF
+    }
 }
 
 
