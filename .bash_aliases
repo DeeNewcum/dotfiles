@@ -121,7 +121,7 @@ alias ansistrip="perl -000 -pe 's/\e(?:\[\??)?[\x20-\x3f]*[\x40-\x7e]//ig; while
 # the one I wanted
 #       (they have gibberish filenames on the same theory that GMail doesn't have folders --
 #        searching is more important than organizing)
-alias lasttmp='ls -1td /var/tmp/* | perl -nle "print if -f && -O" | head | perl -nle "print if -T" | xargs less'
+alias lasttmp='ls -1td /var/tmp/* | perl -nle "print if -f && -O" | head -40 | perl -nle "print if -T" | xargs less'
                         # once in less, use '[' and ']' (or :n and :p) to quickly scan the files
 
 
