@@ -64,6 +64,8 @@ function touchu()    { touch $(rurl "$1"); }
 function go() { xdg-open "$@"; }
 #function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "scp", $ARGV[0], "."; system "xdg-open *"' "$@"; }
 
+alias syslog='tail -fs0 /var/log/syslog'
+
 
 # List all executable files in a package.  Param#1: package name (apt-get).
 # Useful in combination with dmenu.
