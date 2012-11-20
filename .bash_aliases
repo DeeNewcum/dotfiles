@@ -66,6 +66,8 @@ function go() { xdg-open "$@"; }
 
 alias syslog='tail -fs0 /var/log/syslog'
 
+# launch a tempoary webserver, serving static content from the local directory
+function plackup_here() { plackup -MPlack::App::Directory -e 'Plack::App::Directory->new(root => ".");'; }
 
 # List all executable files in a package.  Param#1: package name (apt-get).
 # Useful in combination with dmenu.
