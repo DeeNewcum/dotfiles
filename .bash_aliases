@@ -158,3 +158,8 @@ function unball { cd /var/tmp; eval $(command unball "$@"); }
 function vim16 { vim "+set t_Co=16   | runtime syntax/colortest.vim"; }
 function vim88  { vim "+set t_Co=88  | so $HOME/.vim/VimColorTest.vim"; }
 function vim256 { vim "+set t_Co=256 | so $HOME/.vim/VimColorTest.vim"; }
+
+
+# display the Markdown text from a github project page
+function gh-page { perl -0777 -MJSON -ne 'print JSON->new->decode($_)->{body}' params.json \
+                        | vim -c 'set syntax=markdown' -; }
