@@ -3,6 +3,11 @@
     ins {margin-left:3em; text-decoration:none}
                     /* ^^ abuses the <ins> tag, uses it for something else entirely */
 
+    /* --==##  default to sans-serif font  ##==-- */
+                    /* but when printing, use the default serif */
+    body, td {font-family: sans-serif}
+    @media print { body, td {font-family: serif} }
+
     /* --==##  links aren't underlined unless you :hover  ##==-- */
     a:link:hover {text-decoration:underline; background-color:#aaf; color:#000!important}
     a:visited:hover {background-color:#faf; color:#000!important}
