@@ -85,6 +85,7 @@ if has("spell")             " spell-check settings
 endif
 
 nnoremap <leader>s :setl spell!<CR>|            " toggle spell-check
+nnoremap <leader>w :setl wrap!<CR>|             " toggle line-wrap
 
 " we don't enable spell-checking here...  rather, it gets enabled on a per-filetype basis
 " in the ~/.vim/ftplugin/ files   (see :help ftplugin-overrule)
