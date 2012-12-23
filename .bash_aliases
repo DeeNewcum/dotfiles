@@ -8,6 +8,9 @@ function where { type -pa "$@" | perl -nle 'print unless $seen{$_}++'; }
 alias rehash='hash -r'
 
 
+# Perl replacement for 'uniq'; unlike the system version, this doesn't require 
+#       note: RAM usage is O(n)    (probably;  Perl's hash algorithm may be complex)
+puniq() { perl -nle 'print unless $SEEN{$_}++' "$@"; }
 
 function xargs_newline() { perl -e 'my@a=map{chomp;$_}<STDIN>;system@ARGV,splice(@a,0,200)while(@a)' "$@"; }
 if [ "`uname`" != "SunOS" ]; then
