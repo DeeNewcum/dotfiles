@@ -16,6 +16,7 @@ Before we get into the details of my dotfiles, I'd like to point out that MANY p
 
 * [dotfiles.github.com](http://dotfiles.github.com/)
 * [dotfiles.org](http://dotfiles.org/)
+* [dotshare.it](http://dotshare.it/)
 * good articles: [(1)](http://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/)
 * popular dotfile repos:  [mathias bynens](https://github.com/mathiasbynens/dotfiles)
 
