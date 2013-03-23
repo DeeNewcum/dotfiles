@@ -8,7 +8,7 @@ function where { type -pa "$@" | perl -nle 'print unless $seen{$_}++'; }
 alias rehash='hash -r'
 
 
-# Perl replacement for 'uniq'; unlike the system version, this doesn't require 
+# Perl replacement for 'uniq'; unlike the system version, this doesn't require the input to be sorted
 #       note: RAM usage is O(n)    (probably;  Perl's hash algorithm may be complex)
 puniq() { perl -nle 'print unless $SEEN{$_}++' "$@"; }
 
