@@ -37,7 +37,7 @@
 
 ############### hostname ################
 my $host;
-if (qx|uname| =~ /^SunOS$/) {
+if (qx|uname| =~ /^SunOS$|^AIX$/) {
     ($host = qx[hostname]) =~ s/\s//g;
 } else {
     ($host = qx[hostname --long]) =~ s/\s//g;
