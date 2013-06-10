@@ -75,12 +75,12 @@ sub process_cmdline {
             last;
         }
     }
-    die "Please specify a format.\n"    unless $ARGV{format};
+    usage("Please specify a format.")    unless $ARGV{format};
 
     if (@ARGV && (-e $ARGV[0] || $ARGV[0] eq '-')) {
         $ARGV{file} = shift @ARGV;
     }
-    die "Please specify a file to dumper.\n"    unless $ARGV{file};
+    usage("Please specify a file to dumper.")    unless $ARGV{file};
 
     $ARGV{args} and die Dumper {'%ARGV' => \%ARGV, '@ARGV' => \@ARGV};
     #die Dumper {'%ARGV' => \%ARGV, '@ARGV' => \@ARGV};
@@ -90,6 +90,7 @@ sub process_cmdline {
 
 
 sub usage {
+    print map {"$_\n"} @_, ""       if @_;
     print "Usage:  dumper <format> <filename>\n";
     usage_getopt();
     exit;
