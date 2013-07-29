@@ -19,12 +19,28 @@
 my ($cmdline_view_all) = grep /^(-a|--all)$/,    @ARGV;     # display everything, despite lsgit.hide
 my ($cmdline_raw)      = grep /^(-r|--raw)$/,    @ARGV;     # don't cluster things, display only the directory list
 my ($cmdline_status)   = grep /^(-s|--status)$/, @ARGV;     # show status too   (may be slow if there are any large repos)
-
+my ($cmdline_list)   = grep /^(-l|--list)$/, @ARGV;         # only run on dir, not result of locate?
+my ($cmdline_dir)   = grep /^(-d|--dir)$/, @ARGV;
 
 my %repos;
-open my $pin, '-|',  'locate', '-r', '/HEAD$'
-        or die $!;
-while (<$pin>) {
+my @DATA;
+
+if ($cmdline_list) {
+  @DATA = @ARGV;
+  shift @DATA;
+} elsif ($cmdline_dir) {
+  my $dirName = pop @ARGV;
+  $dirName="." if ($dirName eq "-d");
+  open my $pin, '-|',  'find', "$dirName", '-name', 'HEAD'
+    or die $!;
+  @DATA=<$pin>;
+} else {
+  open my $pin, '-|',  'locate', '-r', '/HEAD$'
+    or die $!;
+  @DATA=<$pin>;
+}
+
+foreach ( @DATA ) {
     chomp;
     my $git_dir = File::Basename::dirname($_);
 
