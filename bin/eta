@@ -30,7 +30,7 @@ my $measure_string = shift @ARGV;        ## what/how to measure
 my $measure;
 my $moving_average_window = shift @ARGV || 10;      ## number of seconds to include in the moving average
 if ($measure_string =~ s/\|$//s) {
-    $measure = sub {trim(readpipe $measure_string)};
+    $measure = sub {firstnum(readpipe $measure_string)};
 } elsif (-f $measure_string) {
     $measure = sub {-s $measure_string};
 } elsif (-d $measure_string) {
@@ -112,10 +112,13 @@ sub human_readable_rate {
 
 
 
+# takes a string, and returns the number at the start of the string
+sub firstnum { $_[0] =~ /^\s*([-+]?[\d\.,]*)/ && return $1 }
 
 # add commas to a number
 sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}
 
+# trim spaces
 sub trim {my@a=map{(my$s=$_)=~s/^[\s\n\r]+|[\s\n\r]+$//gs;$s}@_;wantarray?@a:$a[0]}
 
 # List::Util
