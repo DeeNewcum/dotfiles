@@ -28,6 +28,7 @@
 my $target = parse_size(shift @ARGV);
 my $measure_string = shift @ARGV;        ## what/how to measure
 my $measure;
+my $moving_average_window = shift @ARGV || 10;      ## number of seconds to include in the moving average
 if ($measure_string =~ s/\|$//s) {
     $measure = sub {trim(readpipe $measure_string)};
 } elsif (-f $measure_string) {
@@ -46,7 +47,7 @@ sleep(1);
 while (1) {
     push @meas,   [time, my $current = $measure->()];
     ## only keep the most recent 10.0 seconds of measurements
-    @meas = grep {$meas[-1][0] - $_->[0] < 10} @meas;
+    @meas = grep {$meas[-1][0] - $_->[0] < $moving_average_window} @meas;
     #print "\t", join(" ", map {$_->[MEAS]} @meas), "\n";       
     ## bytes per second
     my $bps = ($meas[LATEST][MEAS] - $meas[EARLIER][MEAS]) / ($meas[LATEST][TIME] - $meas[EARLIER][TIME]);
@@ -54,7 +55,8 @@ while (1) {
     if ($bps > 0.1 || $bps < -0.1) {
         my $eta = ($target - $current) / $bps;
         printf "rate: %-20s", human_readable_rate($bps);
-        printf "remaining:  %s%d:%02d:%02d (HH:MM:SS)\n", sign_str($eta), abs($eta)/3600, (abs($eta)/60) % 60, abs($eta) % 60;
+        printf "remaining:  %s%d:%02d:%02d:%02d (DAY:HH:MM:SS)\n",
+            sign_str($eta), abs($eta)/86400, abs($eta)/3600 % 24, (abs($eta)/60) % 60, abs($eta) % 60;
     } else {
         print "(stalled)\n";
     }
@@ -95,14 +97,16 @@ sub parse_size {
 sub human_readable_rate {
     my $bps = shift;
 
-    if ($bps > 5 * 1024) {
-        if ($bps > 5 * 1024 * 1024) {
-            return sprintf('%d mbps', $bps/(1024*1024));
+    if (abs($bps) > 5 * 1024) {
+        if (abs($bps) > 5 * 1024 * 1024) {
+            return sprintf('%d mBps', $bps/(1024*1024));
         } else {
-            return sprintf('%d kbps', $bps/1024);
+            return sprintf('%d kBps', $bps/1024);
         }
+    } elsif (abs($bps) < 1)  {
+        return sprintf('%.5f Bps', $bps);
     } else {
-        return $bps . " bps";
+        return sprintf('%d Bps', $bps);
     }
 }
 
@@ -157,7 +161,7 @@ EOF
 
 
 __DATA__
-Usage:  eta <target_size>  <measure>
+Usage:  eta <target_size>  <measure>    [<moving_avg_window>]
 
 Estimates when a long-running file-based operation will be complete,
 by measuring how quickly a file/directory/other is growing.
@@ -182,6 +186,11 @@ measure
         To indicate a shell command, append a pipe character ('|') to the end
         of the command.
 
-        For example, to measure the amount of space used on a filesystem, via df:
+        For example, to estismate the time until a file system runs out of space, using df:
 
-                eta  1gb  "df -B 1 . | awk 'NR==2 {print \$3}' |"
+                eta 0kb "df -B 1 /var | awk 'NR==2 {print \$4}' |"
+
+moving average window
+        The number if seconds of recent data to use, for calculating the estimate.
+        Defaults to 10 seconds, but you may want to go much longer if the process you're
+        estimating lasts for hours or days.
