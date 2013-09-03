@@ -55,6 +55,7 @@ var commands = {
     testing  : function() {     // an example of how (typeof(cmd) == "function") works
         return "http://reddit.com";
     },
+    // typing "help help" from anywhere returns the help text for this page
     help : function() { return window.location.href.replace(/\?.*/, "") },
 };
 
@@ -139,7 +140,9 @@ function google(args) {
 
 
 
-<!-- if we're doing a search, we don't want to spend any time trying to parse or render HTML -->
+<!-- If we're doing a search, we don't want to spend any time trying to parse or render HTML.
+   - So instead make this a here-document that we can load if/when we want to.
+  -->
 <script id="really_html" language="ignore">
 
 <style>
@@ -173,12 +176,11 @@ function google(args) {
 </style>
 
 
-This allows you to replace the default search engine in Firefox + Chrome with one that has some custom Javascript features:
+<p>This tool lets you do various preconfigured searches of the form "&lt;keyword&gt; &lt;searchterms&gt;".
 
-<ul>
-<li>preconfigured <a href="https://developer.mozilla.org/en/Bookmark_Keywords">keymarks</a>
-<li>some keymarks have some extra Javascript code
-</ul>
+<p>For example, <kbd>man tmux</kbd> would show the man page for tmux.
+
+<p>To see the list of keywords available, "view source".
 
 
 <h3>Setup instructions</h3>
