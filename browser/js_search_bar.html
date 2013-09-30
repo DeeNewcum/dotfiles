@@ -77,7 +77,7 @@ function parse_search() {
                         .replace(/^\?/, "")
                         .replace(/\+/g, "%20"));
     var cmd = search.match(/^(\S+)/)[0];
-    search = search.replace(/^\S+\s+/, "");
+    search = search.replace(/^\S+\s*/, "");
     do_search(cmd, search);
 }
 
