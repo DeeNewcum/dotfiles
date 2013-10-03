@@ -17,6 +17,11 @@ defscrollback 1000
 # How long to display temporary messages for.
 msgwait 1
 
+# Start at screen #1 instead of #0
+bind c screen 1
+bind ^c screen 1
+bind 0 select 10                                                            
+screen 1
 
 
 attrcolor b ".I"    # allow bold colors - necessary for some reason
