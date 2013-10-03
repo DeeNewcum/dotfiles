@@ -87,6 +87,8 @@ export LESS_TERMCAP_ue=$'\E[0m'             # end underline
     # http://bashcookbook.com/bashinfo/source/bash-4.1/examples/complete/complete-examples
     # http://tldp.org/LDP/abs/html/sample-bashrc.html
 
+[ -f /etc/bash_completion ] && . /etc/bash_completion
+
 shopt -s extglob        # enable extended pattern matching operators
 
             # returns 0 if the command has a completion rule, 1 if not
