@@ -19,7 +19,6 @@
 
 [github]
     user = DeeNewcum
-    # github token must be filled in -- it's not checked in to the centralized repo
 
 [core]
     # see: https://github.com/github/gitignore/tree/master/Global
