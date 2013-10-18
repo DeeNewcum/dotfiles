@@ -40,14 +40,14 @@
 
 my $filename = shift    or die "Specify a filename.\n";
 
-my $absfilename = abs_path($filename);
-
-my $dir = $absfilename;
-my $append = '';
-if (-f $dir) {
-    $append = basename($absfilename);
-    $dir = dirname($absfilename);
+my ($append, $dir) = ('');
+if (-f $filename) {
+    $append = basename($filename);
+    $dir = dirname($filename);
+} else {
+    $dir = $filename;
 }
+$dir = abs_path($dir);
 
 
 my $foundit = '';
