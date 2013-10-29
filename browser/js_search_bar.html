@@ -90,6 +90,7 @@ function do_search(cmd, args) {
         // check if this is a Feeling Lucky upgrade
         var cmd_unlucky;
         if ((cmd_unlucky = cmd.replace(/\+$/, "")) != cmd && commands[cmd_unlucky]) {
+            // the plus-sign can be placed at the end of the command name
             lucky_upgrade = true;
             cmd = cmd_unlucky;
         } else {
@@ -101,6 +102,11 @@ function do_search(cmd, args) {
             args = cmd + " " + args;
             cmd = "google";
         }
+    }
+    if (args.length > 0 && args[args.length-1].match(/\+$/)) {
+        // the plus-sign can also be placed at the very end of the search terms
+        args[args.length-1] = args[args.length-1].replace(/\+$/, "");
+        lucky_upgrade = true;
     }
     var redirectto = commands[cmd];
     if (typeof(redirectto) == "string") {
