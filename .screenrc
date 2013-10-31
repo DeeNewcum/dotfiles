@@ -9,6 +9,7 @@ hardstatus alwayslastline "%h"
 startup_message off
 
 # use ` for the escape key
+#           to change it back, use:     escape ^a^a
 escape ``
 
 # use a bigger scrollback buffer!
