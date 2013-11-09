@@ -87,6 +87,8 @@ function do_search(cmd, args) {
     //alert(cmd + "\n" + args);
     var lucky_upgrade = false;
 
+    cmd = cmd.replace(/^\?+/, "?");     // sometimes the user goes overboard and puts a ton of question marks instead of just one
+
     if (!commands[cmd]) {
         cmd = cmd.replace(/^\?+/, "");
     }
