@@ -1,4 +1,7 @@
 ! Swap caps lock and escape.  This saves SOOO much time for vi.
+! 
+! To load this again:
+!       xmodmap ~/.xmodmap
 remove Lock = Caps_Lock
 keysym Escape = Caps_Lock
 keysym Caps_Lock = Escape
