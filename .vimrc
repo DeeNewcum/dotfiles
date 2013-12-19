@@ -88,6 +88,7 @@ endif
 
 nnoremap <leader>s :setl spell!<CR>|            " toggle spell-check
 nnoremap <leader>w :setl wrap!<CR>|             " toggle line-wrap
+nnoremap <leader>x :exec getreg('*')<CR>        " take what's in the buffer, and execute it as VimScript
 
 " we don't enable spell-checking here...  rather, it gets enabled on a per-filetype basis
 " in the ~/.vim/ftplugin/ files   (see :help ftplugin-overrule)
