@@ -4,7 +4,9 @@
 #
 #       git config --global core.excludesfile ~/.gitignore
 
-*.swp
+*.sw?           # vim
+;               # vim typos
+;w              # vim typos
 
 # OpenOffice / LibreOffice
 .~lock.*#
