@@ -22,27 +22,31 @@
 //
 // If you append "+" to a command that's a Google query, it upgrades it to "I'm feeling lucky"
 //              (eg. "git+" is the feeling-lucky version of "git")
+//
+// Some commands are prefixed with a comma.  This is because I do a lot of
+// normal searches using these words, and I don't want to confuse regular searches
+// with these special commands.
 var commands = {
     google   : google(""),
     g        : google(""),
     wiki     : google("site:en.wikipedia.org"),
 
     // development
-    '?perl'  : "http://perldoc.perl.org/search.html?q=%s",
+    ',perl'  : "http://perldoc.perl.org/search.html?q=%s",
     perlfunc : "http://perldoc.perl.org/functions/%s.html",
     cpan     : "https://metacpan.org/search?q=%s",
     js       : google("site:developer.mozilla.org"),
-    '?git'   : google("site:schacon.github.com/git/"),
-    '?vim'   : "http://vimdoc.sourceforge.net/search.php?search=%s&docs=help",
+    ',git'   : google("site:schacon.github.com/git/"),
+    ',vim'   : "http://vimdoc.sourceforge.net/search.php?search=%s&docs=help",
     ahk      : google("site:autohotkey.com"),
 
     // sysadmin
     man      : "http://man.cx/%s",
     deb      : google("site:packages.debian.org"),
-    '?git'   : "http://man.cx/git-%s",
+    ',git'   : "http://man.cx/git-%s",
 
     // ubuntu
-    '?ubuntu': google("site:ubuntu.com"),
+    ',ubuntu': google("site:ubuntu.com"),
     u        : google("site:ubuntu.com"),
     upkg     : google("site:packages.ubuntu.com"),
     uhelp    : google("site:help.ubuntu.com"),
@@ -87,10 +91,8 @@ function do_search(cmd, args) {
     //alert(cmd + "\n" + args);
     var lucky_upgrade = false;
 
-    cmd = cmd.replace(/^\?+/, "?");     // sometimes the user goes overboard and puts a ton of question marks instead of just one
-
-    if (!commands[cmd]) {
-        cmd = cmd.replace(/^\?+/, "");
+    if (!commands[cmd]) {           // the comma-prefix is optional for some commands, and required for others;  if it's optional on this command, remove it
+        cmd = cmd.replace(/^,+/, "");
     }
 
     if (!commands[cmd]) {
