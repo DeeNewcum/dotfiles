@@ -1,0 +1,96 @@
+<style>
+    * {font-size: 20pt}
+
+    img {margin:1em}
+
+    form * {font-size:50pt}
+
+    div.icon { display: inline-block }
+</style>
+
+<style>
+    /* --==##  simple spacer  ##==-- */
+    ins {margin-left:3em; text-decoration:none}
+    dir {margin:0 0 0 1.5em; padding:0; display:inline}     /* half-width */
+                    /* ^^ abuses the <ins> and <dir> tags, uses them for something else entirely */
+
+    /* --==##  default to sans-serif font  ##==-- */
+                    /* but when printing, use the default serif */
+    body, td {font-family: sans-serif}
+    @media print { body, td {font-family: serif} }
+
+    /* --==##  links aren't underlined unless you :hover  ##==-- */
+    a:link:hover {text-decoration:underline; background-color:#aaf; color:#000!important}
+    a:visited:hover {background-color:#faf; color:#000!important}
+    a {text-decoration:none}
+    @media print { a {text-decoration:underline} }
+
+    /* --==##  make h1/h2/h3 stand out with bars  ##==-- */
+    h1, h2, h3 {padding:0.3em; border-top:2px solid #000; border-bottom:2px solid #000;
+    background-color:#ccc; margin-top:2em}
+    body>h1:first-child, body>h2:first-child, body>h3:first-child {margin-top:0}
+
+    /* --==##  table cells have a nice border  ##==-- */
+    table.wikitable {border-collapse:collapse}
+    table.wikitable td, table.wikitable th {border:1px solid #aaa; padding:0.3em}
+    table.wikitable th {background-color:#000; color:#fff}
+    table.wikitable th a {color:#aaf}
+    table.wikitable th a:visited {color:#faf}
+    table.wikitable tr.header td, table.wikitable thead td {border:#fff}
+
+    /* --==##  kbd has gray background  ##==-- */
+    kbd {background-color:#bbb}
+
+    /* --==##  selectively make ul/ol spaced (non-cascading)  ##==-- */
+    ul.spaced > li, ol.spaced > li {margin-bottom:1em}
+    .spaced > li > .spaced {margin-top:1em}
+
+    /* --==##  CSS reset  ##==-- */
+    a img {border:0}
+
+    /* --==##  text is grayed-out for digressions  ##==-- */
+    .digression     {color:#aaa}
+    span.digression {margin-left:2em}
+    .digression     a {color:#aaf}
+    .digression     a:visited {color:#e9e}
+
+    /* BODY option -- make ul/ol be half-spaced */
+    ul.halfspaced > li, ol.halfspaced > li, body.halfspaced li {margin-bottom:0.5em}
+    .halfspaced > li > .halfspaced, body.halfspaced li > ul, body.halfspaced li > ol {margin-top:0.5em}
+</style>
+
+<body class="">
+
+
+<center>
+
+<div class=icon><a href="http://www.netflix.com/"><img src="img/Netflix-Logo-Red.png" width=256 height=256></a>
+        <br/>&nbsp;</div>
+
+<div class=icon><a href="http://www.hulu.com/tv/popular/episodes"><img src="img/hulu_logo.jpg"></a>
+        <br/>&nbsp;</div>
+
+<div class=icon>
+<a href="http://www.amazon.com/b?ie=UTF8&node=2676882011"><img src="img/amazon-logo.jpg"></a>
+<br><a href="http://www.reddit.com/r/primeinstantvideos">(best)</a>
+</div>
+
+
+
+
+        <form method="post" action="http://www.canistream.it/search/term" id="searchBox" style="padding-top:15em">
+            <div class="search">
+                <input type="text" placeholder="Can I Stream.It?" class="search-field" name="query" id="query"
+                       value="">
+                <input type="hidden" name="type" value="movie">
+            </div>
+            <div class="btn-group search-type movie" data-toggle="buttons-radio" data-toggle-name="type">
+                <button type="button" class="btn movie active"
+                        value="movie">Search Movies</button>
+                <button type="button" class="btn tv "
+                        value="tv">Search TV</button>
+            </div>
+        </form>
+
+<p style="margin-top:15em"><A href="http://paperlined.org/tmp/movie_queue.html">Dee's queue</a>
+</center>
