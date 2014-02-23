@@ -55,6 +55,9 @@ function abs() { perl -MCwd=abs_path -e 'print abs_path(shift), "\n"' "$( [ -e "
 function vimw()      { vim  $(which "$1"); }
 function lessw()     { less $(which "$1"); }
 function cdw()       { cdd $(abs $(which "$1" )); }      # more like "cduaw", but whatever
+alias vimwhich=vimw
+alias lesswhich=lessw
+alias cdwhich=cdw
 
 # combinations of 'rurl' with other programs
 function vimu()      { vim   $(rurl "$1"); }
