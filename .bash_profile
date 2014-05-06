@@ -12,6 +12,9 @@ if [[ "$(uname)" == "Linux" && "$(tty)" == "/dev/tty"* ]]; then
         echo [sudo] Modifying console key mapping
         (echo `dumpkeys | grep -i keymaps`; echo keycode 58 = Escape) | sudo loadkeys -
     fi
+            # ^^ If you want to be able to login at the console without having to type
+            #    your password twice, run this:
+            #           echo "$USER ALL = (root) NOPASSWD: /usr/bin/loadkeys" | sudo 'cat >> /etc/sudoers'
 fi
 
 [ -f ~/.bashrc ] && source ~/.bashrc
