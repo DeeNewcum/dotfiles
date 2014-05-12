@@ -31,4 +31,4 @@
         # if someone has only the default settings, decent fallbacks are:
         #       git log --decorate --color
         #       git log --decorate --color --oneline
-
+    yolo = !git add --all . && git commit --amend --reuse-message=HEAD --no-verify --allow-empty && git push --force
