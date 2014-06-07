@@ -1,12 +1,13 @@
         #   vim: set syntax=gitconfig:
 
 [push]
-    # starting in Git v??, the default was "matching"
-    # starting in Git v2.0, the default is "simple"
+    # in Git v??, the default became "matching"
+    # in Git v2.0, the default became "simple"      ("simple" became available in v1.7.11)
     # http://stackoverflow.com/a/948397/1042525
-    default = current
+    default = simple        # "current" is also a decent option
 
 [color]
+    # in Git v1.8.4, the default became "auto"
     ui = auto
 
 [diff]
