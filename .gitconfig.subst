@@ -4,7 +4,10 @@
     # in Git v??, the default became "matching"
     # in Git v2.0, the default became "simple"      ("simple" became available in v1.7.11)
     # http://stackoverflow.com/a/948397/1042525
-    default = simple        # "current" is also a decent option
+    #default = simple        # "current" is also a decent option
+    default = current       # unfortunately one of my machines has Git v1.7.10-rc0, so "simple"
+                            # isn't available     (and DeeDot doesn't currently have the flexilility
+                            # to do these sorts of checks)
 
 [color]
     # in Git v1.8.4, the default became "auto"
