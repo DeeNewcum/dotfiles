@@ -19,6 +19,8 @@
 
 my $url = shift or die "usage: $0 <url>\n";
 
+$url =~ s/#.*//;        # remove the fragment identifier, if it exists
+
 my @url_mapping = read_url_mappings();
 #die Dumper \@url_mapping;
 
