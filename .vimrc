@@ -40,9 +40,14 @@ endif
 if &diff
     syntax off
     colorscheme evening
-    au BufNewFile,BufRead,BufEnter * set nospell
-    silent! set colorcolumn=
-    set nolist
+    " This event list is almost certainly overkill.  Things that are known to be definitely needed:
+    "       SessionLoadPost         -- needed for           set list listchars=eol:$                mkview
+    autocmd BufNewFile,FileReadPost,BufRead,FilterReadPost,StdinReadPost,BufNew,BufCreate,BufEnter,BufWinEnter,VimEnter,SessionLoadPost * call Diff_ClearSettings()
+    function! Diff_ClearSettings()
+        setlocal nospell
+        setlocal nolist
+        silent! setlocal colorcolumn=
+    endfunction
 else
     syntax enable
     if &t_Co == 256 || has('gui_running')
