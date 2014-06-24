@@ -40,7 +40,7 @@ sub pretty_json {
     my $decoded = $json->decode($file_contents);
     my $reencoded = $json->encode($decoded);
 
-    vim('set syntax=javascript', $reencoded);
+    output('set syntax=javascript', $reencoded);
 }
 
 
@@ -50,7 +50,7 @@ sub pretty_xml {
     if (can_use("XML::Simple")) {
         my $xml = XMLin($file_contents);
         my $reencoded = XMLout($xml);
-        vim('set syntax=xml', $reencoded);
+        output('set syntax=xml', $reencoded);
     } else {
         die_modules_required("XML::Simple");
     }
@@ -118,6 +118,17 @@ sub usage_getopt {
         next if !(/^\s*GetOptions/ .. /^\s*\)/) || /^\s*(GetOptions|\)|map)/;
         printf "  %-30s", /['"](.*?)['"]/ ? join( ", ", map { s/[=:][sif]$//; /../ ? "--$_" : "-$_" } split /\|/, $1 ) : '';
         s/.*#/#/ and print or print "\n";
+    }
+}
+
+
+sub output {
+    my ($vim_command, $contents) = @_;
+    if (-t STDOUT) {
+        vim($vim_command, $contents);
+    } else {
+        # If STDOUT goes to a pipe, then don't use vim, just send the file to the pipe.
+        print $contents;
     }
 }
 
