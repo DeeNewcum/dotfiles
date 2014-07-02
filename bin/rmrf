@@ -19,6 +19,9 @@ if (@files == 0) {
 ### Get the list of files and directories to delete
 my @deletelist = split /[\n\r]+/,
 		quoted_readpipe("find", @files, "-depth", "-print");
+if (@deletelist == 0) {
+    die "No files found.\n";
+}
 
 ### First display the list to the user, then ask them if they really want to delete
 my $answer = 'relist';
