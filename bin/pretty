@@ -5,6 +5,7 @@
     use strict;
     use warnings;
 
+    use LWP::Simple;
     use Getopt::Long;
     use Data::Dumper;
 
@@ -16,9 +17,10 @@ process_cmdline();
 
 ## pretty-print the file
 my $pretty = function_exists("pretty_$ARGV{format}")     or die;
-my $file_contents = $ARGV{file} eq '-'
-        ? do {local $/=undef; <STDIN>}
-        : slurp($ARGV{file});
+my $file_contents =
+        $ARGV{file} eq '-'              ? do {local $/=undef; <STDIN>}      :
+        $ARGV{file} =~ m#^https?://#i   ? get($ARGV{file})                  :
+                                          slurp($ARGV{file});
 my $parsed = $pretty->($file_contents);
 
 
@@ -77,7 +79,7 @@ sub process_cmdline {
     }
     usage("Please specify a format.")    unless $ARGV{format};
 
-    if (@ARGV && (-e $ARGV[0] || $ARGV[0] eq '-')) {
+    if (@ARGV && (-e $ARGV[0] || $ARGV[0] eq '-' || $ARGV[0] =~ m#^https?://#)) {
         $ARGV{file} = shift @ARGV;
     }
     usage("Please specify a file to dumper.")    unless $ARGV{file};
