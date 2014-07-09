@@ -8,6 +8,14 @@
 ! If you continue trying to use xmodmap, your settings will get reset periodically, as a result of
 ! the keyboard layout indicator:
 !       http://www.omgubuntu.co.uk/2013/10/turn-new-keyboard-applet-ubuntu-13-10
+!
+! In XFCE4, you'll need to do this to make sure xmodmap gets loaded  (tested on Ubuntu 13.10):
+!       1. Applications Menu > Settings > Session and Startup > Application Autostart
+!       2. Add
+!       3. fill this in:
+!               name --         xmodmap
+!               description --  <blank>
+!               command --      sleep 2; /usr/bin/xmodmap $HOME/.Xmodmap
 
 remove Lock = Caps_Lock
 keysym Escape = Caps_Lock
