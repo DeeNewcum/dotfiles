@@ -16,6 +16,8 @@
 !               name --         xmodmap
 !               description --  <blank>
 !               command --      sleep 2; /usr/bin/xmodmap $HOME/.Xmodmap
+!       ^^
+!       ^^ damn, that only works temporarily too....  if you plug/unplug a keyboard, you lose it
 
 remove Lock = Caps_Lock
 keysym Escape = Caps_Lock
