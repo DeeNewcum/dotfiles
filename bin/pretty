@@ -5,7 +5,8 @@
     use strict;
     use warnings;
 
-    use LWP::Simple;
+    use LWP::UserAgent;
+    use HTTP::Request::Common;
     use Getopt::Long;
     use Data::Dumper;
 
@@ -14,13 +15,20 @@
 our %ARGV;
 process_cmdline();
 
+## get the contents of the file
+my $file_contents;
+if ($ARGV{file} eq '-') {
+    $file_contents = do {local $/=undef; <STDIN>};
+} elsif ($ARGV{file} =~ m#^https?://#i) {
+    my $ua = LWP::UserAgent->new;
+    $ua->agent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/29.0");
+    $file_contents = $ua->request(GET $ARGV{file})->content;
+} else {
+    $file_contents = slurp($ARGV{file});
+}
 
-## pretty-print the file
+## pretty-print it
 my $pretty = function_exists("pretty_$ARGV{format}")     or die;
-my $file_contents =
-        $ARGV{file} eq '-'              ? do {local $/=undef; <STDIN>}      :
-        $ARGV{file} =~ m#^https?://#i   ? get($ARGV{file})                  :
-                                          slurp($ARGV{file});
 my $parsed = $pretty->($file_contents);
 
 
