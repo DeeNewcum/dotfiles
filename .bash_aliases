@@ -174,3 +174,15 @@ function vim256 { vim "+set t_Co=256 | so $HOME/.vim/VimColorTest.vim"; }
 # display the Markdown text from a github project page
 function gh-page { perl -0777 -MJSON -ne 'print JSON->new->decode($_)->{body}' params.json \
                         | vim -c 'set syntax=markdown' -; }
+
+
+# It has been suggested that this fixes some delays with Vim.  Certainly on my main website, I had a
+# HUGE number of small files in one of these directories.  I don't know if it's the actual solution
+# though.
+#               https://github.com/spf13/spf13-vim/issues/349
+#               http://unix.stackexchange.com/questions/37076/vim-freezes-for-a-short-time
+function cleanVim {
+    rm -Rf ~/.vim/view/
+    rm -Rf ~/.vim/undo/
+    rm -Rf ~/.viminfo
+}
