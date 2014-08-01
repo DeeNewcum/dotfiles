@@ -186,3 +186,8 @@ function cleanVim {
     rm -Rf ~/.vim/undo/
     rm -Rf ~/.viminfo
 }
+
+
+# A quick way to recursively fetch a folder
+function _wget() { wget -r -nH -np --cut-dirs=$(echo "$1" | perl -ne 'print -3 + ( ()= /\//g )' ) --reject "index.htm*" "$@"; }
+                                                                                #  ^^^ eskimo operator
