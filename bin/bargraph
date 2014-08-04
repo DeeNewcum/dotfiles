@@ -39,6 +39,7 @@
     use Data::Dumper;
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
+-t STDIN and die "Usage:  Pipe some lines into 'bargraph' to have an ASCII chart made.\n";
 
 binmode STDOUT, ":utf8";
 
