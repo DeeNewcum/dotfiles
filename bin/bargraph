@@ -2,6 +2,10 @@
 
 # Produce ASCII bar graphs at the command line.
 #
+# Has *zero* dependencies.  It should work on any Unix OS that isn't shockingly old, since those have 
+# Perl available.
+#
+#
 # ==== Usage ====
 # 
 #   Pipe a series of strings into bargraph.  Bargraph will count up how often it sees each string,
@@ -27,7 +31,9 @@
     use strict;
     use warnings;
     
-    use List::Util qw[min max];
+    use List::Util qw[min max];     # This requires Perl v5.7.3  (released in 2002),
+                                    # but this functionality could be built-in, to allow this to run
+                                    # on even older Unixes.
     use utf8;
 
     use Data::Dumper;
