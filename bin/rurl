@@ -66,10 +66,13 @@ sub locate_doturl {
     ## bypass all caching functionality
     #return readpipe q[locate -r '/\.url$'];
 
+    # don't cache unless the current system uses slocate
+    my $is_slocate = (qx[locate --help] =~ /Secure Locate/);
+
     $ENV{XDG_CACHE_HOME} ||= catdir($ENV{HOME}, ".cache");
     my $rurl_cache = catfile($ENV{XDG_CACHE_HOME}, "rurl");
     #die "$rurl_cache\n\t";
-    if (-e $rurl_cache && -M $rurl_cache < 3.0) {         # expire after 3.0 day(s)
+    if ($is_slocate && -e $rurl_cache && -M $rurl_cache < 3.0) {         # expire after 3.0 day(s)
         return slurp($rurl_cache);
     } else {
         my @output = readpipe q[locate -r '/\.url$'];
