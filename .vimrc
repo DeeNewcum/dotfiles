@@ -266,15 +266,8 @@ endif
 
 " Prevent saving if the filename has a semicolon in it.
 "       (the semicolon/colon swap above causes me to often save files named ";w" and such)
-autocmd BufWriteCmd * call CheckWrite()
-        " Note -- This isn't terrrrribly safe.      http://stackoverflow.com/a/5126472/1042525
-function! CheckWrite()
-  if match(expand('%:t'),";") >= 0
-    echohl WarningMsg | echo "The filename can't contain a semicolon." | echohl None
-  else
-    call writefile(getline(1,"$"), bufname("%"))
-    set nomodified
-  endif
+autocmd BufWriteCmd *;* call NoSemicolon()
+function! NoSemicolon()
+  echohl WarningMsg | echo "The filename can't contain a semicolon." | echohl None
 endfunction
-
 
