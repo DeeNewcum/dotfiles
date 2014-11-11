@@ -86,4 +86,4 @@ sub locate_doturl {
 
 
 # quickly read a whole file
-sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
+sub slurp {my$p=open(my$f,"$_[0]")or return;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
