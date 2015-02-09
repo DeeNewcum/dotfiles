@@ -132,7 +132,13 @@ function do_search(cmd, args) {
         return;
     }
     if (lucky_upgrade && redirectto.match(/^https?:\/\/([^\/]*\.)google\.com\//)) {
-        redirectto = redirectto + "&btnI=1";
+        // Google disabled the "feeling lucky" from any other site than its own:
+        //      http://superuser.com/questions/695109/consistent-im-feeling-lucky-macro-for-google
+        //      http://cowsthatgomoo.blogspot.com/2013/05/googles-selfish-move-to-keep-im-feeling.html
+        //      http://forums.mozillazine.org/viewtopic.php?p=7946025&sid=bd71231f6ed794424a276d2c3bc3db7c#p7946025
+        // But there's a workaround!
+        //      http://webapps.stackexchange.com/a/59216
+        redirectto = redirectto.replace(/^https?:\/\/([^\/]*\.)?google\.com\/search\?/, "https://www.google.com/webhp?#") + "&btnI=1";
     }
     //alert("redirecting to\n" + redirectto); // return;
     window.location = redirectto;
