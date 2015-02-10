@@ -1,7 +1,17 @@
 #!/usr/bin/perl
 
-# Estimates when a long-running file-based operation will be complete,
-# by measuring how quickly a file/directory/other is growing.
+# Provides a running estimate of when a long-running file-based process will complete,
+# by watching how quickly a file/directory/other is growing or shrinking.
+#
+# Example:
+#
+#   In one window, 'sftp' is running, downloading system_backup.tgz from another computer.
+#
+#   In another window, run:
+#           eta 2.5gb ./system_backup.tgz
+#   
+#   eta will then provide a time estimate of how long until the file grows to 2.5gb.
+
 
     use strict;
     use warnings;
@@ -167,7 +177,7 @@ __DATA__
 Usage:  eta <target_size>  <measure>    [<moving_avg_window>]
 
 Estimates when a long-running file-based operation will be complete,
-by measuring how quickly a file/directory/other is growing.
+by measuring how quickly a file/directory/other is growing (or shrinking).
 
 target_size
         Size can be specified in bytes, or other formats like:
@@ -194,6 +204,6 @@ measure
                 eta 0kb "df -B 1 /var | awk 'NR==2 {print \$4}' |"
 
 moving average window
-        The number if seconds of recent data to use, for calculating the estimate.
+        The number of seconds of recent data to use, for calculating the estimate.
         Defaults to 10 seconds, but you may want to go much longer if the process you're
         estimating lasts for hours or days.
