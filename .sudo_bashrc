@@ -1,8 +1,8 @@
 # To have this file be loaded after sudoing to root/others, put this in the target user's .bashrc:
 #
 #       # ========  load ~/.sudo_bashrc  ========
-#       export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' $(tty))
-#       [ -f $STDIN_OWNERS_HOME/.sudo_bashrc ] && source $STDIN_OWNERS_HOME/.sudo_bashrc
+#       export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' "$(tty)")
+#       [ -f "$STDIN_OWNERS_HOME"/.sudo_bashrc ] && source "$STDIN_OWNERS_HOME"/.sudo_bashrc
 
 
 
