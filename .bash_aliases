@@ -70,6 +70,9 @@ function touchu()    { touch $(rurl "$1"); }
 function go() { xdg-open "$@"; }
 #function goscp() { perl -MFile::Temp -le 'chdir(File::Temp::tempdir()); system "scp", $ARGV[0], "."; system "xdg-open *"' "$@"; }
 
+# this is useful for creating files with today's date
+alias today='date +%Y%m%d'
+
 alias syslog='tail -fs0 /var/log/syslog'
 
 # launch a tempoary webserver, serving static content from the local directory
