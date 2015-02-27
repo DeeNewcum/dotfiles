@@ -8,7 +8,7 @@
 
     # Your dotfiles are safe.  DeeDot won't overwrite anything.
 
-This is my config file repo.  There are [many like it](https://www.google.com/search?channel=fs&q=site%3Agithub.com+dotfiles&ie=utf-8&oe=utf-8), but this one is mine.
+This is my dotfile repo.  There are many like it, but this one is mine.
 
 ## Dotfile repos generally
 
