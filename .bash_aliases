@@ -195,6 +195,6 @@ function cleanVim {
 function _wget() { wget -r -nH -np --cut-dirs=$(echo "$1" | perl -ne 'print -3 + ( ()= /\//g )' ) --reject "index.htm*" "$@"; }
                                                                                 #  ^^^ goatse operator
 
-alias speaker-test2='mplayer /usr/share/sounds/alsa/Front_*'
+alias speaker-test2='echo /usr/share/sounds/alsa/Front_* | xargs -n 1 paplay -v'
 
 alias XMODMAP='xmodmap ~/.Xmodmap'          # workaround since I haven't figured out how to convert xmodmap => XKB      (see comments in ~/.Xmodmap for more)
