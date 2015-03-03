@@ -196,3 +196,5 @@ function _wget() { wget -r -nH -np --cut-dirs=$(echo "$1" | perl -ne 'print -3 +
                                                                                 #  ^^^ goatse operator
 
 alias speaker-test2='mplayer /usr/share/sounds/alsa/Front_*'
+
+alias XMODMAP='xmodmap ~/.Xmodmap'          # workaround since I haven't figured out how to convert xmodmap => XKB      (see comments in ~/.Xmodmap for more)
