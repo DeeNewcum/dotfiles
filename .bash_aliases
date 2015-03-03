@@ -194,3 +194,5 @@ function cleanVim {
 # A quick way to recursively fetch a folder
 function _wget() { wget -r -nH -np --cut-dirs=$(echo "$1" | perl -ne 'print -3 + ( ()= /\//g )' ) --reject "index.htm*" "$@"; }
                                                                                 #  ^^^ goatse operator
+
+alias speaker-test2='mplayer /usr/share/sounds/alsa/Front_*'
