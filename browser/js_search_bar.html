@@ -29,8 +29,18 @@
 var commands = {
     google   : google(""),
     g        : google(""),
-    wiki     : google("site:en.wikipedia.org"),
     ter      : google("site:terraria.gamepedia.com"),
+
+    // wikipedia
+    wiki     : google("site:en.wikipedia.org"),
+    wikit    : google("site:en.wikipedia.org/wiki/template"),       // search the "Template:" namespace
+    wikiw    : google("site:en.wikipedia.org/wiki/wikipedia"),      // search the "Wikipedia:" namespace
+    wikic    : google("site:en.wikipedia.org/wiki/category"),       // search the "Category:" namespace
+    w        : function(args) { return "https://en.wikipedia.org/wiki/" + args.replace(/ /g, "_") },
+                    // Jump directly to a page.  For example,
+                    //          w Georgia (country)
+                    // would take you to
+                    //          https://en.wikipedia.org/wiki/Georgia_(country)
 
     // development
     ',perl'  : "http://perldoc.perl.org/search.html?q=%s",
