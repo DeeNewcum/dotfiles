@@ -147,7 +147,7 @@ alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
 
 
 if [ "$(type -p apt-get)" ];  then
-    alias upup='sudo apt-get update; sudo apt-get upgrade'
+    alias upup='sudo apt-get update; sudo apt-get -y upgrade'
 fi
 
 
