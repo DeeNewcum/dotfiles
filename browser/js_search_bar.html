@@ -27,12 +27,20 @@
 
 // Browser Keymarks.
 //
-// If you append "+" to a command that's a Google query, it upgrades it to "I'm feeling lucky"
-//              (eg. "git+" is the feeling-lucky version of "git")
+// There are several special characters:
 //
-// Some commands are prefixed with a comma.  This is because I do a lot of
-// normal searches using these words, and I don't want to confuse regular searches
-// with these special commands.
+//      +   If you use this on a Google query, it upgrades it to "I'm feeling lucky".
+//          Example:        wiki+ caesar        -- this is like doing "wiki caesar", but with Feeling Lucky
+//
+//      ,   There are some commands that I often use as a normal search term.  To avoid confusion,
+//          those commands must be used with "," as a prefix.
+//          However, it never hurts to add a comma to a command -- every command can be used with a
+//          comma.
+//          Examples:
+//                  ,vim textwidth       -- Here it's necessary.  Using just "vim textwidth" wouldn't
+//                                          work because I often use "vim" as a search term.
+//
+//                  ,man less            -- Here it's optional.
 var commands = {
     google   : google(""),
     g        : google(""),
