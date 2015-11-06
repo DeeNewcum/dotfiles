@@ -19,6 +19,9 @@ if [ "`uname`" != "SunOS" ]; then
     function lgrep()  { grep -Zls  "$@" | xargs -0 less    -p "$1"; }
     function lgrepi() { grep -Zlsi "$@" | xargs -0 less -i -p "$1"; }
 
+    # vimgrep = grep, and edit all the files that match the pattern
+    function vimgrep() { vim $( grep -l "$@" * ) -c "call cursor(1,1)" -c "/${@: -1}"; }
+
     ## identify excessively large files
     function largefiles() { find ${1:-~} -type f -print0 | xargs -0 ls -l | sort -n -k 5 | tail -100 | perl -ple 's/^(?:\S+\s+){4}//; s/$ENV{HOME}/~/; $_=reverse;s/(\d\d\d)(?=\d)(?!\d*\.)(?=[\d,]*$)/$1,/g;$_=reverse'; }
     function largedirs() { du -k ${1:-~} | sort -n | tail -100; }
