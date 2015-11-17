@@ -23,7 +23,6 @@
     #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
     #use Carp::Always;              # uncomment this to get a full stack backtrace when errors hit
 
-
 our %ARGV;
 process_cmdline();
 
@@ -152,30 +151,52 @@ sub install_symlink {
     my $to   = "$ENV{HOME}/$file";
     my $from = "$FindBin::Bin/$file";
 
+
     if (! -e $to) {
+        ## No file exists there.  Easy peasy, we'll drop our symlink there.
         symlink $from, $to;
         #print "creating symlink    $from     to    $to\n";
         print "setup    ~/$file\n";
-    } else {
-        # The file already exists.  Now what?
-        if (-l $to) {
-            if (readlink($to) ne $from) {
-                # Change the symlink to point to our version.
-                unlink $to;
-                symlink $from, $to;
-                #print "creating symlink    $from     to    $to\n";
-                print "setup    ~/$file\n";
-            }
-        } else {
-            # It's a regular file.
-            # Is it one of the files we know about, that we can suggest a #include/source line to the user?
-            if (!install_source_command($file)) {
-                # If the above function returned false, that means it didn't notify the user about the status of the file.  So we'll use the fallback notification.
-                print "WARNING: ~/$file  already exists\n";
-            }
-            # If it returned true, then it either decided that no error was needed, or it decided an error was needed, and it printed it.
-        }
+        return;
     }
+
+    ## There's already something there, where we want to dump the file.  Can we resolve the conflict?
+    if ( -l $to) {
+        if (readlink($to) eq $from) {
+            ## There's an existing symlink that already points to the right place.
+            ## There's no conflict, we don't need to do anything.
+            return;
+        }
+
+        if (readlink($to) =~ /^\Q$FindBin::Bin\/\E/) {
+            ## The existing symlink points somewhere INSIDE our repo.  We can just assume that
+            ## files were moved/renamed, so it's safe for us to overwrite the symlink to point it
+            ## at the new locsation.
+            unlink $to;
+            symlink $from, $to;
+            #print "creating symlink    $from     to    $to\n";
+            print "setup    ~/$file\n";
+            return;
+        }
+
+        ## TODO: if this is a symlink for a different repo, do we need to try to install the symlink
+        ##          for that repo?
+        ##      Two issues with that:
+        ##          - right now, the routines are hard-coded to only work with OUR repo...
+        ##            they aren't abstracted enough to [easily] work with other repos
+        ##          - sometimes the file is just a symlink that points to some other place, 
+        ##            NOT NECESARILY a deedot repo...  in that case, it's impossible to
+        ##            automatically handle it
+    }
+
+    ## Is it one of the files we know about, that we can suggest a #include/source line to the user?
+    if (install_source_command($file)) {
+        # If it returned true, then it either decided that no error was needed, or it decided an error was needed, and it printed it.
+        return;
+    }
+
+    ## Fallback error message.
+    print "WARNING: ~/$file  already exists\n";
 }
 
 
@@ -191,6 +212,8 @@ sub install_source_command {
         .bash_aliases
                 [ -f ${STDIN_OWNERS_HOME:-~}/<<HOMEPATH>> ] && source ${STDIN_OWNERS_HOME:-~}/<<HOMEPATH>>
         .bashrc
+                [ -f <<PATH>> ] && source <<PATH>>
+        .bash_profile
                 [ -f <<PATH>> ] && source <<PATH>>
         .sudo_bashrc
                 [ -f $STDIN_OWNERS_HOME/<<HOMEPATH>> ] && source $STDIN_OWNERS_HOME/<<HOMEPATH>>
