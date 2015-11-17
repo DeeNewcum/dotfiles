@@ -167,6 +167,7 @@ if [ -z "$(type _feh 2>/dev/null)" ]; then
         unset FIRST
     }
 fi
+alias thumbnails='(gwenview . &> /dev/null &)'
 
 
 function unball { cd /var/tmp; eval $(command unball "$@"); }
