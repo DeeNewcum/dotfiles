@@ -53,7 +53,9 @@ else
     if &t_Co == 256 || has('gui_running')
         let g:solarized_termcolors=&t_Co    " terminfo knows how many colors are available
         set background=light
-        colorscheme solarized
+        if !has("win32")                    " if we're running on Windows, then we're missing most files, only the .vimrc has been copied over
+            colorscheme solarized
+        endif
     else
             " Solarized looks ugly in 16 colors, so fallback to something else
             " Also, Solarized doesn't work in 88 colors  (urxvt)
@@ -69,7 +71,7 @@ else
     endif
 
     " make tabs visible
-    set list listchars=tab:› 
+    " set list listchars=tab:› 
 
     " hilight tabs that are used for alignment -- we only want to use them for indenting
     "match ErrorMsg /\(	\|^\)\@<!	\+/
@@ -271,3 +273,7 @@ function! NoSemicolon()
   echohl WarningMsg | echo "The filename can't contain a semicolon." | echohl None
 endfunction
 
+
+if has("win32")
+    source $VIMRUNTIME/mswin.vim
+endif
