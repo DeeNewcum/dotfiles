@@ -70,8 +70,10 @@ else
         endif
     endif
 
-    " make tabs visible
-    " set list listchars=tab:› 
+    if !has("win32")            " This REALLY should be done without a has(), but I'm short on time right now.
+        " make tabs visible
+        set list listchars=tab:› 
+    endif
 
     " hilight tabs that are used for alignment -- we only want to use them for indenting
     "match ErrorMsg /\(	\|^\)\@<!	\+/
