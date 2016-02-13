@@ -41,10 +41,14 @@
 //                                          work because I often use "vim" as a search term.
 //
 //                  ,man less            -- Here it's optional.
+//
+// Each URL should have "%s" somewhere.  This will be replaced by the user's query.
 var commands = {
-    google   : google(""),
+    google   : google(""),      // are these superfluous?
     g        : google(""),
-    ter      : google("site:terraria.gamepedia.com"),
+    img      : google("") + "&tbm=isch",
+    maps     : "https://www.google.com/maps?q=%s",
+    map      : ">maps",     // 'map' is an alias for 'maps'
 
     // wikipedia
     wiki     : google("site:en.wikipedia.org"),
@@ -56,6 +60,7 @@ var commands = {
                     //          w Georgia (country)
                     // would take you to
                     //          https://en.wikipedia.org/wiki/Georgia_(country)
+    wikt     : feeling_lucky("site:en.wiktionary.org"),
 
     // development
     ',perl'  : "http://perldoc.perl.org/search.html?q=%s",
@@ -79,11 +84,17 @@ var commands = {
     uman     : google("site:manpages.ubuntu.com"),
     uforum   : google("site:ubuntuforums.org"),
 
+    // meta
     testing  : function() {     // an example of how (typeof(cmd) == "function") works
         return "http://reddit.com";
     },
     // typing "help help" from anywhere returns the help text for this page
     help : function() { return window.location.href.replace(/\?.*/, "") },
+
+    // random other stuff
+    ter      : google("site:terraria.gamepedia.com"),
+    amazon   : "http://www.amazon.com/s?field-keywords=%s",
+    am       : ">amazon",           // 'am' is an alias for 'amazon'
 };
 
 
@@ -145,6 +156,10 @@ function do_search(cmd, args) {
     }
     var redirectto = commands[cmd];
     if (typeof(redirectto) == "string") {
+        if (redirectto.charAt(0) == ">") {      // commands[cmd1] is an alias for commands[cmd2]
+            cmd = redirectto.substring(1);
+            return do_search(cmd, args);
+        }
         redirectto = redirectto.replace(/%s/, encodeURIComponent(args));
             // reasons why this should be "encodeURIComponent":
             //      - so the plus-symbol in  [g 2+3=] gets sent to Google
