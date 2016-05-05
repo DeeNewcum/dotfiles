@@ -95,6 +95,13 @@ if has("spell")             " spell-check settings
     hi link SPellBad ErrorMsg
 endif
 
+" Features that don't work well over a slow terminal.  TODO: have a way to disable them when needed.
+"           http://vimdoc.sourceforge.net/htmldoc/term.html#slow-fast-terminal
+"           https://www.reddit.com/r/vim/comments/4hz0u2/sensible_horizontal_scrolling_howto_make_vim/#d2tqjg5
+" if is_slow()              <-- pseudocode, TODO: replace me with a user setting like :slow
+    set sidescroll=1 nowrap sidescrolloff=10    " scroll sideways like every other normal editor
+" endif
+
 nnoremap <leader>s :setl spell!<CR>|            " toggle spell-check
 nnoremap <leader>w :setl wrap!<CR>|             " toggle line-wrap
 nnoremap <leader>x :exec getreg('*')<CR>        " take what's in the buffer, and execute it as VimScript
