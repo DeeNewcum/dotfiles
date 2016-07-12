@@ -1,11 +1,17 @@
 #!/usr/bin/env perl
 
+        # Copyright 2012, Dee Newcum.  License: GPL v3.
+
 # Solaris's tail doesn't have the -s option, so you can't do the uber-useful `tail -fs0`.
 # This duplicates that functionality.
 #
 # Further, this allows you to do real-time sed/grep things to do the output, which is otherwise
 # difficult to do in an unbuffered manner.
 # (to do this, make a copy of the script, and change the "SED/GREP" line below)
+#
+#
+# d'oh, I only discovered later that this had been implemented well elsewhere:
+#       https://github.com/briandfoy/PerlPowerTools/blob/master/bin/tail
 
 
     use strict;

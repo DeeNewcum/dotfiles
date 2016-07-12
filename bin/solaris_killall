@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+        # Copyright 2012, Dee Newcum.  License: GPL v3.
+
 # In Solaris, 'killall' doesn't work like killall does elsewhere -- it literally kills EVERYTHING.
 #
 # This works like killall does elsewhere.

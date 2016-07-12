@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+        # Copyright 2012, Dee Newcum.  License: GPL v3.
+
 # List ALL Git repositories on the current machine, grouped by cloned repositories.
 # 
 # This is essentially a wrapper around:

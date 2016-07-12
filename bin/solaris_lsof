@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+        # Copyright 2012, Dee Newcum.  License: GPL v3.
+
 # Before Solaris 10, Solaris didn't have an adequate version of 'lsof'.  This tries to fill in the gaps, though it runs very slowly.
 #
 #       http://prefetch.net/blog/index.php/2006/09/22/mapping-pfiles-output-to-files/

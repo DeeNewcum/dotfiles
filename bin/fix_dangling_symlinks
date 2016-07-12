@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+        # Copyright 2013, Dee Newcum.  License: GPL v3.
+
 # When using DeeDot, if you rename files, or especially directories, you get a LOT of dangling
 # symlinks, pointing to the old location.  This script is a band-aid that tries to clean these up.
 

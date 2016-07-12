@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+        # Copyright 2011, Dee Newcum.  License: GPL v3.
+
 # Display the output of stat(2)  (struct stat)  in maximum detail.
 
 # See http://www.gnu.org/software/libc/manual/html_node/Attribute-Meanings.html

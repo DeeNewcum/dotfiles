@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+        # Copyright 2014, Dee Newcum.  License: GPL v3.
+
 # This is a helper script for copying a file from one computer to another.
 #
 # It outputs the path to the specified file, in a form that's useful for scp'ing from another computer.

@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+        # Copyright 2013, Dee Newcum.  License: GPL v3.
+
 # Provides a running estimate of when a long-running file-based process will complete,
 # by watching how quickly a file/directory/other is growing or shrinking.
 #

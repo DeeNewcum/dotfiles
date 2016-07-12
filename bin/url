@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+        # Copyright 2012, Dee Newcum.  License: GPL v3.
+
 # Pass this a filename/directory, and this will return the equivalent URL for that file.
 #
 # This relies on a file named '.url' located somewhere in the directory structure above the

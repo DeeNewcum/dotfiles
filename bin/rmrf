@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+        # Copyright 2012, Dee Newcum.  License: GPL v3.
+
 # A safer version of "rm -rf", in that the user gets to review the list of files that are going to be deleted, before deletion actually occurs.
 
 	BEGIN{$^W=1}

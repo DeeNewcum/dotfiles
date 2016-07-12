@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+        # Copyright 2014, Dee Newcum.  License: GPL v3.
+
 # Do the reverse of the 'url' script -- take in a URL, and output its corresponding filename.
 # 
 #
