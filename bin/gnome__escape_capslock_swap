@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# To install this, run:
+#       gnome-session-properties &
+# and add this script to the startup scripts.
+
+setxkbmap -option caps:escape
