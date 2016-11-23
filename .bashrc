@@ -132,6 +132,9 @@ if [ "$LOGNAME" = "root" ]; then
 fi
 
 
+~/bin/gnome__escape_capslock_swap     # swap caps-lock and escape
+
+
 # make X apps work properly when changing to root, without having to use sux/sudox
 [ -z "$XAUTHORITY" -a -n "$DISPLAY" -a -e "$HOME/.Xauthority" ] && export XAUTHORITY="$HOME/.Xauthority"
     # Note: For this to work, you also have to add the following to /etc/sudoers:

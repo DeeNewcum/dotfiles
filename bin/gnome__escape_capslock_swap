@@ -1,7 +1,20 @@
 #!/bin/bash
 
-# To install this, run:
-#       gnome-session-properties &
-# and add this script to the startup scripts.
+# ==== swap the escape key and caps-lock, which is useful for Vim ====
+#
+# The below works for Gnome ~v3.14.
 
-setxkbmap -option caps:escape
+
+# Temporarily change caps-lock to escape:
+#     setxkbmap -option caps:escape
+
+# Permanently change it:
+if dconf read "/org/gnome/desktop/input-sources/xkb-options" | grep caps:swapescape >/dev/null
+then
+    /bin/false
+else
+    dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
+fi
+
+# To undo the above:
+#   dconf write "/org/gnome/desktop/input-sources/xkb-options" "['']"
