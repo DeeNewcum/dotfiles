@@ -57,7 +57,9 @@ fi
 #################  COLOR  #########################
 ###################################################
 # enable color for as many things as possible
-export GREP_OPTIONS='--color=auto' 
+
+#export GREP_OPTIONS='--color=auto' 
+alias grep='command grep --color=auto'
 
 if [ "$(command ls --color 2>&1 >/dev/null)" ]; then
     alias ls='ls -F'
