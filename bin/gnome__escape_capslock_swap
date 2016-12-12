@@ -9,11 +9,13 @@
 #     setxkbmap -option caps:escape
 
 # Permanently change it:
-if dconf read "/org/gnome/desktop/input-sources/xkb-options" | grep caps:swapescape >/dev/null
-then
-    /bin/false
-else
-    dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
+if which dconf >/dev/null; then
+    if dconf read "/org/gnome/desktop/input-sources/xkb-options" | grep caps:swapescape >/dev/null
+    then
+        /bin/false
+    else
+        dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
+    fi
 fi
 
 # To undo the above:
