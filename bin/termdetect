@@ -41,7 +41,7 @@ $fatpacked{"FingerprintDB.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'F
       m_null_inside=%x+2,
       m_pad_null=,
       m_sub=%x+4,
-      r_device_attr=\E[?62;9;c,
+      r_device_attr=\E[?62;%*c,
       r_device_attr2=\E[>1;%+;0c,
       r_device_attr3=,
       r_device_status=\E[0n,
@@ -49,7 +49,7 @@ $fatpacked{"FingerprintDB.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'F
       r_ext_cursor_pos=\E[%+R,
       r_printer_status=\E[?11n,
       r_screen_size=\E[9;%+t,
-      r_term_id=\E[?62;9;c,
+      r_term_id=\E[?62;%*c,
       r_term_param=%x+3,
       r_window_icon_label=\E]L%*\E\\,
       r_window_pos=\E[3;%+t,
@@ -2308,6 +2308,7 @@ if ($ARGV{snapshot}) {
                 ['font size',           $fingerprint->{s_font_size},           '(pixels)'  ],
                 ['window position',     $fingerprint->{s_window_pos},          '(pixels)'  ],
                 ['screen size',         $fingerprint->{s_screen_size},         '(pixels)'  ],
+                ['suggested $TERM',     $suggested_term  ],
         );
         foreach my $field (@fields) {
             next unless defined($field->[1]);
@@ -2460,7 +2461,7 @@ sub help_install_terminfos {
     if (`which apt-get 2>&1 `) {
         # Debian/Ubuntu/et al don't come with the full set of terminfo entries
         # installed by default, but they're easy to install
-        die "    sudo apt-get install ncurses-term\n";
+        die "    sudo apt install ncurses-term\n";
     } else {
         die <<'EOF';
 
