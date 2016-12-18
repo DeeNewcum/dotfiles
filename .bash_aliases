@@ -105,6 +105,16 @@ function hed { head -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d
 function tal { tail -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d+)/'); }
 
 
+# Launch an XWindow-style program, while making sure that it detaches fully from the current
+# terminal.  In particular, all outputs are hidden.
+# 
+# Example:
+#       x  firefox https://www.google.com/search?q=bat+bomb
+function x () {
+    ( $@ & ) 2>&1 >/dev/null
+}
+
+
 ####[ screen + tmux ]####
 # reattach to the screen named 'main'   (or create it if it doesn't exist)
 alias   srm='screen -U -dr main || screen -U -S main'
