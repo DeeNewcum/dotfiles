@@ -105,8 +105,8 @@ function hed { head -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d
 function tal { tail -$(stty -F /dev/tty -a | perl -ne 'print $1 - 2 if /rows (\d+)/'); }
 
 
-# Launch an XWindow-style program, while making sure that it detaches fully from the current
-# terminal.  In particular, all outputs are hidden.
+# Launch an XWindow-style program from the terminal, while 1) while making sure the program detaches
+# fully from the current terminal, and 2) makes sure all stdout and stderr output is hidden.
 # 
 # Example:
 #       x  firefox https://www.google.com/search?q=bat+bomb
