@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+#
+# A helper script for 'feh'.  Gets run whenever one of these keys is pressed:
+#       - enter
+#       - 0 through 9
+#
+
+#
+# TODO -- I don't yet have a script that finds all the best-rated images, and symlinks them to 
+#         a special directory.
+#
+
+    use strict;
+    use warnings;
+
+    use File::Spec;
+
+    use Data::Dumper;
+
+my ($key, $filename) = @ARGV;
+
+$filename = File::Spec->rel2abs($filename);
+my (undef, $dir, $file) = File::Spec->splitpath($filename);
+
+#open FOUT, '>>', '/tmp/fehkey.log'      or die $!;
+#print FOUT "$key -- $dir -- $file\n";
+
+
+my $new_rating = "$key -- $file";
+my $ratings_hashref = read_ratings_file("$dir/.ratings",  $new_rating);
+write_ratings_file("$dir/.ratings",  $ratings_hashref);
+exit;
+
+
+
+sub read_ratings_file {
+    my ($ratings_filename, $additional_ratings) = @_;
+
+    my %ratings;
+    if (-e $ratings_filename) {
+        open RATINGS, '<', $ratings_filename      or die "$ratings_filename -- $!";
+        while (<RATINGS>) {
+            parse_ratings_line($_, \%ratings);
+        }
+        close RATINGS;
+    }
+
+    if ($additional_ratings) {
+        debug_print($additional_ratings);
+        parse_ratings_line($additional_ratings, \%ratings);
+    }
+
+    return \%ratings;
+}
+
+
+sub parse_ratings_line {
+    my ($text_line, $ratings_hashref) = @_;
+
+    chomp $text_line;
+    my ($ratings, $file) = split / -- /, $text_line, 2;
+    foreach my $r (split ' ', $ratings) {       # the ratings string is space-delimited
+        push @{ $ratings_hashref->{$file} }, $r;
+    }
+}
+
+
+sub write_ratings_file {
+    my ($ratings_filename, $ratings_hashref) = @_;
+
+    open RATINGS, '>', $ratings_filename      or die "$ratings_filename -- $!";
+    while (my ($file, $ratings) = each %$ratings_hashref) {
+        print RATINGS join(" ", @$ratings), " -- $file\n";
+    }
+    close RATINGS;
+}
+
+
+
+# to watch these:
+#       tail -f /tmp/fehkey_debug.txt
+sub debug_print {
+    open DEBUG, '>>', '/tmp/fehkey_debug.txt';
+    print DEBUG @_, "\n";
+    close DEBUG;
+}

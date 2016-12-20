@@ -171,14 +171,23 @@ fi
 alias google='w3m google.com'
 
 
-if [ -z "$(type _feh 2>/dev/null)" ]; then
-    function _feh {
-        FIRST="${1:-.}"
-        shift
-        feh --recursive --full-screen --auto-zoom --draw-filename "$FIRST" "$@" 2>/dev/null &
-        unset FIRST
-    }
-fi
+function _feh {
+    FIRST="${1:-.}"
+    shift
+    feh --recursive --full-screen --auto-zoom --draw-filename \
+        --action  ";fehkey 0 %F" \
+        --action1 ";fehkey 1 %F" \
+        --action2 ";fehkey 2 %F" \
+        --action3 ";fehkey 3 %F" \
+        --action4 ";fehkey 4 %F" \
+        --action5 ";fehkey 5 %F" \
+        --action6 ";fehkey 6 %F" \
+        --action7 ";fehkey 7 %F" \
+        --action8 ";fehkey 8 %F" \
+        --action9 ";fehkey 9 %F" \
+        "$FIRST" "$@" 2>/dev/null &
+    unset FIRST
+}
 alias thumbnails='(gwenview . &> /dev/null &)'
 
 
