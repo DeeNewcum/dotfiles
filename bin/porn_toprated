@@ -104,7 +104,7 @@ sub process_ratings_file {
         
         my $num_scores = scalar(@scores);
         my $avg_score = sum(@scores) / $num_scores;
-        if ($num_scores >= 2 && $avg_score >= 8.0) {
+        if ($num_scores >= 2 && $avg_score >= 7.0) {
             push @return, "$ratings_file_dir/$file";
         }
         if ($avg_score >= 6) {
@@ -115,27 +115,6 @@ sub process_ratings_file {
     return @return;
 }
 
-
-
-#    # look through all lines mentioned in this particular .porn_toprated file
-#    foreach my $toprated_sourcedir (slurp($toprated_file;)) {
-#
-#        foreach my $ratings_file = 
-#my @porn_toprated = slurp(
-#            " locate -r '/.porn_toprated\$' | " );
-#
-#    }
-#                    "locate -r '$/.porn_toprated\$' |   ] );
-#    my $toprated_sourcedir = <FIN>;
-#    open FIN, '<', $toprated_targetdir      or die $!;
-#    
-#    chomp $toprated_sourcedir;
-#    close FIN;
-#
-#
-#    print "$toprated_sourcedir  ==>  $toprated_targetdir\n";
-#}
-#
 
 
 
