@@ -7,8 +7,9 @@
 #
 
 #
-# TODO -- I don't yet have a script that finds all the best-rated images, and symlinks them to 
-#         a special directory.
+# TODO:
+#   - If the image is a symlink, then fully dereference it  (because we don't want to be dropping
+#       .ratings files within a .../toprated/ directory.
 #
 
     use strict;

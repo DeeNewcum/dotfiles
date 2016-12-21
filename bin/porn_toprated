@@ -1,0 +1,137 @@
+#!/usr/bin/perl
+
+#
+# Collate porn ratings.
+#
+# From the end user's standpoint, it drops new symlinks into, for example, /porn/toprated/.
+# /porn/toprated/ contains only symlinks to the images that live elsewhere in the larger directory
+# hierarchy.
+#
+#
+# How are ratings stored?  There are three pieces:
+#       - `feh`, an image viewer
+#       - 'fehkey', called by feh when the user pressed 0..9 to rate a specific photo
+#       - .ratings files, dropped all over in various directories throughout the directory hierarchy
+#
+# This program looks through ALL the .ratings files, collates them, and drops the symlinks in the
+# right directory.
+#
+
+    use strict;
+    use warnings;
+
+    use List::Util qw[ sum ];
+
+    use Data::Dumper;
+
+my @porn_toprated = slurp(
+            " locate -r '/.porn_toprated\$' | " );
+
+# look through all .porn_toprated files
+foreach my $toprated_file (@porn_toprated) {
+    my $toprated_targetdir = $toprated_file;
+    $toprated_targetdir =~ s#/[^/]*$##;
+
+    process_toprated_file( $toprated_file );
+}
+
+
+# process a particular .../.porn_toprated file
+sub process_toprated_file {
+    my ($toprated_file) = @_;
+
+    (my $targetdir = $toprated_file)
+            =~ s#/[^/]*$##;
+
+    # remove all existing symlinks from the target directory
+    #       (since we're going to place new symlinks here -- we don't want to keep photos that would have otherwise been deleted)
+    foreach my $file (glob "$targetdir/*") {
+        if (-l $file) {
+            unlink $file;
+        }
+    }
+
+    # The .../.porn_toprated file can contain multiple lines, each a particular source directory.  For example:
+    #       $ cat /porn/toprated/.porn_toprated
+    #       /porn/bdsm/
+    #       /porn/celebs/
+    #
+    #       $ cat /porn/hentai/toprated/.porn_toprated
+    #       /porn/hentai
+    #
+    foreach my $sourcedir (slurp($toprated_file)) {
+        $sourcedir =~ s#/$##;
+        ##print ">> $sourcedir <<\n";
+        my @ratings_files = slurp( "locate -r '^$sourcedir.*/\\.ratings\$' |" );
+        foreach my $ratings_file (@ratings_files) {
+            ##print "    >> $ratings_file\n";
+            my @top_rated_files = process_ratings_file( $ratings_file );
+                    # ^^ function returns only files that are top-rated
+
+            foreach my $top_rated_file (@top_rated_files) {
+                ##print "        >> $top_rated_file\n";
+                print "$top_rated_file\n";
+                (my $fileonly = $top_rated_file)
+                        =~ s#^.*/##;
+                my $target_symlink = "$targetdir/$fileonly";
+                symlink($top_rated_file, $target_symlink);
+            }
+        }
+    }
+}
+
+
+# process a particular .../.ratings file
+#
+# only return files that 1) has at least two ratings, and 2) has an average rating of at least 8.0
+sub process_ratings_file {
+    my ($ratings_file) = @_;
+
+    (my $ratings_file_dir = $ratings_file)
+            =~ s#/\.ratings$##;
+
+    my @return;
+
+    my @lines = slurp( $ratings_file );
+    foreach my $line (@lines) {
+        my ($scores, $file) = split ' -- ', $line, 2;
+        my @scores = split ' ', $scores;
+        
+        my $num_scores = scalar(@scores);
+        my $avg_score = sum(@scores) / $num_scores;
+        if ($num_scores >= 2 && $avg_score >= 8.0) {
+            push @return, "$ratings_file_dir/$file";
+        }
+    }
+
+    return @return;
+}
+
+
+
+#    # look through all lines mentioned in this particular .porn_toprated file
+#    foreach my $toprated_sourcedir (slurp($toprated_file;)) {
+#
+#        foreach my $ratings_file = 
+#my @porn_toprated = slurp(
+#            " locate -r '/.porn_toprated\$' | " );
+#
+#    }
+#                    "locate -r '$/.porn_toprated\$' |   ] );
+#    my $toprated_sourcedir = <FIN>;
+#    open FIN, '<', $toprated_targetdir      or die $!;
+#    
+#    chomp $toprated_sourcedir;
+#    close FIN;
+#
+#
+#    print "$toprated_sourcedir  ==>  $toprated_targetdir\n";
+#}
+#
+
+
+
+
+# quickly read a whole file
+# equivalent to File::Slurp or IO::All->slurp
+sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?map{chomp;$_}@o:join("",@o)}
