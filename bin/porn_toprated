@@ -64,7 +64,7 @@ sub process_toprated_file {
     foreach my $sourcedir (slurp($toprated_file)) {
         $sourcedir =~ s#/$##;
         ##print ">> $sourcedir <<\n";
-        my @ratings_files = slurp( "locate -r '^$sourcedir.*/\\.ratings\$' |" );
+        my @ratings_files = slurp( "find '$sourcedir' -name .ratings |" );
         foreach my $ratings_file (@ratings_files) {
             ##print "    >> $ratings_file\n";
             my @top_rated_files = process_ratings_file( $ratings_file );
