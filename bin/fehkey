@@ -6,22 +6,18 @@
 #       - 0 through 9
 #
 
-#
-# TODO:
-#   - If the image is a symlink, then fully dereference it  (because we don't want to be dropping
-#       .ratings files within a .../toprated/ directory.
-#
-
     use strict;
     use warnings;
 
     use File::Spec;
+    use Cwd;
 
     use Data::Dumper;
 
 my ($key, $filename) = @ARGV;
 
 $filename = File::Spec->rel2abs($filename);
+$filename = Cwd::realpath($filename);           # Resolve symlinks.  Find the actual final file they point to.
 my (undef, $dir, $file) = File::Spec->splitpath($filename);
 
 #open FOUT, '>>', '/tmp/fehkey.log'      or die $!;
