@@ -51,6 +51,8 @@ sub process_toprated_file {
         }
     }
 
+    open REVIEW, '>', "$targetdir/.review"     or die $!;
+
     # The .../.porn_toprated file can contain multiple lines, each a particular source directory.  For example:
     #       $ cat /porn/toprated/.porn_toprated
     #       /porn/bdsm/
@@ -78,7 +80,10 @@ sub process_toprated_file {
             }
         }
     }
+
+    close REVIEW;
 }
+
 
 
 # process a particular .../.ratings file
@@ -101,6 +106,9 @@ sub process_ratings_file {
         my $avg_score = sum(@scores) / $num_scores;
         if ($num_scores >= 2 && $avg_score >= 8.0) {
             push @return, "$ratings_file_dir/$file";
+        }
+        if ($avg_score >= 6) {
+            print REVIEW "$ratings_file_dir/$file\n";
         }
     }
 

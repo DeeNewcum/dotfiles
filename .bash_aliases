@@ -171,6 +171,15 @@ fi
 alias google='w3m google.com'
 
 
+
+##
+## There's four commands used for porn-viewing:
+##
+##             _feh -- View all photos, including subdirectories.  While here, press 0..9 to rate a photo.
+##    porn_toprated -- Update the symlinks in ALL .../toprated/ directories.
+##      porn_review -- View all semi-toprated photos, in THIS particular .../toprated/ directory.
+##             _feh -- Run in a .../toprated/ directory to see all top-rated photos.
+##
 function _feh {
     FIRST="${1:-.}"
     shift
@@ -189,6 +198,17 @@ function _feh {
     unset FIRST
 }
 alias thumbnails='(gwenview . &> /dev/null &)'
+        # This is related to the porn_toprated program -- view all images that have been reviewed, but haven't crossed the threshold yet.
+        # A photo needs at least two reviews before it can be top-rated, but this command lets you view all that are semi-top-rated.
+function porn_review {
+    if [ -e .review ]; then
+        _feh /dev/null --filelist .review
+    else
+        echo 'You must be in a "toprated" directory'
+    fi
+}
+
+
 
 
 function unball { cd /var/tmp; eval $(command unball "$@"); }
