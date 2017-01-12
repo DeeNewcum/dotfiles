@@ -2284,7 +2284,7 @@ if ($ARGV{snapshot}) {
             print STDERR "-\n"
                     unless (-t STDOUT);
         } else {
-            print STDERR "The suggested \$TERM \"$final_term\" wasn't found.\n";
+            print STDERR "The \$TERM for $fingerprint_name wasn't found.\n";
             print STDERR "        \n";
             print STDERR "\nTo install the full set of terminfo files:\n";
             help_install_terminfos();
