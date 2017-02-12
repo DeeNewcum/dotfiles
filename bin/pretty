@@ -4,6 +4,9 @@
 
 # pretty-prints JSON, XML, and other data formats
 
+            # TODO: pretty-print HTML
+            #               (I tried HTML::TreeBuilder, but HTML::Element->as_HTML() spits out ugly HTML
+
     use strict;
     use warnings;
 
