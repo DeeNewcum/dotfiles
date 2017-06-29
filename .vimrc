@@ -13,6 +13,7 @@ set ignorecase hlsearch incsearch nowrapscan                    " search setting
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent   " tab and indent settings
 set backspace=indent,eol,start
 set ruler                                                       " display row/col
+set hidden                                                      " make it possible to use buffers
 command! W w                                                    " accomodate stuck-shift keys
 command! Q q
 set clipboard=unnamed                                           " default to the * clipboard when yanking/pasting
