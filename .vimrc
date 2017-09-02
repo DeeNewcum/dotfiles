@@ -287,3 +287,11 @@ endfunction
 if has("win32")
     source $VIMRUNTIME/mswin.vim
 endif
+
+
+" https://superuser.com/questions/457911/in-vim-background-color-changes-on-scrolling
+if &term =~ '256color'
+    " Disable Background Color Erase (BCE) so that color schemes
+    " work properly when Vim is used inside tmux and GNU screen.
+    set t_ut=
+endif
