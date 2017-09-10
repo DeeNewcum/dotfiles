@@ -35,6 +35,7 @@ shopt -s histappend         # append to the history file, don't overwrite it
 HISTSIZE=1000
 HISTFILESIZE=2000
 HISTIGNORE="&:ls:clear"
+HISTTIMEFORMAT="%F %T -- "
 
 
 # https://github.com/DeeNewcum/termdetect
