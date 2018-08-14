@@ -1,7 +1,7 @@
 ! Swap caps lock and escape.  This saves SOOO much time for vi.
 ! 
 ! To manually load this:
-!       xmodmap ~/.xmodmap
+!       xmodmap ~/.Xmodmap
 !
 ! In Gnome 3 (Ubuntu 13.10+), it's better to use XKB instead of Xmodmap.  Run this at the command line, once:
 !       dconf write /org/gnome/desktop/input-sources/xkb-options "['caps:escape']"                           
