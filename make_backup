@@ -44,6 +44,15 @@ EXCLUDES=$(perl -x "$0" <<'EOF'
 EOF
 )
 
+
+read -r -d '' INCLUDES << EOF
+    public_html/
+    make_backup
+    .bash_aliases
+    .ssh/config
+EOF
+
+
 ## don't be verbose if we're outputing the tarball to stdout
 if [ -z "$1" ]; then
     VERBOSE=-v
@@ -52,9 +61,7 @@ else
 fi
 
 
-tar $VERBOSE -czf $TARBALL $EXCLUDES \
-        public_html make_backup
-        ## ^^ This is the list of "includes".
+tar $VERBOSE -czf $TARBALL $EXCLUDES $INCLUDES
 
 ## don't be verbose if we're outputing the tarball to stdout
 if [ "$VERBOSE" ]; then
