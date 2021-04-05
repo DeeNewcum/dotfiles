@@ -1,0 +1,102 @@
+#!/bin/bash
+
+## This is a helper script, a wrapper around `tar`.
+##
+## I put this shell script on each host, and customize to the directories and files on
+## that specific host. I then run it and copy its tarballs to a few of my other hosts.
+##
+## It's based on a bare-bones `tar` and `perl`, and should work on Linux and even old versions of
+## Solaris. I'd like to also get it working on old AIX and old HP-UX.
+##
+## Obviously you shouldn't rely on tarballs for backups. But this is here in case you do.
+
+
+## To download the output of this script from another box, stream-style, run:
+##       ssh interiot@webhost.com './make_backup -' > webhost.com_$(date +%Y%m%d).tgz
+
+
+TODAY=$(date +%Y%m%d)
+#TARBALL=/var/tmp/backup_$(hostname)_$LOGNAME.$TODAY.tgz
+#TARBALL=/var/tmp/webhost.com_$TODAY.tgz
+## Let the user specify (via $1) where to store the tarball, otherwise use a sensible default.
+TARBALL=${1:- $HOME/webhost.com_$TODAY.tgz }
+
+## CUSTOMIZE PER-HOST HERE. These are specific files/directories that 
+EXCLUDES=$(perl -x "$0" <<'EOF'
+    ~/public_html/photoblog/                    # temporarily added -- big directory
+    ~/public_html/trades/knots/pdf/             # temporarily added -- big directory
+    ~/public_html/games/pc/Spelunky/releases/   # temporarily added -- big directory
+
+    ~/public_html/old/                  # anything in here that is valuable should have been moved elsewhere a while ago
+    ~/public_html/games/pc/Spelunky/releases/               # big, and I am not interested in it anymore
+    ~/public_html/dev/reference/clearcase_v5.0/             # big, not originated by me
+    ~/public_html/dev/reference/clearcase_v4.0/             # big, not originated by me
+    ~/public_html/games/pc/ADOM/ImprovedGuidebook/          # mirror / unimportant
+    ~/public_html/tmp/                  # temporary and not important for the backup
+    ~/public_html/games/pc/Spelunky/releases/spelunky_0_99_5.frozenregion.exe           # big / unnecessary / unimportant
+    ~/public_html/vehicle/bicycle/mp3/4x30_HITT.mp3                                     # big / unnecessary
+    ~/public_html/product_searches/for_motorcycle/CycleWorld_2004.pdf                   # big / unnecessary
+    ~/public_html/dev/oss/high_energy_slings/projectile_rope-end.xcf                    # big / unnecessary
+    ~/public_html/dev/oss/high_energy_slings/exploded_diagram.xcf                       # big / unnecessary
+    ~/public_html/external/mirror/31295019381234.pdf                                    # big / unnecessary
+    ~/public_html/apps/+isms/Learning_Good_Consent/learning_good_consent_screen.pdf     # big / unnecessary
+
+EOF
+)
+
+## don't be verbose if we're outputing the tarball to stdout
+if [ -z "$1" ]; then
+    VERBOSE=-v
+else
+    VERBOSE=
+fi
+
+
+tar $VERBOSE -czf $TARBALL $EXCLUDES \
+        public_html make_backup
+        ## ^^ This is the list of "includes".
+
+## don't be verbose if we're outputing the tarball to stdout
+if [ "$VERBOSE" ]; then
+    chmod go-rwx $TARBALL
+    echo
+    ls -l --si $TARBALL
+fi
+
+exit
+
+
+
+
+#!perl
+    ## A Perl script embedded inside a shell script.
+    ## For more info, see 'perlrun' and Ctrl-F for "larger chunk".
+
+    ## Reads a list of "excludes" from STDIN, and processes them to be suitable for use by 'tar'.
+    ## Why add an extra layer here?  Tar's format isn't very readable, which
+    ## makes it hard to maintain the exclude list.
+
+    ## Syntax of input data:
+    ##       - one path per line
+    ##           (and no backslashing is available, which usually makes things simpler, unless you have a newline inside a path name)
+    ##       - comments are allowed;  comments are indicated by the hash sign
+    ##       - comments can occur anywhere  (they don't have to be on a separate line)
+    ##       - unlike with 'tar' inputs, directory specifiers can end with a slash
+    ##           (in fact, this is *encouraged*, as it aids readability)
+
+    use strict;
+    use warnings;
+
+my @arguments;
+while (<>) {
+    s/\#.*//;               # remove comments
+    s/^\s+|\s+$//sg;        # ltrim / rtrim
+    next unless /\S/;       # skip blank lines
+    s#^~/##;                # assume all paths are relative to $HOME
+    s#/$##;                 # tar can't handle trailing slashes on directories
+    s/([ '"\(\)])/\\$1/g;   # for characters that could problems on the command line, escape each of them
+    push @arguments, "--exclude=$_";
+}
+
+print join(" ", @arguments), "\n";
+#print STDERR map {"\t$_\n"}  @arguments, "";            # DEBUG only
