@@ -61,7 +61,7 @@ else
 fi
 
 
-tar $VERBOSE -czf $TARBALL $EXCLUDES $INCLUDES
+tar $VERBOSE --absolute-names -czf $TARBALL $EXCLUDES $INCLUDES
 
 ## don't be verbose if we're outputing the tarball to stdout
 if [ "$VERBOSE" ]; then
