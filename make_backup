@@ -15,11 +15,11 @@
 ##       ssh interiot@webhost.com './make_backup -' > webhost.com_$(date +%Y%m%d).tgz
 
 
+HOSTNAME=laptop                                                                                                                                                 
 TODAY=$(date +%Y%m%d)
-#TARBALL=/var/tmp/backup_$(hostname)_$LOGNAME.$TODAY.tgz
-#TARBALL=/var/tmp/webhost.com_$TODAY.tgz
-## Let the user specify (via $1) where to store the tarball, otherwise use a sensible default.
-TARBALL=${1:- $HOME/webhost.com_$TODAY.tgz }
+## Let the user specify (via $1) where to store the tarball, otherwise use a sensible default.                                                                  
+TARBALL=${1:- $HOME/${HOSTNAME}_$TODAY.tgz } 
+
 
 ## CUSTOMIZE PER-HOST HERE. These are specific files/directories that 
 EXCLUDES=$(perl -x "$0" <<'EOF'
