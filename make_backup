@@ -15,7 +15,6 @@
 ##       ssh interiot@webhost.com './make_backup -' > webhost.com_$(date +%Y%m%d).tgz
 
 
-
 HOSTNAME=laptop                                                                                                                                                 
 TODAY=$(date +%Y%m%d)
 ## Let the user specify (via $1) where to store the tarball, otherwise use a sensible default.                                                                  
