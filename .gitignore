@@ -4,9 +4,16 @@
 #
 #       git config --global core.excludesfile ~/.gitignore
 
-*.sw?           # vim
 ;               # vim typos
 ;w              # vim typos
+
+# Vim swapfiles
+[._]*.s[a-v][a-z]
+!*.svg  # comment out if you don't need vector files
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
 
 # OpenOffice / LibreOffice
 .~lock.*#
