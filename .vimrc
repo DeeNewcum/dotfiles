@@ -183,16 +183,6 @@ nnoremap <leader>L :call clearmatches()<cr>
 " ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================
 
-
-
-" Use 'smart tabs'  -- tabs for indenting, spaces for aligning
-
-
-" toggle between spaces and tabs  (to do a manual form of "smart tabs")
-nnoremap <C-t> :set et!<cr>
-vnoremap <C-t> :set et!<cr>
-
-
 " Originally from http://www.noah.org/engineering/dotfiles/.vimrc
 " License unclear.
 "
