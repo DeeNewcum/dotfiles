@@ -10,11 +10,13 @@
 
 # Permanently change it:
 if type -p dconf >/dev/null; then
-    if dconf read "/org/gnome/desktop/input-sources/xkb-options" | grep caps:swapescape >/dev/null
-    then
-        /bin/false
-    else
-        dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
+    if [ -n "$DISPLAY" ]; then
+        if dconf read "/org/gnome/desktop/input-sources/xkb-options" | grep caps:swapescape >/dev/null
+        then
+            /bin/false
+        else
+            dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
+        fi
     fi
 fi
 
