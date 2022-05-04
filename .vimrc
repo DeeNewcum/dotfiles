@@ -55,7 +55,7 @@ else
         let g:solarized_termcolors=&t_Co    " terminfo knows how many colors are available
         set background=light
         if !has("win32")                    " if we're running on Windows, then we're missing most files, only the .vimrc has been copied over
-            colorscheme solarized
+            silent! colorscheme solarized
         endif
     else
             " Solarized looks ugly in 16 colors, so fallback to something else
