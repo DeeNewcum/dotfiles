@@ -179,6 +179,10 @@ mkdir -p ~/apps/build/
 [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
 
 
+# install all the 'fasd' aliases -- "a", "S", "sd","sf", "d", "f", "z", "zz", etc.
+eval "$(fasd --init auto)"
+
+
 # you don't want to use local::lib while in PerlBrew
 function local_lib_disable {
     unset PERL_LOCAL_LIB_ROOT
