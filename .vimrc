@@ -276,6 +276,11 @@ endfunction
 
 if has("win32")
     source $VIMRUNTIME/mswin.vim
+
+	" I really dislike that mswin.vim overwrites Ctrl-F, which I use often, and not for
+	" searching-within-a-file.
+	"		https://github.com/vim/vim/issues/1457
+	unmap <C-F>
 endif
 
 
