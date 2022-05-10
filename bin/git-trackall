@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+# adds all of the remote branches 
+
+use strict;
+use warnings;

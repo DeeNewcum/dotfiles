@@ -180,7 +180,7 @@ mkdir -p ~/apps/build/
 
 
 # install all the 'fasd' aliases -- "a", "S", "sd","sf", "d", "f", "z", "zz", etc.
-eval "$(fasd --init auto)"
+type -p fasd >/dev/null && eval "$(fasd --init auto)"
 
 
 # you don't want to use local::lib while in PerlBrew
