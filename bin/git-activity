@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# originally downloaded from https://bitbucket.org/ssaasen/git-pastiche/src/master/bin/
+
+set -e
+
+GIT_OPTS=""
+OUTPUT_FILTER="cat" # no-op
+
+commit_id_format=$(tput setaf 1)
+date_format=$(tput bold; tput setaf 4)
+author_format=$(tput setaf 2)
+ref_name_format=$(tput setaf 3)
+bold=$(tput bold)
+reset=$(tput sgr0)
+
+function usage() {
+    echo ""
+    echo "git activity [REMOTE]"
+    echo ""
+    echo "  See 'man git-activity' for further information"
+}
+
+# actually parse the options and do stuff
+while [[ $1 = -?* ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --fetch)
+            echo "Fetch updates"
+            git fetch -q
+            ;;
+        -c|--count)
+            shift
+            limit=${1-"10"}
+            #OUTPUT_FILTER="tail -n ${limit}"
+            GIT_OPTS="--count=${limit}"
+            ;;
+        --no-color|--no-colour)
+            commit_id_format=""
+            date_format=""
+            author_format=""
+            ref_name_format=""
+            bold=""
+            reset=""
+            ;;
+        *) ;;
+    esac
+
+shift
+done
+
+REMOTE=${1:-"origin"}
+
+# Use newline as a field separator
+IFS=$(echo -en "\n\b")
+
+# Use tac if available, otherwise tail with the possibly-not-always-available
+# -r flag (for reverse output)
+TAC=$(which tac || echo 'tail -r')
+
+for line in $(git for-each-ref ${GIT_OPTS} refs/remotes/${REMOTE} --format="%(authordate:relative)|%(objectname:short)|%(authorname)|%(refname:short)|%(subject)" --sort="-authordate"); do
+    fields=(`echo $line | tr "|" "\n"`)
+    printf "${date_format}%15s${reset} ${commit_id_format}%s${reset} - ${author_format}[%s]${reset} (${ref_name_format}%s${reset}): %s\n" ${fields[*]}
+done | eval $TAC # reverse sort the output to show the newest entry last
+
