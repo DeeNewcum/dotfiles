@@ -1,0 +1,25 @@
+.\" Manpage for git-activity
+.TH man 1 "May 2012" "1.0" "git activity man page"
+.SH NAME
+git activity \- Show the recent activity on each ref
+.SH SYNOPSIS
+git activity [-c|--count <number>] [--no-color] [--fetch]
+.SH DESCRIPTION
+List each ref with the last commit on the ref sorted by commit date.
+.SH OPTIONS
+.TP
+.I --fetch
+Fetch download objects and refs from all the remotes that are configured.
+.TP
+.I --no-color
+Turn off colored output.
+.TP
+.I -c | --count <number>
+Limit the output to <number> of entries.
+.I
+.SH SEE ALSO
+git-for-each-ref(1)
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Stefan Saasen <stefan@saasen.me>
