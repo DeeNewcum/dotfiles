@@ -205,16 +205,49 @@ function gvim {
 
 
 
-# Under CygWin, check if the local XWin Server is running, and if so, then set $DISPLAY.
+# Under CygWin, automatically set $DISPLAY if the local XWin Server is running
 if [ "$(uname -o)" = "Cygwin" ]; then
-	# Try setting $DISPLAY to something reasonable, and check if we get any sort of response.
-	# See more at -- https://stackoverflow.com/questions/637005/how-to-check-if-x-server-is-running
-	DISPLAY="${DISPLAY:-:0.0}" timeout 1s xprop -root 2>&1 >/dev/null
+	function Cygwin_auto_set_DISPLAY() {
+		# Try setting $DISPLAY to something reasonable, and check if we get any sort of response.
+		# See more at -- https://stackoverflow.com/questions/637005/how-to-check-if-x-server-is-running
+		DISPLAY="${DISPLAY:-:0.0}" timeout 1s xprop -root 2>&1 >/dev/null
 
-	# did 'xprop' timeout?
-	if [ $? -ne 124 ]; then
-		# no, it finished successfully
-		export DISPLAY="${DISPLAY:-:0.0}"
-	fi
+		# did 'xprop' timeout?
+		if [ $? -ne 124 ]; then
+			# no, it finished successfully
+			export DISPLAY="${DISPLAY:-:0.0}"
+		else
+			unset DISPLAY
+		fi
+	}
+
+	# This should be run immediately after running Cygwin_auto_set_DISPLAY.
+	# it will let the user know that xinit should be installed.
+	function Cygwin_error_if_xinit_not_installed() {
+		if [ -z "$DISPLAY" ]; then
+			if ! cygcheck -c xinit | grep '^xinit' >/dev/null; then
+				# At this point, $DISLAY isn't set, and the 'xinit' package isn't installed.
+				>&2 echo "In order to run X Window programs, the Cygwin package"
+				>&2 echo "'xinit' must be installed."
+				return 1
+			fi
+		fi
+		return 0
+	}
+	
+	Cygwin_auto_set_DISPLAY
+
+	# also, if 'gitk' is installed, provide a wrapper that recommends starting the XWin Server if
+	# it hasn't been started yet
+	type -p gitk >/dev/null && function gitk() {
+		Cygwin_auto_set_DISPLAY		# check if XWin Server is running
+		Cygwin_error_if_xinit_not_installed || return
+		if [ -z "$DISPLAY" ]; then
+			# XWin Server isn't running currently, so prompt the user to start it
+			>&2 echo "Cygwin-X's 'XWin Server' must be started before running gitk."
+		else
+			command gitk "$@"
+		fi
+	}
 fi
 
