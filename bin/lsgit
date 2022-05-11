@@ -31,7 +31,6 @@ while (<$pin>) {
     my $git_dir = $_;
 
     if (-d "$git_dir/refs/heads" && -f "$git_dir/HEAD" && -d "$git_dir/objects") {
-		print ">>$git_dir\n";
         $repos{$git_dir} = {};
     }
 }
@@ -57,7 +56,7 @@ while (my ($git_dir, $data) = each %repos) {
             $data->{work_tree} =~ s#[/\n\r]+$##s;
         } else {
             ## there are other ways to specify the git-dir and work-tree...
-            ##      http://paperlined.org/apps/git/separate_working_tree.html
+			##		https://stackoverflow.com/a/21085415
             ## TODO: can we support any more of them?
 
             ## this is a rough guesstimate
