@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# originally downloaded from https://bitbucket.org/ssaasen/git-pastiche/src/master/bin/
+# A custom git subcommand "git activity" -- displays a list of all remote
+# branches, sorted by which was most recently updated.
+# 
+# This was originally downloaded from https://www.atlassian.com/git/articles/extending-git
 
 set -e
 
