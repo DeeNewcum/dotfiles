@@ -245,6 +245,8 @@ if [ "$(uname -o)" = "Cygwin" ]; then
 		if [ -z "$DISPLAY" ]; then
 			# XWin Server isn't running currently, so prompt the user to start it
 			>&2 echo "Cygwin-X's 'XWin Server' must be started before running gitk."
+			>&2 echo "You can just run this command:"
+			>&2 echo "    startxwin &"
 		else
 			command gitk "$@"
 		fi
