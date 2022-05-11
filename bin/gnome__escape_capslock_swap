@@ -15,7 +15,7 @@ if type -p dconf >/dev/null; then
         then
             /bin/false
         else
-            dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']"
+            dconf write "/org/gnome/desktop/input-sources/xkb-options" "['caps:swapescape']" 2>/dev/null
         fi
     fi
 fi
