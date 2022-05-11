@@ -1,6 +1,17 @@
 #!/usr/bin/perl
 
-# adds all of the remote branches 
+# adds all of the remote branches as tracked branches
 
 use strict;
 use warnings;
+
+
+# I've seen this proposed as one way to add all branches as tracked:
+#       for remote in `git branch -r`; do git branch --track ${remote#origin/} $remote; done
+# However, that doesn't work on my local machine.
+
+
+# TODO: these are possible ways to list the branches on a remote repo:
+#   git branch -r
+#   git remote show
+#   git ls-remote
