@@ -24,11 +24,11 @@ my ($cmdline_status)   = grep /^(-s|--status)$/, @ARGV;     # show status too   
 
 
 my %repos;
-open my $pin, '-|',  'locate', '-r', '/HEAD$'
+open my $pin, '-|',  'locate', '-r', '/\.git$'
         or die $!;
 while (<$pin>) {
     chomp;
-    my $git_dir = File::Basename::dirname($_);
+    my $git_dir = $_;
 
     if (-d "$git_dir/refs/heads" && -f "$git_dir/HEAD" && -d "$git_dir/branches") {
         $repos{$git_dir} = {};
