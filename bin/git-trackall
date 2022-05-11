@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-# adds all of the remote branches as tracked branches
+# A custom Git subcommand "git trackall" -- adds all of the remote branches as
+# tracked branches
 
 use strict;
 use warnings;
@@ -12,6 +13,18 @@ use warnings;
 
 
 # TODO: these are possible ways to list the branches on a remote repo:
-#   git branch -r
-#   git remote show
-#   git ls-remote
+#   git branch -r               # this displays some extraneous stuff that I'd have to regexp out
+#   git branch -a               # a minor variation of `git branch -r`
+#   git remote show <remote>    # see remote branches and associated metadata
+#   git ls-remote <remote>      # This is close to what I want, but it will have to be regexped apart.
+#                               # This one actually queries the remote server,
+#                               # so note that it might be a little slower, but
+#                               # since it doesn't use cached data, it might
+#                               # actually be what we want.
+#   git ls-remote --heads <remote>  # a minor variation that might actually be the most helpful
+
+
+
+# TODO: maybe also remove all local branches that *used to be* tracked, but
+# where the remote branch has since been deleted?
+#       https://github.com/nvie/git-toolbelt/blob/master/git-cleanup
