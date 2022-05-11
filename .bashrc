@@ -202,3 +202,19 @@ function gvim {
     command gvim -f "$@" >/dev/null 2>/dev/null &
     disown
 }
+
+
+
+# Under CygWin, check if the local XWin Server is running, and if so, then set $DISPLAY.
+if [ "$(uname -o)" = "Cygwin" ]; then
+	# Try setting $DISPLAY to something reasonable, and check if we get any sort of response.
+	# See more at -- https://stackoverflow.com/questions/637005/how-to-check-if-x-server-is-running
+	DISPLAY="${DISPLAY:-:0.0}" timeout 1s xprop -root 2>&1 >/dev/null
+
+	# did 'xprop' timeout?
+	if [ $? -ne 124 ]; then
+		# no, it finished successfully
+		export DISPLAY="${DISPLAY:-:0.0}"
+	fi
+fi
+
