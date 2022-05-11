@@ -30,7 +30,8 @@ while (<$pin>) {
     chomp;
     my $git_dir = $_;
 
-    if (-d "$git_dir/refs/heads" && -f "$git_dir/HEAD" && -d "$git_dir/branches") {
+    if (-d "$git_dir/refs/heads" && -f "$git_dir/HEAD" && -d "$git_dir/objects") {
+		print ">>$git_dir\n";
         $repos{$git_dir} = {};
     }
 }
