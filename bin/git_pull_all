@@ -94,11 +94,7 @@ sub handle_path {
         }
     }
 
-    if ($num_commits_before_fetch == $num_commits_after_fetch) {
-        print "$work_tree_rel -- already up to date\n";
-        return;
-    }
-
+    # parse the .git/FETCH_HEAD file, to find out what the HEAD should be
     my @fetch_head = slurp(File::Spec->catfile($git_dir, 'FETCH_HEAD'));
     @fetch_head = map {chomp; $_} @fetch_head;
     @fetch_head = grep {!/  not-for-merge  /} @fetch_head;
@@ -108,16 +104,43 @@ sub handle_path {
     ### $merge_head
     ### current_branch
 
-    my $num_commits_before_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
+    my $current_head = readpipe_args(qw[ git rev-parse HEAD ]);
+    chomp $current_head;
 
-    my $git_merge = readpipe_args(qw[ git merge --quiet HEAD ], $merge_head);
+    my $num_commits_before_merge = 0;
+    my $num_commits_after_merge = 0;
+    if ($current_head ne $merge_head) {
+        if ($work_tree) {
+            $num_commits_before_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
 
-    # TODO: Check its output, and maybe report specific errors to the user at this point?
+            my $git_merge = readpipe_args("git", "--work-tree=$work_tree",
+                                    qw[ merge --quiet HEAD ], $merge_head);
 
-    my $num_commits_after_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
+            # TODO: Check its output, and maybe report specific errors to the user at this point?
 
-    print "$work_tree_rel -- ", ($num_commits_after_fetch - $num_commits_before_fetch),
-            " commits fetched\n";
+            $num_commits_after_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
+        } else {
+            # see more at https://stackoverflow.com/a/4914298
+            print "$work_tree_rel -- merges can't occur in a bare repo\n";
+            return;
+        }
+    }
+
+    my $num_fetched = $num_commits_after_fetch - $num_commits_before_fetch;
+    my $num_merged = $num_commits_after_merge - $num_commits_before_merge;
+
+    if ($num_fetched == 0 && $num_merged == 0) {
+        print "$work_tree_rel -- already up to date\n";
+
+    } elsif ($num_fetched = 0) {
+        print "$work_tree_rel -- $num_merged commits merged\n";
+
+    } elsif ($num_merged == 0) {
+        print "$work_tree_rel -- $num_fetched commits fetched\n";
+
+    } else {
+        print "$work_tree_rel -- $num_fetched commits fetched and $num_merged commits merged\n";
+    }
 }
 
 
