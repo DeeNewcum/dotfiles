@@ -8,7 +8,7 @@ use warnings;
 
 use Cwd;                # core Perl
 use Data::Dumper;       # core Perl
-#use Devel::Comments;   # uncomment to enable "smart comments" -- those that start with ###
+use Devel::Comments;   # uncomment to enable "smart comments" -- those that start with ###
 use File::Find;         # core Perl
 use File::Spec;         # core Perl
 
@@ -46,7 +46,7 @@ sub handle_path {
                 ? File::Spec->abs2rel($work_tree, $starting_dir)
                 : File::Spec->abs2rel($git_dir, $starting_dir);
     ### $git_dir
-    ### $work_tree_rel
+    ### $work_tree
 
     my @remotes = readpipe_args(qw[ git remote ]);
     if (!@remotes) {
@@ -54,30 +54,32 @@ sub handle_path {
         return;
     }
 
-    my $num_commits_before = readpipe_args(qw[ git rev-list --all --count ]);
+    my $num_commits_before_fetch = readpipe_args(qw[ git rev-list --all --count ]);
 
     my $git_fetch = readpipe_args(qw[ git fetch --all --quiet ]);
 
     # TODO: Check its output, and maybe report specific errors to the user at this point?
 
-    my $num_commits_after = readpipe_args(qw[ git rev-list --all --count ]);
+    my $num_commits_after_fetch = readpipe_args(qw[ git rev-list --all --count ]);
 
-    if ($num_commits_before == $num_commits_after) {
-        print "$work_tree_rel -- already up to date\n";
-        return;
+    if ($work_tree) {
+        my @unstaged_files = readpipe_args(
+                            qw[ git ls-files --other --exclude-standard ]);
+
+        if (@unstaged_files) {
+            my $numfiles;
+            if (@unstaged_files == 1) {
+                print "$work_tree_rel -- 1 unstaged file exists, unable to merge\n";
+            } else {
+                print "$work_tree_rel -- ", scalar(@unstaged_files), 
+                        " unstaged files exist, unable to merge\n";
+            }
+            return;
+        }
     }
 
-    my @unstaged_files = readpipe_args(
-                        qw[ git ls-files --other --exclude-standard ]);
-    
-    if (@unstaged_files) {
-        my $numfiles;
-        if (@unstaged_files == 1) {
-            print "$work_tree_rel -- 1 unstaged file exists, unable to merge\n";
-        } else {
-            print "$work_tree_rel -- ", scalar(@unstaged_files), 
-                    " unstaged files exist, unable to merge\n";
-        }
+    if ($num_commits_before_fetch == $num_commits_after_fetch) {
+        print "$work_tree_rel -- already up to date\n";
         return;
     }
 
@@ -85,14 +87,20 @@ sub handle_path {
     @fetch_head = map {chomp; $_} @fetch_head;
     @fetch_head = grep {!/  not-for-merge  /} @fetch_head;
     ### @fetch_head
-    my ($merge_head) = split(' ', $fetch_head[0]);
+    my ($merge_head, undef, $current_branch) = split(' ', $fetch_head[0]);
+    $current_branch =~ s/^'(.*)'$/$1/s;
     ### $merge_head
+    ### current_branch
+
+    my $num_commits_before_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
 
     my $git_merge = readpipe_args(qw[ git merge --quiet HEAD ], $merge_head);
 
     # TODO: Check its output, and maybe report specific errors to the user at this point?
 
-    print "$work_tree_rel -- ", ($num_commits_after - $num_commits_before),
+    my $num_commits_after_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
+
+    print "$work_tree_rel -- ", ($num_commits_after_fetch - $num_commits_before_fetch),
             " commits fetched\n";
 }
 
