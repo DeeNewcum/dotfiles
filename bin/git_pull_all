@@ -55,6 +55,12 @@ sub handle_path {
         return;
     }
 
+    my @remote_tracked_branches = readpipe_args(qw[ git branch -r ]);
+    if (!@remote_tracked_branches) {
+        print "$work_tree_rel -- no remote-tracked branches found\n";
+        return;
+    }
+
     my $num_commits_before_fetch = readpipe_args(qw[ git rev-list --all --count ]);
 
     my $git_fetch = readpipe_args(qw[ git fetch --all --quiet ]);
