@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+
+# Does 'git fetch --all; git merge' in *all* repos directly under the current
+# working directory, and reports the status of the fetch + merge processes.
+
+use strict;
+use warnings;
+
+use Cwd;                # core Perl
+use Data::Dumper;       # core Perl
+#use Devel::Comments;   # uncomment to enable "smart comments" -- those that start with ###
+use File::Find;         # core Perl
+use File::Spec;         # core Perl
+
+my $starting_dir = Cwd::getcwd();
+
+my $num_repos_processed = 0;
+File::Find::find(\&handle_path, $starting_dir);
+
+if (!$num_repos_processed) {
+    print "No git repositories found in the current directory.\n";
+}
+
+
+sub handle_path {
+    # at this point, the variables are:
+    #   $File::Find::dir is the current directory name
+    #   $_ is the current filename within that directory
+    #   $File::Find::name is the complete pathname to the file
+
+    return unless ($_ eq '.git'
+                    && -d $File::Find::name
+                    && -e File::Spec->catfile($File::Find::name, 'objects'));
+
+    $File::Find::prune = 1;     # I don't think we'll ever find a .git/
+                                # underneath another .git/
+    $num_repos_processed++;
+
+    my $git_dir = $File::Find::name;
+    my $work_tree = get_working_tree_from_git_dir($git_dir);
+    my $work_tree_rel = File::Spec->abs2rel($work_tree, $starting_dir);
+    ### $git_dir
+    ### $work_tree_rel
+
+    my @remotes = readpipe_args(qw[ git remote ]);
+    if (!@remotes) {
+        print "$work_tree_rel -- no remotes found\n";
+        return;
+    }
+
+    my $num_commits_before = readpipe_args(qw[ git rev-list --all --count ]);
+
+    my $git_fetch = readpipe_args(qw[ git fetch --all --quiet ]);
+
+    # TODO: Check its output, and maybe report specific errors to the user at this point?
+
+    my $num_commits_after = readpipe_args(qw[ git rev-list --all --count ]);
+
+    if ($num_commits_before == $num_commits_after) {
+        print "$work_tree_rel -- already up to date\n";
+        return;
+    }
+
+    my @unstaged_files = readpipe_args(
+                        qw[ git ls-files --other --exclude-standard ]);
+    
+    if (@unstaged_files) {
+        my $numfiles;
+        if (@unstaged_files == 1) {
+            print "$work_tree_rel -- 1 unstaged file exists, unable to merge\n";
+        } else {
+            print "$work_tree_rel -- ", scalar(@unstaged_files), 
+                    " unstaged files exist, unable to merge\n";
+        }
+        return;
+    }
+
+    my @fetch_head = slurp(File::Spec->catfile($git_dir, 'FETCH_HEAD'));
+    @fetch_head = map {chomp; $_} @fetch_head;
+    @fetch_head = grep {!/  not-for-merge  /} @fetch_head;
+    ### @fetch_head
+    my ($merge_head) = split(' ', $fetch_head[0]);
+    ### $merge_head
+
+    my $git_merge = readpipe_args(qw[ git merge --quiet HEAD ], $merge_head);
+
+    # TODO: Check its output, and maybe report specific errors to the user at this point?
+
+    print "$work_tree_rel -- ", ($num_commits_after - $num_commits_before),
+            " commits fetched\n";
+}
+
+
+
+
+# Given something like ~/git/myrepo/.git/, return something like ~/git/myrepo/
+# (but only if that's actually its working directory).
+#
+# Note that it may sometimes be impossible to locate the currect working tree,
+# see https://stackoverflow.com/a/21085415
+sub get_working_tree_from_git_dir {
+    my ($git_dir) = @_;
+
+    # Is this a bare repo?
+    my $is_bare = readpipe_args(qw[ git config --get core.bare ]);
+    if ($is_bare eq 'true') {
+        # there is no working tree
+        return undef;
+    }
+
+    # Has the working tree been moved somewhere else with 
+    # `git config core.worktree <directory>`?
+    my $core_worktree = readpipe_args(qw[ git config --get core.worktree ]);
+    if ($core_worktree =~ /\S/s) {
+        chomp $core_worktree;
+        return Cwd::realpath(File::Spec->rel2abs($core_worktree, $git_dir));
+    }
+
+    # At this point, we don't really know where the working tree is. But we can
+    # make a wild-ass-guess.
+    return Cwd::realpath(File::Spec->rel2abs(File::Spec->updir(), $git_dir));
+}
+
+
+
+
+
+# like qx// or readpipe(), BUT it allows you to give explicitely delimited args, so you don't have to worry about escaping quotes
+# see also   IPC::System::Simple                                                 
+sub readpipe_args {my$p=open(my$f,'-|',@_)or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
+
+
+# quickly read a whole file
+# equivalent to File::Slurp or IO::All->slurp
+sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
+
