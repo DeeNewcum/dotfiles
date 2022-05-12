@@ -76,28 +76,19 @@ sub handle_path {
 
     my $num_commits_after_fetch = readpipe_args(qw[ git rev-list --all --count ]);
 
+    my $num_unstaged_but_tracked = 0;
+    my $num_untracked = 0;
+    my $num_staged = 0;
+    my $num_tracked_modified = 0;
     if ($work_tree) {
         my @status = readpipe_args("git", "--work-tree=$work_tree",
                                     qw[ status --porcelain ]);
 
-        my $num_unstaged_but_tracked = 0;
-        my $num_untracked = 0;
-        my $num_staged = 0;
-        my $num_tracked_modified = 0;
         foreach (@status) {
             $num_untracked++            if (/^\?\?/);
             $num_unstaged_but_tracked++ if (/^ M/);
             $num_staged++               if (/^[DA]/);
             $num_tracked_modified++     if (/^(?: M|[DA])/);
-        }
-
-        if ($num_tracked_modified) {
-            if ($num_tracked_modified == 1) {
-                print "$work_tree_rel -- 1 modified file exists, unable to merge\n";
-            } else {
-                print "$work_tree_rel -- $num_tracked_modified modified files exist, unable to merge\n";
-            }
-            return;
         }
     }
 
@@ -118,6 +109,15 @@ sub handle_path {
     my $num_commits_after_merge = 0;
     if ($current_head ne $merge_head) {
         if ($work_tree) {
+            if ($num_tracked_modified) {
+                if ($num_tracked_modified == 1) {
+                    print "$work_tree_rel -- 1 modified file exists, unable to merge\n";
+                } else {
+                    print "$work_tree_rel -- $num_tracked_modified modified files exist, unable to merge\n";
+                }
+                return;
+            }
+
             $num_commits_before_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
 
             my $git_merge = readpipe_args("git", "--work-tree=$work_tree",
