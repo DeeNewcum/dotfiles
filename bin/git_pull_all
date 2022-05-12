@@ -72,6 +72,12 @@ sub handle_path {
 
     my $git_fetch = readpipe_args(qw[ git fetch --all --quiet ]);
 
+    if ($? != 0) {
+        print "Unknown error while fetching under $work_tree_rel:\n";
+        print $git_fetch;
+        exit(1);
+    }
+
     # TODO: Check its output, and maybe report specific errors to the user at this point?
 
     my $num_commits_after_fetch = readpipe_args(qw[ git rev-list --all --count ]);
@@ -128,6 +134,11 @@ sub handle_path {
             my $git_merge = readpipe_args("git", "--work-tree=$work_tree",
                                     qw[ merge --quiet HEAD ], $merge_head);
 
+            if ($? != 0) {
+                print "Unknown error while merging under $work_tree_rel:\n";
+                print $git_fetch;
+                exit(1);
+            }
             # TODO: Check its output, and maybe report specific errors to the user at this point?
 
             $num_commits_after_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
