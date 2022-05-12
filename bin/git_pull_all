@@ -162,7 +162,11 @@ sub handle_path {
         print "$work_tree_rel -- $num_fetched commits fetched\n";
 
     } else {
-        print "$work_tree_rel -- $num_fetched commits fetched and $num_merged commits merged\n";
+        if ($num_fetched == $num_merged) {
+            print "$work_tree_rel -- $num_fetched commits fetched and merged\n";
+        } else {
+            print "$work_tree_rel -- $num_fetched commits fetched and $num_merged commits merged\n";
+        }
     }
 }
 
