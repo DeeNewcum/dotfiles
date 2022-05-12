@@ -28,17 +28,23 @@ sub handle_path {
     #   $_ is the current filename within that directory
     #   $File::Find::name is the complete pathname to the file
 
-    return unless ($_ eq '.git'
-                    && -d $File::Find::name
-                    && -e File::Spec->catfile($File::Find::name, 'objects'));
+    return unless ($_ eq 'HEAD'
+                    && -d $File::Find::dir
+                    && -e File::Spec->catfile($File::Find::dir, 'objects'));
+
+    my $is_inside_git_dir = readpipe_args(qw[ git rev-parse --is-inside-git-dir ]);
+
+    return unless ($is_inside_git_dir =~ /^true$/);
 
     $File::Find::prune = 1;     # I don't think we'll ever find a .git/
                                 # underneath another .git/
     $num_repos_processed++;
 
-    my $git_dir = $File::Find::name;
+    my $git_dir = $File::Find::dir;
     my $work_tree = get_working_tree_from_git_dir($git_dir);
-    my $work_tree_rel = File::Spec->abs2rel($work_tree, $starting_dir);
+    my $work_tree_rel = defined($work_tree) 
+                ? File::Spec->abs2rel($work_tree, $starting_dir)
+                : File::Spec->abs2rel($git_dir, $starting_dir);
     ### $git_dir
     ### $work_tree_rel
 
