@@ -28,19 +28,26 @@ sub handle_path {
     #   $_ is the current filename within that directory
     #   $File::Find::name is the complete pathname to the file
 
-    return unless ($_ eq 'HEAD'
-                    && -d $File::Find::dir
-                    && -e File::Spec->catfile($File::Find::dir, 'objects'));
+    # only go one level deep
+    ### $File::Find::name
+    $File::Find::prune = 1  unless ($File::Find::name eq $starting_dir);
 
-    my $is_inside_git_dir = readpipe_args(qw[ git rev-parse --is-inside-git-dir ]);
-
-    return unless ($is_inside_git_dir =~ /^true$/);
+    my $git_dir;
+    if (is_git_dir($File::Find::name)) {
+        $git_dir = $File::Find::name;
+    } else {
+        $git_dir = File::Spec->catfile($File::Find::name, '.git');
+        if (is_git_dir($git_dir)) {
+            chdir($git_dir);
+        } else {
+            return;
+        }
+    }
 
     $File::Find::prune = 1;     # I don't think we'll ever find a .git/
                                 # underneath another .git/
     $num_repos_processed++;
 
-    my $git_dir = $File::Find::dir;
     my $work_tree = get_working_tree_from_git_dir($git_dir);
     my $work_tree_rel = defined($work_tree) 
                 ? File::Spec->abs2rel($work_tree, $starting_dir)
@@ -172,6 +179,20 @@ sub get_working_tree_from_git_dir {
     # At this point, we don't really know where the working tree is. But we can
     # make a wild-ass-guess.
     return Cwd::realpath(File::Spec->rel2abs(File::Spec->updir(), $git_dir));
+}
+
+
+sub is_git_dir {
+    my ($dir) = @_;
+
+    return(0) unless (-d $dir
+                    && -d File::Spec->catfile($dir, 'objects')
+                    && -f File::Spec->catfile($dir, 'HEAD'));
+
+    chdir($dir);        # "git -C $dir" would work in Git v2.*, but we have lots of v1.* laying around
+    my $is_inside_git_dir = readpipe_args(qw[ git rev-parse --is-inside-git-dir ]);
+
+    return($is_inside_git_dir =~ /^true$/);
 }
 
 
