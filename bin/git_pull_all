@@ -217,10 +217,10 @@ sub is_git_dir {
 
 # like qx// or readpipe(), BUT it allows you to give explicitely delimited args, so you don't have to worry about escaping quotes
 # see also   IPC::System::Simple                                                 
-sub readpipe_args {my$p=open(my$f,'-|',@_)or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
+sub readpipe_args {my$p=open(my$f,'-|',@_)or die$!;my@o=<$f>;close$f;wantarray?@o:join("",@o)}
 
 
 # quickly read a whole file
 # equivalent to File::Slurp or IO::All->slurp
-sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
+sub slurp {my$p=open(my$f,"$_[0]")or die$!;my@o=<$f>;close$f;wantarray?@o:join("",@o)}
 
