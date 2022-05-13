@@ -155,7 +155,7 @@ sub handle_path {
     if ($num_fetched == 0 && $num_merged == 0) {
         print "$work_tree_rel -- already up to date\n";
 
-    } elsif ($num_fetched = 0) {
+    } elsif ($num_fetched == 0) {
         print "$work_tree_rel -- $num_merged commits merged\n";
 
     } elsif ($num_merged == 0) {
