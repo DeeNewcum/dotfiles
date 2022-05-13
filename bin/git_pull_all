@@ -14,6 +14,8 @@ use File::Spec;         # core Perl
 
 my $starting_dir = Cwd::getcwd();
 
+my (undef, undef, $git_version) = split(' ', readpipe_args(qw[git --version]));
+
 my $num_repos_processed = 0;
 File::Find::find(\&handle_path, $starting_dir);
 
@@ -68,7 +70,7 @@ sub handle_path {
         return;
     }
 
-    my $num_commits_before_fetch = readpipe_args(qw[ git rev-list --all --count ]);
+    my $num_commits_before_fetch = git_num_commits();
 
     my $git_fetch = readpipe_args(qw[ git fetch --all --quiet ]);
 
@@ -80,7 +82,7 @@ sub handle_path {
 
     # TODO: Check its output, and maybe report specific errors to the user at this point?
 
-    my $num_commits_after_fetch = readpipe_args(qw[ git rev-list --all --count ]);
+    my $num_commits_after_fetch = git_num_commits();
 
     my $num_unstaged_but_tracked = 0;
     my $num_untracked = 0;
@@ -127,7 +129,7 @@ sub handle_path {
                 return;
             }
 
-            $num_commits_before_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
+            $num_commits_before_merge = git_num_commits('HEAD');
 
             my $git_merge = readpipe_args("git", "--work-tree=$work_tree",
                                     qw[ merge --quiet HEAD ], $merge_head);
@@ -139,7 +141,7 @@ sub handle_path {
             }
             # TODO: Check its output, and maybe report specific errors to the user at this point?
 
-            $num_commits_after_merge = readpipe_args(qw[ git rev-list --count HEAD ]);
+            $num_commits_after_merge = git_num_commits('HEAD');
         } else {
             # see more at https://stackoverflow.com/a/4914298
             print "$work_tree_rel -- merges can't occur in a bare repo\n";
@@ -213,6 +215,19 @@ sub is_git_dir {
     return($is_inside_git_dir =~ /^true$/);
 }
 
+
+# Returns the number of commits found in Git repo in the current working dir.
+# The first argument is an optional revision specification.
+sub git_num_commits() {
+    my @revisions = @_;
+    # somewhere below git v1.8, the --count flag was unavailable
+    if ($git_version lt '1.8') {
+        my @commits = readpipe_args(qw[ git rev-list --all], @revisions);
+        return scalar(@commits);
+    } else {
+        return readpipe_args_chomp(qw[ git rev-list --all --count ], @revisions);
+    }
+}
 
 
 
