@@ -108,16 +108,14 @@ sub handle_path {
     ### $merge_head
     ### current_branch
 
-    my $current_head = readpipe_args(qw[ git rev-parse HEAD ]);
-    chomp $current_head;
+    my $current_head = readpipe_args_chomp(qw[ git rev-parse HEAD ]);
 
     my $num_commits_before_merge = 0;
     my $num_commits_after_merge = 0;
 
     # do we actually need to merge?
-    my $best_common_ancestor = readpipe_args("git", "merge-base", 
+    my $best_common_ancestor = readpipe_args_chomp("git", "merge-base", 
                         $current_head, $merge_head);
-    chomp($best_common_ancestor);
     if ($merge_head ne $best_common_ancestor) {
         if ($work_tree) {
             if ($num_tracked_modified) {
@@ -150,22 +148,22 @@ sub handle_path {
     }
 
     my $num_fetched = $num_commits_after_fetch - $num_commits_before_fetch;
-    my $num_merged = $num_commits_after_merge - $num_commits_before_merge;
+    my $num_merged  = $num_commits_after_merge - $num_commits_before_merge;
 
     if ($num_fetched == 0 && $num_merged == 0) {
         print "$work_tree_rel -- already up to date\n";
 
     } elsif ($num_fetched == 0) {
-        print "$work_tree_rel -- $num_merged commits merged\n";
+        print "$work_tree_rel -- $num_merged commit(s) merged\n";
 
     } elsif ($num_merged == 0) {
-        print "$work_tree_rel -- $num_fetched commits fetched\n";
+        print "$work_tree_rel -- $num_fetched commit(s) fetched\n";
 
     } else {
         if ($num_fetched == $num_merged) {
-            print "$work_tree_rel -- $num_fetched commits fetched and merged\n";
+            print "$work_tree_rel -- $num_fetched commit(s) fetched and merged\n";
         } else {
-            print "$work_tree_rel -- $num_fetched commits fetched and $num_merged commits merged\n";
+            print "$work_tree_rel -- $num_fetched commit(s) fetched and $num_merged commits merged\n";
         }
     }
 }
@@ -222,6 +220,9 @@ sub is_git_dir {
 # like qx// or readpipe(), BUT it allows you to give explicitely delimited args, so you don't have to worry about escaping quotes
 # see also   IPC::System::Simple                                                 
 sub readpipe_args {my$p=open(my$f,'-|',@_)or die$!;my@o=<$f>;close$f;wantarray?@o:join("",@o)}
+
+# like readpipe_args(), but it runs chomp() on every line returned
+sub readpipe_args_chomp {wantarray&&return map{chomp;$_}readpipe_args(@_);$_=readpipe_args(@_);chomp;$_}
 
 
 # quickly read a whole file
