@@ -108,7 +108,7 @@ sub handle_path {
     my ($merge_head, undef, $current_branch) = split(' ', $fetch_head[0]);
     $current_branch =~ s/^'(.*)'$/$1/s;
     ### $merge_head
-    ### current_branch
+    ### $current_branch
 
     my $current_head = readpipe_args_chomp(qw[ git rev-parse HEAD ]);
 
