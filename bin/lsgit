@@ -24,6 +24,9 @@ my ($cmdline_status)   = grep /^(-s|--status)$/, @ARGV;     # show status too   
 
 
 my %repos;
+# I once used a machine where /etc/updatedb.conf unfortunately included PRUNENAMES=.git, and I
+# didn't have the authority to change it. So, on machines like that, we can't look for files inside
+# the .git/ directories.
 open my $pin, '-|',  'locate', '-r', '/\.git$'
         or die $!;
 while (<$pin>) {
@@ -34,6 +37,23 @@ while (<$pin>) {
         $repos{$git_dir} = {};
     }
 }
+close $pin;
+
+# But...  if we don't look for files inside the .git/ directory, then we'll never spot bare repos.
+open $pin, '-|',  'locate', '-r', '/HEAD$'
+        or die $!;
+while (<$pin>) {
+    chomp;
+    my $git_dir = File::Basename::dirname($_);
+
+    if (-d "$git_dir/refs/heads" && -f "$git_dir/HEAD" && -d "$git_dir/objects") {
+        $repos{$git_dir} = {};
+    }
+}
+close $pin;
+
+
+
 
 my %revisions;      # data needed to create %related_to
 while (my ($git_dir, $data) = each %repos) {
