@@ -56,7 +56,7 @@ while (my ($git_dir, $data) = each %repos) {
             $data->{work_tree} =~ s#[/\n\r]+$##s;
         } else {
             ## there are other ways to specify the git-dir and work-tree...
-			##		https://stackoverflow.com/a/21085415
+            ##      https://stackoverflow.com/a/21085415
             ## TODO: can we support any more of them?
 
             ## this is a rough guesstimate
