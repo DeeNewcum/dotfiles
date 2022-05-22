@@ -32,6 +32,10 @@
 [alias]
     # credit: http://www.jukie.net/bart/blog/pimping-out-git-log
     lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+
+    # I often want to look at the most recent commit, just after I create it.
+    difflast = diff HEAD^ HEAD
+    
         # if someone has only the default settings, decent fallbacks are:
         #       git log --decorate --color
         #       git log --decorate --color --oneline
