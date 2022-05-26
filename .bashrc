@@ -188,6 +188,10 @@ type -p fasd >/dev/null && eval "$(fasd --init auto)"
 [ -e $HOME/.asdf/completions/asdf.bash ] && source $HOME/.asdf/completions/asdf.bash
 
 
+# pip3
+[ -e $HOME/.local/bin/ ] && export PATH="$PATH:$HOME/.local/bin/"
+
+
 # you don't want to use local::lib while in PerlBrew
 function local_lib_disable {
     unset PERL_LOCAL_LIB_ROOT
