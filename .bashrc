@@ -183,6 +183,11 @@ mkdir -p ~/apps/build/
 type -p fasd >/dev/null && eval "$(fasd --init auto)"
 
 
+# https://asdf-vm.com/
+[ -e $HOME/.asdf/asdf.sh ] && source $HOME/.asdf/asdf.sh
+[ -e $HOME/.asdf/completions/asdf.bash ] && source $HOME/.asdf/completions/asdf.bash
+
+
 # you don't want to use local::lib while in PerlBrew
 function local_lib_disable {
     unset PERL_LOCAL_LIB_ROOT
