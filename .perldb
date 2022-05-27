@@ -1,3 +1,12 @@
 # Always show the couple of lines around the current line, before every prompt.
 # https://perldoc.perl.org/perldebug#%7B-%5B-command-%5D
 DB::cmd_prepost('{{', 'v', undef);
+
+# Use color in the prompt. Warning: Uses monkey-patching!
+use Term::ANSIColor;
+my $orig_readline = \&DB::readline;							\
+*DB::readline = sub {										\
+	@DB::typeahead											\
+		? $orig_readline->(shift)							\
+		: $orig_readline->(colored(shift, 'on_blue'))		\
+}
