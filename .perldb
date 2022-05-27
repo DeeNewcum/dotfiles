@@ -1,0 +1,3 @@
+# Always show the couple of lines around the current line, before every prompt.
+# https://perldoc.perl.org/perldebug#%7B-%5B-command-%5D
+DB::cmd_prepost('{{', 'v', undef);
