@@ -9,7 +9,7 @@
 # 6 = new-hex
 # 7 = new-mode
 
-exec vimdiff -c "setlocal buftype=nofile bufhidden=hide noswapfile" -c "cmap q qall" -R "$2" "$5"
+exec vimdiff -c "setlocal buftype=nofile bufhidden=hide noswapfile" -R "$2" "$5"
 exit
 
 

@@ -245,6 +245,16 @@ if ! &diff
     " http://vim.wikia.com/wiki/Make_views_automatic
     autocmd BufWinLeave ?* mkview
     autocmd BufWinEnter ?* silent loadview
+else
+	" see for more -- https://stackoverflow.com/questions/3878692/how-to-create-an-alias-for-a-command-in-vim
+	fun! SetupCommandAlias(from, to)
+		exec 'cnoreabbrev <expr> '.a:from
+			  \ .' ((getcmdtype() is# ":" && getcmdline() is# "'.a:from.'")'
+			  \ .'? ("'.a:to.'") : ("'.a:from.'"))'
+	endfun
+
+	" remap :q to :qall, to allow the user to quit BOTH windows at once, within vimdiff
+	call SetupCommandAlias("q", "qall")
 endif
 
 
