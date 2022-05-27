@@ -9,6 +9,11 @@
 # 6 = new-hex
 # 7 = new-mode
 
+# Note -- Sometimes 'git diff' generates a long sequence of vimdiff calls. If
+#         you have looked at all the diffs you want to, halfway through, you can
+#         run :cq, which tells Vim to quit with a non-zero exit code. This
+#         non-zero exit code signals to 'git' to stop calling
+#         $GIT_EXTERNAL_DIFF.
 exec vimdiff -c "setlocal buftype=nofile bufhidden=hide noswapfile" -R "$2" "$5"
 exit
 
