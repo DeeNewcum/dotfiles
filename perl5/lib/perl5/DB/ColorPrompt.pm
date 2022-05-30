@@ -12,7 +12,7 @@ DB::ColorPrompt - Use ANSI colors to hilight your perl5db.pl prompt.
 
 In your F<~/.perldb> file, add this:
 
- use DB::ColorPrompt 'on_blue';
+ use DB::ColorPrompt 'black on_blue';
 
 Any L<Term::ANSIColor> color sequence works.
 
