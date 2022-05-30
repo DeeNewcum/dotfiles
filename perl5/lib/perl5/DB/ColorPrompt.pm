@@ -89,8 +89,15 @@ sub import {
 sub _colorvalid {
     my @codes = map { split } @_;
     for (@codes) {
-        unless (defined $Term::ANSIColor::ATTRIBUTES{lc $_}) {
-            return;
+        # %attributes became %ATTRIBUTES in Term::ANSIColor v2.0
+        if ($Term::ANSIColor::VERSION le '2.0') {
+            unless (defined $Term::ANSIColor::attributes{lc $_}) {
+                return;
+            }
+        } else {
+            unless (defined $Term::ANSIColor::ATTRIBUTES{lc $_}) {
+                return;
+            }
         }
     }
     return 1;
