@@ -7,7 +7,7 @@
 $] > 5.009 && DB::cmd_prepost('{{', 'v', undef);
 
 # Don't automatically display the normal lines, since 'v' is already doing it.
-*DB::print_lineinfo = sub { };
+$] > 5.009 && *DB::print_lineinfo = sub { };
 
 # Use color in the prompt.
 use DB::ColorPrompt 'on_blue';
