@@ -36,7 +36,7 @@ use strict;
 use warnings;
 
 use Carp;                       # core Perl, as of Perl 5.000
-use Term::ANSIColor 2.02 ();    # core Perl, as of Perl 5.6.0
+use Term::ANSIColor ();         # core Perl, as of Perl 5.6.0
 
 our $main_color;        # the color we use when there's no typeahead
 our $typeahead_color;   # the color we use when there is typeahead
@@ -48,7 +48,7 @@ sub import {
 
     if (@_) {
         $main_color = shift;
-        if (!Term::ANSIColor::colorvalid($main_color)) {
+        if (!_colorvalid($main_color)) {
             carp "'$main_color' isn't a valid color attribute per Term::ANSIColor";
             # Normally perl5db.pl fastidiously avoids exiting. Tell it to stop
             # doing that and actually let us exit.
@@ -58,7 +58,7 @@ sub import {
 
         if (@_) {
             $typeahead_color = shift;
-            if (!Term::ANSIColor::colorvalid($typeahead_color)) {
+            if (!_colorvalid($typeahead_color)) {
                 carp "'$typeahead_color' isn't a valid color attribute per Term::ANSIColor";
                 # Normally perl5db.pl fastidiously avoids exiting. Tell it to
                 # stop doing that and actually let us exit.
@@ -77,11 +77,27 @@ sub import {
 
     # monkey-patch the DB::readline() function
     no warnings 'redefine';
-    *DB::readline = \&DB::ColorPrompt::readline;
+    *DB::readline = \&DB::ColorPrompt::_readline;
 }
 
 
-sub readline {
+# Copied from Term::ANSIColor v2.2+.
+#
+# Unfortunately, Term::ANSIColor v2.2 wasn't introduced until Perl 5.11.0, which
+# was released in Oct 2009. I would really like our module to be easily
+# compatible with previous Perls.
+sub _colorvalid {
+    my @codes = map { split } @_;
+    for (@codes) {
+        unless (defined $Term::ANSIColor::ATTRIBUTES{lc $_}) {
+            return;
+        }
+    }
+    return 1;
+}
+
+
+sub _readline {
     my ($prompt) = @_;
 
     # Usually there's a space at the end of the prompt. If it's there, then
