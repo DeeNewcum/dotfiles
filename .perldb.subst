@@ -1,3 +1,6 @@
+# An example of how to stuff basic debug commands into the type-ahead buffer.
+#sub afterinit { push @DB::typeahead, "b 4", "b 6"; }
+
 # Always show the couple of lines around the current line, before every prompt.
 # https://perldoc.perl.org/perldebug#%7B-%5B-command-%5D
 # (unfortunately this wasn't availble prior to Perl v5.9.0)
