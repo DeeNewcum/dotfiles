@@ -87,6 +87,9 @@ sub import {
 # was released in Oct 2009. I would really like our module to be easily
 # compatible with previous Perls.
 sub _colorvalid {
+    if ($Term::ANSIColor::VERSION ge '3.0') {
+        return Term::ANSIColor::colorvalid(@_);
+    }
     my @codes = map { split } @_;
     for (@codes) {
         # %attributes became %ATTRIBUTES in Term::ANSIColor v2.0
