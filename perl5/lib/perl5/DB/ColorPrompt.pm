@@ -107,6 +107,7 @@ sub _colorvalid {
 }
 
 
+# a wrapper around DB::readline()
 sub _readline {
     my ($prompt) = @_;
 
