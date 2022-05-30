@@ -4,10 +4,10 @@
 # Always show the couple of lines around the current line, before every prompt.
 # https://perldoc.perl.org/perldebug#%7B-%5B-command-%5D
 # (unfortunately this wasn't availble prior to Perl v5.9.0)
-$] > 5.009 && DB::cmd_prepost('{{', 'v', undef);
+$] > 5.009 and DB::cmd_prepost('{{', 'v', undef);
 
 # Don't automatically display the normal lines, since 'v' is already doing it.
-$] > 5.009 && *DB::print_lineinfo = sub { };
+$] > 5.009 and *DB::print_lineinfo = sub { };
 
 # Use color in the prompt.
 use DB::ColorPrompt 'on_blue';
