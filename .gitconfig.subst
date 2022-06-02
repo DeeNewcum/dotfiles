@@ -40,3 +40,9 @@
         #       git log --decorate --color
         #       git log --decorate --color --oneline
     yolo = !git add --all . && git commit --amend --reuse-message=HEAD --no-verify --allow-empty && git push --force
+
+	# In Git v2.0, `git add --all` changed to include any changes in the entire working tree.
+	# In the lead-up to v2.0, Git started complaining if you used --all without specifying which you
+	# wanted -- the whole working tree, or just under the current directory.
+	# Use this alias if you want to force pre-2.0 Git to include the whole working tree. 
+	a = add --all :/
