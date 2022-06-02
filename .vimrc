@@ -104,7 +104,6 @@ endif
 " endif
 
 nnoremap <leader>s :setl spell!<CR>|            " toggle spell-check
-nnoremap <leader>w :setl wrap!<CR>|             " toggle line-wrap
 nnoremap <leader>x :exec getreg('*')<CR>        " take what's in the buffer, and execute it as VimScript
 
 " we don't enable spell-checking here...  rather, it gets enabled on a per-filetype basis
@@ -255,6 +254,16 @@ else
 
 	" remap :q to :qall, to allow the user to quit BOTH windows at once, within vimdiff
 	call SetupCommandAlias("q", "qall")
+
+	" allow the user to toggle back and forth between ignoring whitespace and not
+	function! IwhiteToggle()
+		if &diffopt =~ 'iwhite'
+			set diffopt-=iwhite
+		else
+			set diffopt+=iwhite
+		endif
+	endfunction
+	nnoremap <leader>w :call IwhiteToggle()<CR>
 endif
 
 
