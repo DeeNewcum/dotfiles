@@ -71,9 +71,21 @@ sub _print_warnings {
 	# detect this, and avoid printing on other kinds of documents (which could
 	# corrupt file downloads, for example)
 
-	# TODO: In some situations (particularly early syntax errors), the HTTP
-	# response header won't have been output yet. We should also auto-detect
-	# this and output our own HTTP response header in that case.
+	# TODO: What do we do about encoding? Is there a way to auto-detect what
+	# kind of encoding was specified? Or should we just use
+	# Unicode::Diacritic::Strip (to strip diacritics) and/or Text::Unidecode (to
+	# output string-representations of non-ASCII Unicode characters)?
+
+	# In some situations, the HTTP response header won't have been output yet.
+	# Try to auto-detect this.
+	my $bytes_written = tell(STDOUT);
+	if (!defined($bytes_written) || $bytes_written <= 0) {
+		# The HTTP response header *probably* hasn't been output yet, so output
+		# one of our own.
+		# (though see https://perldoc.perl.org/functions/tell for caveats)
+		print STDOUT "Status: 500\n";
+		print STDOUT "Content-type: text/html\n\n";
+	}
 
 	# print the warning-header
 	print <<'EOF';
