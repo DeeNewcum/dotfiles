@@ -70,11 +70,13 @@ sub _print_warnings {
 	# TODO: Hopefully we have output a text/html document. Is there a way to
 	# detect this, and avoid printing on other kinds of documents (which could
 	# corrupt file downloads, for example)
+	#		see -- Tie::StdHandle or Tie::Handle::Base
 
 	# TODO: What do we do about encoding? Is there a way to auto-detect what
 	# kind of encoding was specified? Or should we just use
 	# Unicode::Diacritic::Strip (to strip diacritics) and/or Text::Unidecode (to
 	# output string-representations of non-ASCII Unicode characters)?
+	#		see -- Tie::StdHandle or Tie::Handle::Base
 
 	# In some situations, the HTTP response header won't have been output yet.
 	# Try to auto-detect this.
