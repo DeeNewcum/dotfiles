@@ -1,0 +1,102 @@
+package CGI::Carp::warningsToBrowser;
+
+our $VERSION = 0.01;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+CGI::Carp::warningsToBrowser — A version of L<CGI::Carp>'s warningsToBrowser()
+that displays the warnings loudly and boldy
+
+=head1 SYNOPSIS
+
+Put this at the very top of your CGI script:
+
+ use CGI::Carp::warningsToBrowser;
+
+Warnings will now be displayed right up top, rather than hidden in HTML comments
+like L<CGI::Carp>'s version.  This is intended mainly for dev and test
+environments, not for prod. It's a good idea to use L<if>:
+
+ use if $IS_DEV, 'GI::Carp::warningsToBrowser';
+
+=head1 AUTHOR
+
+Dee Newcum <deenewcum@cpan.org>
+
+=head1 CONTRIBUTING
+
+Please use Github's issue tracker to file both bugs and feature requests.
+Contributions to the project in form of Github's pull requests are welcome.
+
+=head1 LICENSE
+
+This library is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+
+use HTML::Entities ();
+
+our @WARNINGS;
+
+sub import {
+	# if we're under the debugger, don't interfere with the warnings
+	return if (exists $INC{'perl5db.pl'} && $DB::{single});
+	# if we're under perl -c, don't interfere with the warnings
+	return if ($^C);
+	$main::SIG{__WARN__} = \&_handle_warn;
+}
+
+
+sub _handle_warn {
+	push @WARNINGS, shift;
+}
+
+
+END {
+	_print_warnings();
+}
+
+
+sub _print_warnings {
+	return unless (@WARNINGS);
+	# TODO: Hopefully we have output a text/html document. Is there a way to
+	# detect this, and avoid printing on other kinds of documents (which could
+	# corrupt file downloads, for example)
+
+	# TODO: In some situations (particularly early syntax errors), the HTTP
+	# response header won't have been output yet. We should also auto-detect
+	# this and output our own HTTP response header in that case.
+
+	# print the warning-header
+	print <<'EOF';
+	<div id="CGI::Carp::warningsToBrowser" style="background-color:#faa; border:1px solid #000; padding:0.3em; margin-bottom:1em">
+	<b>Perl warnings</b>
+	<pre style="font-size:85%">
+EOF
+	foreach my $warning (@WARNINGS) {
+		print HTML::Entities::encode_entities($warning);
+	}
+
+	# print the warning-footer
+	print <<'EOF';
+</pre></div>
+<!-- move the warnings box to the very top of the document -->
+<script type="text/javascript">
+	var warningsToBrowser_pre = document.getElementById('CGI::Carp::warningsToBrowser');
+	if (warningsToBrowser_pre) {
+		warningsToBrowser_pre.remove();
+		document.body.prepend(warningsToBrowser_pre);
+	}
+</script>
+EOF
+}
+
+1;
