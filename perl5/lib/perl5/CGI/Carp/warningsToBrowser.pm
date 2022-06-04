@@ -4,24 +4,32 @@ our $VERSION = 0.01;
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
-CGI::Carp::warningsToBrowser — A version of L<CGI::Carp>'s warningsToBrowser()
+CGI::Carp::warningsToBrowser - A version of L<CGI::Carp>'s warningsToBrowser()
 that displays the warnings loudly and boldy
 
 =head1 SYNOPSIS
 
-Put this at the very top of your CGI script:
+Put this at the top of your CGI script (the earlier the better, otherwise some
+warnings won't be captured):
 
  use CGI::Carp::warningsToBrowser;
 
-Warnings will now be displayed right up top, rather than hidden in HTML comments
-like L<CGI::Carp>'s version.  This is intended mainly for dev and test
-environments, not for prod. It's a good idea to use L<if>:
+Warnings will now be displayed at the very top of the web page, rather than
+hidden in HTML comments like L<CGI::Carp>'s version.  This is intended mainly
+for dev and test environments, not for prod, so it's a good idea to use L<if>:
 
- use if $IS_DEV, 'CGI::Carp::warningsToBrowser';
+ use if $is_dev, 'CGI::Carp::warningsToBrowser';
+
+The author feels that it's important to expose warnings early in the software
+development lifecycle, as part of the "L<shift
+left|https://devopedia.org/shift-left>" effort.
+
+=head1 ERRORS
+
+This module does not handle fatal errors. The author feels that L<CGI::Carp>
+does an adequate job at accomplishing that task.
 
 =head1 AUTHOR
 
@@ -102,7 +110,7 @@ EOF
     # print the warning-footer
     print <<'EOF';
 </pre></div>
-<!-- move the warnings box to the very top of the document -->
+<!-- move the warnings <div> to the very top of the document -->
 <script type="text/javascript">
     var warningsToBrowser_pre = document.getElementById('CGI::Carp::warningsToBrowser');
     if (warningsToBrowser_pre) {
