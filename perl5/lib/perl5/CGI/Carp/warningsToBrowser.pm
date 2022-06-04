@@ -21,7 +21,7 @@ Warnings will now be displayed right up top, rather than hidden in HTML comments
 like L<CGI::Carp>'s version.  This is intended mainly for dev and test
 environments, not for prod. It's a good idea to use L<if>:
 
- use if $IS_DEV, 'GI::Carp::warningsToBrowser';
+ use if $IS_DEV, 'CGI::Carp::warningsToBrowser';
 
 =head1 AUTHOR
 
