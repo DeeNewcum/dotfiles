@@ -1,4 +1,4 @@
-package CGI::Carp::warningsToBrowser;
+package CGI::Carp::WarningsToBrowser;
 
 our $VERSION = 0.01;
 
@@ -6,7 +6,7 @@ our $VERSION = 0.01;
 
 =head1 NAME
 
-CGI::Carp::warningsToBrowser - A version of L<CGI::Carp>'s warningsToBrowser()
+CGI::Carp::WarningsToBrowser - A version of L<CGI::Carp>'s warningsToBrowser()
 that displays the warnings loudly and boldy
 
 =head1 SYNOPSIS
@@ -14,13 +14,13 @@ that displays the warnings loudly and boldy
 Put this at the top of your CGI script (the earlier the better, otherwise some
 warnings won't be captured):
 
- use CGI::Carp::warningsToBrowser;
+ use CGI::Carp::WarningsToBrowser;
 
 Warnings will now be displayed at the very top of the web page, rather than
 hidden in HTML comments like L<CGI::Carp>'s version.  This is intended mainly
 for dev and test environments, not for prod, so it's a good idea to use L<if>:
 
- use if $is_dev, 'CGI::Carp::warningsToBrowser';
+ use if $is_dev, 'CGI::Carp::WarningsToBrowser';
 
 The author feels that it's important to expose warnings early in the software
 development lifecycle, as part of the "L<shift
@@ -99,7 +99,7 @@ sub _print_warnings {
 
     # print the warning-header
     print <<'EOF';
-    <div id="CGI::Carp::warningsToBrowser" style="background-color:#faa; border:1px solid #000; padding:0.3em; margin-bottom:1em">
+    <div id="CGI::Carp::WarningsToBrowser" style="background-color:#faa; border:1px solid #000; padding:0.3em; margin-bottom:1em">
     <b>Perl warnings</b>
     <pre style="font-size:85%">
 EOF
@@ -112,7 +112,7 @@ EOF
 </pre></div>
 <!-- move the warnings <div> to the very top of the document -->
 <script type="text/javascript">
-    var warningsToBrowser_pre = document.getElementById('CGI::Carp::warningsToBrowser');
+    var warningsToBrowser_pre = document.getElementById('CGI::Carp::WarningsToBrowser');
     if (warningsToBrowser_pre) {
         warningsToBrowser_pre.remove();
         document.body.prepend(warningsToBrowser_pre);
