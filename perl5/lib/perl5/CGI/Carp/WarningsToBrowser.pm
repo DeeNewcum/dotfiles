@@ -7,7 +7,7 @@ our $VERSION = 0.01;
 =head1 NAME
 
 CGI::Carp::WarningsToBrowser - A version of L<CGI::Carp>'s warningsToBrowser()
-that displays the warnings loudly and boldy
+that displays the warnings loudly and boldly
 
 =head1 SYNOPSIS
 
