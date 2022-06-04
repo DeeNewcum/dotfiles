@@ -47,68 +47,68 @@ use HTML::Entities ();
 our @WARNINGS;
 
 sub import {
-	# if we're under the debugger, don't interfere with the warnings
-	return if (exists $INC{'perl5db.pl'} && $DB::{single});
-	# if we're under perl -c, don't interfere with the warnings
-	return if ($^C);
-	$main::SIG{__WARN__} = \&_handle_warn;
+    # if we're under the debugger, don't interfere with the warnings
+    return if (exists $INC{'perl5db.pl'} && $DB::{single});
+    # if we're under perl -c, don't interfere with the warnings
+    return if ($^C);
+    $main::SIG{__WARN__} = \&_handle_warn;
 }
 
 
 sub _handle_warn {
-	push @WARNINGS, shift;
+    push @WARNINGS, shift;
 }
 
 
 END {
-	_print_warnings();
+    _print_warnings();
 }
 
 
 sub _print_warnings {
-	return unless (@WARNINGS);
-	# TODO: Hopefully we have output a text/html document. Is there a way to
-	# detect this, and avoid printing on other kinds of documents (which could
-	# corrupt file downloads, for example)
-	#		see -- Tie::StdHandle or Tie::Handle::Base
+    return unless (@WARNINGS);
+    # TODO: Hopefully we have output a text/html document. Is there a way to
+    # detect this, and avoid printing on other kinds of documents (which could
+    # corrupt file downloads, for example)
+    #       see -- Tie::StdHandle or Tie::Handle::Base
 
-	# TODO: What do we do about encoding? Is there a way to auto-detect what
-	# kind of encoding was specified? Or should we just use
-	# Unicode::Diacritic::Strip (to strip diacritics) and/or Text::Unidecode (to
-	# output string-representations of non-ASCII Unicode characters)?
-	#		see -- Tie::StdHandle or Tie::Handle::Base
+    # TODO: What do we do about encoding? Is there a way to auto-detect what
+    # kind of encoding was specified? Or should we just use
+    # Unicode::Diacritic::Strip (to strip diacritics) and/or Text::Unidecode (to
+    # output string-representations of non-ASCII Unicode characters)?
+    #       see -- Tie::StdHandle or Tie::Handle::Base
 
-	# In some situations, the HTTP response header won't have been output yet.
-	# Try to auto-detect this.
-	my $bytes_written = tell(STDOUT);
-	if (!defined($bytes_written) || $bytes_written <= 0) {
-		# The HTTP response header *probably* hasn't been output yet, so output
-		# one of our own.
-		# (though see https://perldoc.perl.org/functions/tell for caveats)
-		print STDOUT "Status: 500\n";
-		print STDOUT "Content-type: text/html\n\n";
-	}
+    # In some situations, the HTTP response header won't have been output yet.
+    # Try to auto-detect this.
+    my $bytes_written = tell(STDOUT);
+    if (!defined($bytes_written) || $bytes_written <= 0) {
+        # The HTTP response header *probably* hasn't been output yet, so output
+        # one of our own.
+        # (though see https://perldoc.perl.org/functions/tell for caveats)
+        print STDOUT "Status: 500\n";
+        print STDOUT "Content-type: text/html\n\n";
+    }
 
-	# print the warning-header
-	print <<'EOF';
-	<div id="CGI::Carp::warningsToBrowser" style="background-color:#faa; border:1px solid #000; padding:0.3em; margin-bottom:1em">
-	<b>Perl warnings</b>
-	<pre style="font-size:85%">
+    # print the warning-header
+    print <<'EOF';
+    <div id="CGI::Carp::warningsToBrowser" style="background-color:#faa; border:1px solid #000; padding:0.3em; margin-bottom:1em">
+    <b>Perl warnings</b>
+    <pre style="font-size:85%">
 EOF
-	foreach my $warning (@WARNINGS) {
-		print HTML::Entities::encode_entities($warning);
-	}
+    foreach my $warning (@WARNINGS) {
+        print HTML::Entities::encode_entities($warning);
+    }
 
-	# print the warning-footer
-	print <<'EOF';
+    # print the warning-footer
+    print <<'EOF';
 </pre></div>
 <!-- move the warnings box to the very top of the document -->
 <script type="text/javascript">
-	var warningsToBrowser_pre = document.getElementById('CGI::Carp::warningsToBrowser');
-	if (warningsToBrowser_pre) {
-		warningsToBrowser_pre.remove();
-		document.body.prepend(warningsToBrowser_pre);
-	}
+    var warningsToBrowser_pre = document.getElementById('CGI::Carp::warningsToBrowser');
+    if (warningsToBrowser_pre) {
+        warningsToBrowser_pre.remove();
+        document.body.prepend(warningsToBrowser_pre);
+    }
 </script>
 EOF
 }
