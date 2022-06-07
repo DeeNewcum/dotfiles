@@ -262,3 +262,6 @@ if [ "$(uname -o)" = "Cygwin" ]; then
     }
 fi
 
+
+# `perl -d` won't work properly unless this file has the right permissions
+[ -e ~/.perldb ] && chmod go-w ~/.perldb
