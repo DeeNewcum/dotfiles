@@ -6,13 +6,15 @@
 # (unfortunately this wasn't availble prior to Perl v5.9.0)
 $] > 5.009 and DB::cmd_prepost('{{', 'v', undef);
 
-# Ideally, we could suppress the extraneous display of the current line of code,
-# since we're already displaying it above via cmd_prepost(). Unfortunately,
 # print_lineinfo() displays TWO pieces of information: 1) the current
 # file/line-number, and 2) the CODE located at the current file/line-number.
-# It might be nice to figure out how to suppress #2 but keep #1, because we tend
-# to get pretty lost without #1.
-#$] > 5.009 and *DB::print_lineinfo = sub { };
+# Suppress #2 (because it's already displayed using cmd_prepost()), but keep #1.
+$] > 5.009
+and *DB::print_lineinfo = sub {
+    local $_ = join("", @_);
+    s/\):.*/):/s;
+    print "$_\n";
+};
 
 # Use color in the prompt.
 use DB::ColorPrompt 'on_blue';
