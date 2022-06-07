@@ -152,6 +152,7 @@ sub output {
 
 
 # tries to 'use' the specified module; returns true/false, whether the module was loaded
+#   #>> maybe replace this with the popular and well-tested Module::Runtime?
 sub can_use {eval "use $_[0];"; !$@}
 
 # check if the given function exists  (and, if so, it returns a pointer to it)
