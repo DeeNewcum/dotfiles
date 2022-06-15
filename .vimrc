@@ -49,6 +49,19 @@ if &diff
         setlocal nolist
         silent! setlocal colorcolumn=
     endfunction
+
+    " several settings that make it MUCH easier to keep track of things while
+    " using a horizontal split within vimdiff       (accomplished by pressing Ctrl-W J)
+    set cursorline      " hilight the current line
+    set scrollbind      " both windows scroll together
+    set cursorbind      " both cursors move together
+
+    " OH GOD, hack hack. This causes every press on the up or down arrows to
+    " switch back and forth between the windows once, which updates the cursor
+    " position on the other window.
+    " See here for more -- https://stackoverflow.com/questions/5227964/
+    nnoremap j j:let curwin=winnr()<CR>:keepjumps windo redraw<CR>:execute curwin . "wincmd w"<CR>
+    nnoremap k k:let curwin=winnr()<CR>:keepjumps windo redraw<CR>:execute curwin . "wincmd w"<CR>
 else
     syntax enable
     if &t_Co == 256 || has('gui_running')
