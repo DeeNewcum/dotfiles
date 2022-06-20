@@ -54,7 +54,9 @@ if &diff
     " using a horizontal split within vimdiff       (accomplished by pressing Ctrl-W J)
     set cursorline      " hilight the current line
     set scrollbind      " both windows scroll together
-    set cursorbind      " both cursors move together
+    if exists('+cursorbind')
+        set cursorbind      " both cursors move together
+    endif
 
     " OH GOD, hack hack. This causes every press on the up or down arrows to
     " switch back and forth between the windows once, which updates the cursor
