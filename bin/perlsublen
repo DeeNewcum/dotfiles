@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+# Show subroutines that have a very large number of lines of code.
+#
+# see also -- https://softwareengineering.stackexchange.com/questions/27798/
+#
+# (some of the code I work on has VERY VERY long subroutines)
+
+use strict;
+use warnings;
+
+use Perl::Metrics::Simple;	# it counts all "non-blank, non-comment, non-pod lines"
+
+@ARGV or die "Please specify a Perl filename to find the SLOC of.\n";
+
+my $analyzer = Perl::Metrics::Simple->new;
+
+my @filenames = grep {file_magic($_) =~ /\bperl5?\b/i} @ARGV;
+
+foreach my $filename (@filenames) {
+	#if (@filenames > 1) {
+		print "================ $filename ================\n";
+	#}
+
+	my $analysis = $analyzer->analyze_files($filename);
+
+	my @subs = @{$analysis->subs()};
+	foreach my $sub (@subs) {
+		$sub->{name} = "$sub->{name}()";
+	}
+	
+	my $main = $analysis->main_stats();
+	$main->{name} = "(outside of any sub)";
+	push(@subs, $main);
+
+	@subs = sort {$a->{lines} <=> $b->{lines}} @subs;
+
+	foreach my $sub (@subs) {
+		print "$sub->{name} -- $sub->{lines} SLOC\n";
+	}
+
+	print "total -- ", $analysis->lines(), " SLOC\n";
+	print "average -- ", int($analysis->lines() / scalar(@subs)), " SLOC\n";
+}
+
+
+# Given a filename, returns that file's type.
+# see https://linux.die.net/man/1/file
+# see https://linux.die.net/man/5/magic
+sub file_magic {
+	my ($filename) = @_;
+
+	# avoid letting 'file' send stuff to STDERR
+	if (!-f $filename || !-r $filename) {
+		#warn "'$filename' not a file or not readable.\n";
+		return '';
+	}
+
+	open my $fh, '-|', 'file', '-bL', $filename
+			or die "Unable to run 'file': $!\n";
+	my $type = <$fh>;
+	close $fh;
+	chomp $type;
+	return $type;
+}
