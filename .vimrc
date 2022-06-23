@@ -102,6 +102,8 @@ else
             "       TODO: research ways to avoid this side-effect
             "             or, failing that, use a different method to hilight the 'textwidth'
             "             point:    http://vim.wikia.com/wiki/Highlight_long_lines
+    else
+        match ErrorMsg "\%>79v.\+"      " before Vim 7.3, we have to do something different
     endif
 endif
 
