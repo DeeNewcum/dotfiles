@@ -46,3 +46,6 @@
 	# wanted -- the whole working tree, or just under the current directory.
 	# Use this alias if you want to force pre-2.0 Git to include the whole working tree. 
 	a = add --all :/
+
+	# a "quick status", which is sometimes necessary for massive repos
+	qstatus = status --untracked-files=no

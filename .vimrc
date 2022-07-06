@@ -94,7 +94,7 @@ else
     " hilight tabs that are used for alignment -- we only want to use them for indenting
     "match ErrorMsg /\(	\|^\)\@<!	\+/
 
-    if exists("&colorcolumn")
+    if exists('+colorcolumn')
         set colorcolumn=+1        " highlight column after 'textwidth'
             " NOTE: colorcolumn has a negative side-effect:  when you copy-n-paste things
             "       using the terminal-emulator's functionality (instead of Vim's internal features)
