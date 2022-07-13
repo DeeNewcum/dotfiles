@@ -278,6 +278,7 @@ else
 			set diffopt-=iwhite
 		else
 			set diffopt+=iwhite
+			set diffexpr=""
 		endif
 	endfunction
 	nnoremap <leader>w :call IwhiteToggle()<CR>
