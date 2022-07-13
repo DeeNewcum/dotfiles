@@ -243,3 +243,9 @@ function _wget() { wget -r -nH -np --cut-dirs=$(echo "$1" | perl -ne 'print -3 +
 alias speaker-test2='echo /usr/share/sounds/alsa/Front_* | xargs -n 1 paplay -v'
 
 alias XMODMAP='xmodmap ~/.Xmodmap'          # workaround since I haven't figured out how to convert xmodmap => XKB      (see comments in ~/.Xmodmap for more)
+
+
+function tabcheck() {
+	echo "Files under the curdir that contain tabs include:"
+	find -type f | perl -nle 'if (readpipe("file --brief $_") =~ /^perl/i) {system("grep", "-q", "\\t", $_) and print}'
+}
