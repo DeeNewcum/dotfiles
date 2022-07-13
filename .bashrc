@@ -244,7 +244,8 @@ if [ "$(uname -o)" = "Cygwin" ]; then
         return 0
     }
     
-    Cygwin_auto_set_DISPLAY
+	# warning -- enabling this can add a lot of delay
+    #Cygwin_auto_set_DISPLAY
 
     # also, if 'gitk' is installed, provide a wrapper that recommends starting the XWin Server if
     # it hasn't been started yet
