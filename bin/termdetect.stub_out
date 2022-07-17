@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# a way to "stub out" termdetect:
+#   
+#   rm ~/bin/termdetect
+#   cp ~/bin/termdetect.stub_out ~/bin/termdetect
+
+if [ -z "$TERM" ]; then
+    echo "vt100"
+else
+    echo "$TERM"
+fi
