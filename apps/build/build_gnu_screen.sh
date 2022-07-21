@@ -6,7 +6,7 @@
 
 set -x
 
-[ -e Makefile ] && make clean       # in case we're re-running this script
+[ -e Makefile ] && make realclean       # in case we're re-running this script
 
 ./autogen.sh                                    || exit
 ./configure --prefix=$HOME/apps/screen/         || exit
