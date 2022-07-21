@@ -9,6 +9,6 @@ These are similar to, but not literally the same as:
 
 These scripts will download and compile various things from source for me, and configure them the way I want.
 
-They ultimately dump the binaries in ~/apps/stow/.
+Some of them ultimately dump their binaries into ~/apps/stow/.
 
 These scripts may eventually become more like proper ebuild/pkgbuild scripts, but for now, they're fairly immature and hard-coded.
