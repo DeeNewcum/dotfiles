@@ -6,9 +6,8 @@
 
 
 # Allow this file to be 'source'd directly, without first setting $STDIN_OWNERS_HOME.
-# (or even just symlink it to /root/.bashrc!)
 if [ -z "$STDIN_OWNERS_HOME" ]; then
-    export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' "$(tty)")
+    export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' "${BASH_SOURCE[0]}")
 fi
 
 
