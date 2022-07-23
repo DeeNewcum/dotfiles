@@ -3,6 +3,9 @@
 #       # ========  load the original user's ~/.sudo_bashrc  ========
 #       export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' "$(tty)")
 #       [ -f "$STDIN_OWNERS_HOME"/.sudo_bashrc ] && source "$STDIN_OWNERS_HOME"/.sudo_bashrc
+#
+# TODO -- ls -l $(tty) -- No longer shows that the tty's owner is the original user, before they
+#         sudo'd. So the above cmdline no longer works. Fix it.
 
 
 # Allow this file to be 'source'd directly, without first setting $STDIN_OWNERS_HOME.
