@@ -246,6 +246,7 @@ alias XMODMAP='xmodmap ~/.Xmodmap'          # workaround since I haven't figured
 
 
 function tabcheck() {
-	echo "Files under the curdir that contain tabs include:"
-	find -type f | perl -nle 'if (readpipe("file --brief $_") =~ /^perl(?! Storable)/i) {system("grep", "-q", "\t", $_) or print}'
+    echo "Files under the curdir that contain tabs include:"
+    find -type f -name .git -prune \
+        | perl -nle 'if (readpipe("file --brief $_") =~ /^perl(?! Storable)/i) {system("grep", "-q", "\t", $_) or print}'
 }
