@@ -55,6 +55,11 @@ if (! -t STDOUT) {
     $shell_capture = *STDOUT;
 }
 
+# Ensure that 'unzip' has been installed, because without it we're SOL.
+readpipe('which unzip');
+if ($? >> 8) {
+    die "'unzip' hasn't been installed yet.\n";
+}
 
 # create a tempdir off of the current directory, where we'll do our work
 my $tempdir = tempdir(DIR => '.');
@@ -66,7 +71,7 @@ our $final_directory;
 
 # if we die, cleanup after ourselves
 END {
-    if (!$final_directory || $final_directory ne $full_tempdir) {
+    if ($tempdir && (!$final_directory || $final_directory ne $full_tempdir)) {
                     # ^^ don't nuke the directory if it's the one we want to show the user
         chdir $start_dir;
         system 'rm', '-rf', '--', $tempdir;
