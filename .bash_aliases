@@ -251,9 +251,9 @@ function tabcheck() {
         | perl -nle 'if (readpipe("file --brief $_") =~ /^perl(?! Storable)/i) {system("grep", "-q", "\t", $_) or print}'
 }
 
-# Scans all Perl files underneath the current directory, and provide SLOC and a bunch of other metrics.
+# Scans all Perl files underneath the current directory, and provides SLOCs and other metrics.
 function _countperl() {
-	# first make sure Perl::Metrics::Simple has been installed
-	perl -MPerl::Metrics::Simple -e0 \
-		&& find -type f | xargs countperl | less --quit-if-one-screen
+    # first make sure Perl::Metrics::Simple has been installed
+    perl -MPerl::Metrics::Simple -e0 \
+        && find -type f | xargs countperl | less --quit-if-one-screen
 }
