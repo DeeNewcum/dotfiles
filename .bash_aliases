@@ -263,13 +263,15 @@ function _countperl() {
 # allow cd-ing to files
 # (what could go wrong?!?)
 function cd() {
-	if [ $# -eq 0 ]; then
-		command cd
-	elif [ "$1" = "-" ]; then
-		command cd -
+    if [ $# -eq 0 ]; then
+        command cd
+    elif [ "$1" = "-" ]; then
+        command cd -
     elif [ -d "$1" ]; then
-		command cd "$1"
-	else
-		command cd "$(dirname $1)"
-	fi
+        command cd "$1"
+    else
+        # quoting inside of $(command substitution) is surprisingly subtle,
+        # see -- https://unix.stackexchange.com/a/118438/52831
+        command cd "$(dirname -- "$1")"
+    fi
 }
