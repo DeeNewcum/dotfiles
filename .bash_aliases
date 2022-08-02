@@ -257,3 +257,19 @@ function _countperl() {
     perl -MPerl::Metrics::Simple -e0 \
         && find -type f | xargs countperl | less --quit-if-one-screen
 }
+
+
+
+# allow cd-ing to files
+# (what could go wrong?!?)
+function cd() {
+	if [ $# -eq 0 ]; then
+		command cd
+	elif [ "$1" = "-" ]; then
+		command cd -
+    elif [ -d "$1" ]; then
+		command cd "$1"
+	else
+		command cd "$(dirname $1)"
+	fi
+}
