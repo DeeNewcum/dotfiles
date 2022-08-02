@@ -275,3 +275,9 @@ function cd() {
         command cd "$(dirname -- "$1")"
     fi
 }
+
+# Show the whole string of parent processes, starting from the current process, going all the way
+# back to init.
+function parents() {
+    ps -fq "$(pstree -lps $$ | perl -0400 -ple 's/\D+/ /g; s/^\s+|\s+$//g')"
+}
