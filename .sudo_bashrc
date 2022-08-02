@@ -12,11 +12,25 @@ if [ -z "$STDIN_OWNERS_HOME" ]; then
     export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' "$THIS_SCRIPT")
 
     if [ -z "$STDIN_OWNERS_HOME" ]; then
-        # This stopped working in newer Ubuntus -- For some reason, the user's TTY is now owned by root at this point,
-        # not the original user.
         export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' "$(tty)")
 
-        # TODO -- is there some other backup command we can try?
+        # Ubuntu now includes "Defaults use_pty" in its /etc/sudoers file.
+        # This results in the $(tty) changing across the sudo boundary, and this makes it difficult
+        # to track down the original tty.
+        #
+        # the sudo(8) manpage reads:
+        #       If an I/O logging plugin is configured or if the security policy explicitly requests
+        #       it, a new pseudo-terminal (“pty”) is allocated and fork(2) is used to create a
+        #       second sudo process, referred to as the monitor. 
+        
+        # TODO: try walking up the process tree, sequentially finding the parent process, and
+        # checking to see what userid is associated with the process just before the sudo.
+        #
+        # https://stackoverflow.com/a/1525673/1042525
+        #
+        # try running one of these after sudoing:
+        #       pstree -apus $$
+        #       ps -fq "$(pstree -lps $$ | perl -0400 -ple 's/\D+/ /g; s/^\s+|\s+$//g')"
 
         [ -z "$STDIN_OWNERS_HOME" ] && echo "ERROR -- \$STDIN_OWNERS_HOME is unset."
     fi
