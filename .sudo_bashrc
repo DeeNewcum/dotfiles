@@ -5,14 +5,21 @@
 #       [ -f "$STDIN_OWNERS_HOME"/.sudo_bashrc ] && source "$STDIN_OWNERS_HOME"/.sudo_bashrc
 
 
-# Allow this file to be 'source'd directly, without first setting $STDIN_OWNERS_HOME.
-# (or even just symlink it to /root/.bashrc!)
 if [ -z "$STDIN_OWNERS_HOME" ]; then
+    # Allow ~/.sudo_bashrc to be 'source'd directly, without first setting $STDIN_OWNERS_HOME.
+    # (or even just symlink it to /root/.bashrc!)
     THIS_SCRIPT=$(readlink -f "${BASH_SOURCE[0]}")
     export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' "$THIS_SCRIPT")
 
     if [ -z "$STDIN_OWNERS_HOME" ]; then
+        # Check the TTY owner
         export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' "$(tty)")
+
+        # Given a PID (process ID), find that process's parent PID.
+        # Returns "0" when run on PID 1.
+        function parent_PID() {
+            awk '{print $4}' /proc/$1/stat
+        }
 
         # Ubuntu now includes "Defaults use_pty" in its /etc/sudoers file.
         # This results in the $(tty) changing across the sudo boundary, and this makes it difficult
@@ -22,15 +29,22 @@ if [ -z "$STDIN_OWNERS_HOME" ]; then
         #       If an I/O logging plugin is configured or if the security policy explicitly requests
         #       it, a new pseudo-terminal (“pty”) is allocated and fork(2) is used to create a
         #       second sudo process, referred to as the monitor. 
-        
-        # TODO: try walking up the process tree, sequentially finding the parent process, and
-        # checking to see what userid is associated with the process just before the sudo.
         #
-        # https://stackoverflow.com/a/1525673/1042525
-        #
-        # try running one of these after sudoing:
-        #       pstree -apus $$
-        #       ps -fq "$(pstree -lps $$ | perl -0400 -ple 's/\D+/ /g; s/^\s+|\s+$//g')"
+        # So walk up the process tree, sequentially finding the parent process, and look for what
+        # userid is associated with the process just before the sudo.
+        CURRENT_PID=$$
+        WILL_BE_JUST_AFTER_PROC=0
+        while [ $CURRENT_PID -gt 1 ]
+        do
+            PROC_NAME=$(awk '{print $2}' /proc/$CURRENT_PID/stat)
+            if [ "$PROC_NAME" = "(sudo)" ]; then
+                WILL_BE_JUST_AFTER_PROC=1
+            elif [ $WILL_BE_JUST_AFTER_PROC -gt 0 ]; then
+                export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' /proc/$CURRENT_PID)
+                break
+            fi
+            CURRENT_PID=$(parent_PID $CURRENT_PID)
+        done
 
         [ -z "$STDIN_OWNERS_HOME" ] && echo "ERROR -- \$STDIN_OWNERS_HOME is unset."
     fi
