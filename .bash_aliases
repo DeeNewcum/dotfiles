@@ -119,7 +119,8 @@ function x () {
 
 ####[ screen + tmux ]####
 # reattach to the screen named 'main'   (or create it if it doesn't exist)
-alias   srm='screen -U -dr main || screen -U -S main'
+alias   sr='screen -U -dr main || screen -U -S main'
+alias   srm=sr
 # reattach to the screen named 'main'   (or create it if it doesn't exist)
 alias   tmx='tmux attach -t main || tmux new -s main'
 
