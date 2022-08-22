@@ -11,9 +11,9 @@
 PROMPT_HOSTNAME='\h'
 [ -e ~/.short_hostname_override ] && PROMPT_HOSTNAME="$(cat ~/.short_hostname_override)"
 if is_under_gnu_screen; then
-	XTERM_TITLE=
+    XTERM_TITLE=
 else
-	XTERM_TITLE='\[\033]0;'$PROMPT_HOSTNAME'\007\]'
+    XTERM_TITLE='\[\033]0;'$PROMPT_HOSTNAME'\007\]'
 fi
 [ "$IS_VIRTUAL_CONSOLE" ] && XTERM_TITLE=''         # don't use the Xterm title when at the Linux Virtual Console
 PS1=$XTERM_TITLE'\[\033[01;32m\]\u@'$PROMPT_HOSTNAME'\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
@@ -139,9 +139,9 @@ look_for_cmd=0
 print_cmd() {
   if [ ${look_for_cmd} = 1 ] ;then
     if [ "${BASH_COMMAND}" != 'print_default' ] ;then
-	  if [ -z "$HISTTIMEFORMAT" ]; then
+      if [ -z "$HISTTIMEFORMAT" ]; then
         cmdline=$(history 1 | xargs | cut -d\  -f2-)
-	  else
+      else
         cmdline=$(history 1 | xargs | cut -d\  -f5-)
       fi
       if [[ "${cmdline}" =~ ^(sudo|ssh|vi|vim|man|more|less)\  ]] ;then
@@ -175,9 +175,9 @@ print_default() {
 
 # are we running underneath GNU Screen?
 if is_under_gnu_screen; then
-	PROMPT_COMMAND='print_default'
+    PROMPT_COMMAND='print_default'
 
-	trap "print_cmd" DEBUG
+    trap "print_cmd" DEBUG
 fi
 
 ###################################################
@@ -301,7 +301,7 @@ if [ "$(uname -o)" = "Cygwin" ]; then
         return 0
     }
     
-	# warning -- enabling this can add a lot of delay
+    # warning -- enabling this can add a lot of delay
     #Cygwin_auto_set_DISPLAY
 
     # also, if 'gitk' is installed, provide a wrapper that recommends starting the XWin Server if
