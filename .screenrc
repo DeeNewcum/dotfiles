@@ -1,7 +1,7 @@
 # Set up the last two lines to:
 #  1) show all the windows, and the time
 #  2) show the hardstatus that's updated every time I change directories
-caption always '%= %-Lw%{+b M}%n%f* %t%{-}%+LW %='
+caption always '%H %= %-Lw%{Wm}%n%f* %t%{-}%+LW %='
 hardstatus alwayslastline "%h"
 
 
