@@ -152,12 +152,6 @@ print_default() {
   look_for_cmd=1
 }
 
-# Sets $? to indicate whether we're currently running underneath GNU Screen.
-# Works even across 'sudo' boundaries, while checks for $STY or $WINDOW or such don't.
-function is_under_gnu_screen() {                                                                     
-    pstree -lps $$ | grep -P -q '\bscreen\b'                                                         
-}   
-
 # are we running underneath GNU Screen?
 if is_under_gnu_screen; then
 	PROMPT_COMMAND='print_default'

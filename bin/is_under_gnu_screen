@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+# Sets $? to indicate whether we're currently running under GNU Screen (on the current host, anyway; if you need to do
+# this across hosts, then use 'termdetect').
+
+use strict;
+use warnings;
+
+my $pid = $$;
+
+while ($pid > 0) {
+	my $info = get_proc_info($pid);
+
+	if ($info->{comm} eq '(screen)') {
+		exit 0;
+	}
+
+	$pid = $info->{ppid};
+}
+
+exit 1;
+
+
+sub get_proc_info {
+	my ($pid) = @_;
+
+	open my $fin, '<', "/proc/$pid/stat"
+		or die $!;
+	my %proc_info;
+	# see man proc(5)
+	# (this funky syntax is called a "assigning to a hash slice")
+	@proc_info{qw(pid comm state ppid pgrep session tty_nr)} = split ' ', <$fin>;
+	close $fin;
+
+	return \%proc_info;
+}
