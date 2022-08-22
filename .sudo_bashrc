@@ -82,11 +82,7 @@ git() {
 
 PROMPT_HOSTNAME='\h'
 [ -e $STDIN_OWNERS_HOME/.short_hostname_override ] && PROMPT_HOSTNAME="$(cat $STDIN_OWNERS_HOME/.short_hostname_override)"
-if is_under_gnu_screen; then
-	XTERM_TITLE=''
-else
-	XTERM_TITLE='\[\033]0;'$PROMPT_HOSTNAME'\007\]'
-fi
+XTERM_TITLE='\[\033]0;'$PROMPT_HOSTNAME'\007\]'
 [ "$IS_VIRTUAL_CONSOLE" ] && XTERM_TITLE=''         # don't use the Xterm title when at the Linux Virtual Console
 PS1=$XTERM_TITLE'\[\033[01;32m\]\u@'$PROMPT_HOSTNAME'\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
@@ -125,9 +121,9 @@ look_for_cmd=0
 print_cmd() {
   if [ ${look_for_cmd} = 1 ] ;then
     if [ "${BASH_COMMAND}" != 'print_default' ] ;then
-	  if [ -z "$HISTTIMEFORMAT" ]; then
+      if [ -z "$HISTTIMEFORMAT" ]; then
         cmdline=$(history 1 | xargs | cut -d\  -f2-)
-	  else
+      else
         cmdline=$(history 1 | xargs | cut -d\  -f5-)
       fi
       if [[ "${cmdline}" =~ ^(sudo|ssh|vi|vim|man|more|less)\  ]] ;then
@@ -151,7 +147,7 @@ print_cmd() {
   fi
 
   # show the current directory in the hardstatus
-  echo -en '\033]0;'$PWD'/\007'
+  #echo -en '\033]0;'$PWD'/\007'
 }
 
 print_default() {
@@ -161,7 +157,7 @@ print_default() {
 
 # are we running underneath GNU Screen?
 if is_under_gnu_screen; then
-	PROMPT_COMMAND='print_default'
+    PROMPT_COMMAND='print_default'
 
-	trap "print_cmd" DEBUG
+    trap "print_cmd" DEBUG
 fi
