@@ -284,8 +284,3 @@ function cd() {
 function parents() {
     ps -fq "$(pstree -lps $$ | perl -0400 -ple 's/\D+/ /g; s/^\s+|\s+$//g')"
 }
-
-# sets $? to indicate whether we're currently running underneath GNU Screen                               
-function is_under_gnu_screen() {                                                                     
-    pstree -lps $$ | grep -P -q '\bscreen\b'                                                         
-}   

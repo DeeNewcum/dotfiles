@@ -126,6 +126,60 @@ has_complete bunzip2     || complete -f -o default -X '!*.+(bz2|BZ2)' bunzip2
 
 
 ###################################################
+################ GNU SCREEN  ######################
+###################################################
+
+# copied from https://brainscraps.fandom.com/wiki/Extreme_Multitasking_with_tmux_and_PuTTY
+
+look_for_cmd=0
+print_cmd() {
+  if [ ${look_for_cmd} = 1 ] ;then
+    if [ "${BASH_COMMAND}" != 'print_default' ] ;then
+	  if [ -z "$HISTTIMEFORMAT" ]; then
+        cmdline=$(history 1 | xargs | cut -d\  -f2-)
+	  else
+        cmdline=$(history 1 | xargs | cut -d\  -f5-)
+      fi
+      if [[ "${cmdline}" =~ ^(sudo|ssh|vi|vim|man|more|less)\  ]] ;then
+        first=$(echo "${cmdline}" | awk '{print $1}')
+        for i in ${cmdline} ;do
+          if ! [[ "${i}" =~ ^-.*$ ]] && ! [[ "${i}" =~ ^${first}$ ]] ;then
+            cmd="${first}[${i}]"
+            break
+          fi
+        done
+      elif [[ "${cmdline}" =~ ^[A-Z]*=.*$ ]] ;then
+        cmd=$(echo ${cmdline} | awk '{print $2}')
+      else
+        cmd=$(echo ${cmdline} | awk '{print $1}')
+      fi
+      echo -ne "\033k${cmd}\033\\" 1>&2
+      look_for_cmd=0
+    else
+      return
+    fi
+  fi
+}
+
+print_default() {
+  echo -ne "\033kbash\033\\" 1>&2
+  look_for_cmd=1
+}
+
+# Sets $? to indicate whether we're currently running underneath GNU Screen.
+# Works even across 'sudo' boundaries, while checks for $STY or $WINDOW or such don't.
+function is_under_gnu_screen() {                                                                     
+    pstree -lps $$ | grep -P -q '\bscreen\b'                                                         
+}   
+
+# are we running underneath GNU Screen?
+if is_under_gnu_screen; then
+	PROMPT_COMMAND='print_default'
+
+	trap "print_cmd" DEBUG
+fi
+
+###################################################
 ###################################################
 
 
