@@ -32,10 +32,6 @@ attrcolor b ".I"    # allow bold colors - necessary for some reason
 defbce on    # use current bg color for erased chars
 
 
-# don't update the window title (xterm title) whenever the hardstatus is updated
-defdynamictitle off
-
-
 ## TODO:
 ## 
 ## I want to have:
