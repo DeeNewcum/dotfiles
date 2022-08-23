@@ -34,3 +34,31 @@ defbce on    # use current bg color for erased chars
 
 # don't update the window title (xterm title) whenever the hardstatus is updated
 defdynamictitle off
+
+
+## TODO:
+## 
+## I want to have:
+##      1. the hardstatus (the very bottom line) display the current directory
+##      2. the window title (which displays in my local terminal emulator) display the server name
+## Unfortunately, the ANSI escape sequences
+##          '\e]0;'$HOSTNAME'\007'    and
+##          '\e_'$HOSTNAME'\e\\'
+## seem to update both. This is not what I want to happen. Ther MUST be a way to update them
+## separately, since the GNU Screen manual, in the "String Escapes" section, uses %h for the
+## hardstatus string, and %t for the window title, so they must be separate things at some level,
+## no?
+##
+## Possible solutions:
+##
+##      * SecureCRT has an option "Ignore window title change requests option", which means that I
+##        I could set the tab's title manually.
+##
+## Things to note:
+##
+##      * I believe I got this working on the server 'toolkit', but those same settings failed to
+##        work properly on my webserver. Why, I don't know.
+##              https://github.com/DeeNewcum/dotfiles/commit/2ac6e79d74ec5a516b005e5d61e2375e1d0fb8be
+##
+##      * I don't understand the manual's section called "Dynamic Titles", but there ARE .screenrc
+##        settings named 'defdynamictitle' and 'dynamictitle'. Maybe those could help?
