@@ -144,7 +144,7 @@ print_cmd() {
         first=$(echo "${cmdline}" | awk '{print $1}')
         for i in ${cmdline} ;do
           if ! [[ "${i}" =~ ^-.*$ ]] && ! [[ "${i}" =~ ^${first}$ ]] ;then
-            cmd="${first}[${i}]"
+            cmd=$(echo "${first} ${i}" | grep -o ".\{,30\}$")
             break
           fi
         done
