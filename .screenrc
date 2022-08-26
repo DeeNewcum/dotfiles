@@ -58,3 +58,8 @@ defbce on    # use current bg color for erased chars
 ##
 ##      * I don't understand the manual's section called "Dynamic Titles", but there ARE .screenrc
 ##        settings named 'defdynamictitle' and 'dynamictitle'. Maybe those could help?
+
+
+## TODO:
+##
+## The stuff in .bashrc that changes the "window title" isn't working on computer db2-1.
