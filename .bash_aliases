@@ -163,9 +163,13 @@ alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
 
 
 if [ "$(type -p apt-get)" ];  then
-    # dist-upgrade is better than upgrade https://itsfoss.com/apt-get-upgrade-vs-dist-upgrade/
-    # https://askubuntu.com/questions/194651/why-use-apt-get-upgrade-instead-of-apt-get-dist-upgrade
-    alias upup='sudo apt update; sudo apt-get dist-upgrade -y'
+    function upup() {
+        sudo apt update
+        # dist-upgrade is better than upgrade https://itsfoss.com/apt-get-upgrade-vs-dist-upgrade/
+        # https://askubuntu.com/questions/194651/why-use-apt-get-upgrade-instead-of-apt-get-dist-upgrade
+        sudo apt-get dist-upgrade -y
+        [ -f /var/run/reboot-required ] && cat /var/run/reboot-required
+    }
 fi
 
 
