@@ -4,13 +4,17 @@
 
 # A safer version of "rm -rf", in that the user gets to review the list of files that are going to be deleted, before deletion actually occurs.
 
-	BEGIN{$^W=1}
-	use strict;
+    BEGIN{$^W=1}
+    use strict;
 
-	use Data::Dumper;
+    use Data::Dumper;
 
 
-my (@files) = @ARGV;
+# allow --shred to be passed as an argument, to enable use of 
+# https://git.savannah.gnu.org/cgit/coreutils.git/tree/src/shred.c
+my $is_shred = (grep /^--shred$/, @ARGV);
+
+my (@files) = grep {! /^--shred$/} @ARGV;
 
 if (@files == 0) {
     print STDERR "rmrf:  View the files you'll delete first, as an extra safety check.\n\n";
@@ -20,7 +24,7 @@ if (@files == 0) {
 
 ### Get the list of files and directories to delete
 my @deletelist = split /[\n\r]+/,
-		quoted_readpipe("find", @files, "-depth", "-print");
+        quoted_readpipe("find", @files, "-depth", "-print");
 if (@deletelist == 0) {
     die "No files found.\n";
 }
@@ -45,9 +49,15 @@ while (! $done) {
                 system("rmdir", $f) == 0
                     or die "'rmdir $f' failed: $!\n";
             } else {
-                print "Deleting $f...\n";
-                system("rm", "-f", $f) == 0
-                        or die "'rm -f $f' failed: $!\n";
+                if (!$is_shred) {
+                    print "Deleting $f...\n";
+                    system("rm", "-f", $f) == 0
+                            or die "'rm -f $f' failed: $!\n";
+                } else {
+                    print "Shredding $f...\n";
+                    system("shred", "-f", "-u", $f) == 0
+                            or die "'shred -f -u $f' failed: $!\n";
+                }
             }
         }
         print "Space Freed: ", commify($space_freed), "\n";
