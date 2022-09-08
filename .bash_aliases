@@ -121,6 +121,11 @@ function x () {
 # reattach to the screen named 'main'   (or create it if it doesn't exist)
 alias   sr='screen -U -dr main || screen -U -S main'
 alias   srm=sr
+
+# you should configure SecureCRT to send this line when logging in:
+#       if [ -n "$(type -t resumescreen_and_exit)" ]; then resumescreen_and_exit; else screen -U -dr main || screen -U -S main; exit; fi
+# then you can define your own local alias/function named 'resumescreen_and_exit'
+
 # reattach to the screen named 'main'   (or create it if it doesn't exist)
 alias   tmx='tmux attach -t main || tmux new -s main'
 
