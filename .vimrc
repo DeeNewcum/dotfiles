@@ -222,32 +222,111 @@ autocmd BufWrite *.py silent !chmod a+x %
 
 
 " make Ctrl-Up and Ctrl-Down modify the font size    (unfortunately, ctrl-plus and ctrl-minus can't be bound)
-if has("gui_gtk2")
+if has("gui_running")
     " The syntax for &guiformat is totally different between GTK+2 and non-GTK,
     " and the below is designed only for GTK+2.
 
     " if we don't set an initial guifont, the below code won't work
     set guifont=Liberation\ Mono\ 10
 
-    let s:pattern = '^\(.* \)\([1-9][0-9]*\)$'
-    let s:minfontsize = 6
-    let s:maxfontsize = 24
-    function! AdjustFontSize(amount)
-      if has("gui_gtk2") && has("gui_running")
-        let fontname = substitute(&guifont, s:pattern, '\1', '')
-        let cursize = substitute(&guifont, s:pattern, '\2', '')
-        let newsize = cursize + a:amount
-        if (newsize >= s:minfontsize) && (newsize <= s:maxfontsize)
-          let newfont = fontname . newsize
-          let &guifont = newfont
-        endif
-      else
-        echoerr "You need to run the GTK2 version of Vim to use this function."
-      endif
-    endfunction
+	" from https://vim.fandom.com/wiki/Change_font_size_quickly
+	function! AdjustFontSize(amount)
+		if !has("gui_running")
+			return
+		endif
 
-    nnoremap <C-MouseDown> :silent! call AdjustFontSize(1)<CR>
-    nnoremap <C-MouseUp> :silent! call AdjustFontSize(-1)<CR>
+		let l:min_font_size = 5
+		let l:max_font_size = 23
+
+		let l:font_info = GetFontInfo()
+		if l:font_info.name == '' || l:font_info.size == ''
+			return
+		endif
+
+		let l:font_name = l:font_info.name
+		let l:font_size = l:font_info.size
+
+		" Decrease font size.
+		if a:amount == '-'
+			let l:font_size = l:font_size - 1
+
+		" Increase font size.
+		elseif a:amount == '+'
+			let l:font_size = l:font_size + 1
+
+		" Use a specific font size.
+		elseif str2nr(a:amount)
+			let l:font_size = str2nr(a:amount)
+		endif
+
+		" Clamp font size.
+		let l:font_size = max([l:min_font_size, min([l:max_font_size, l:font_size])])
+
+		if matchstr(&guifont, ':') == '' " Linux guifont style.
+			" \v           Very magical.
+			" (\d+$)       Capture group:       Match [0-9] one-or-more times, at the end of the string.
+			let l:font_size_pattern = '\v(\d+$)'
+		else " Windows and macOS guifont style.
+			" \v           Very magical.
+			" (:h)@<=      Positive lookbehind: Match ':h'.
+			" (\d+)        Capture group:       Match [0-9] one-or-more times.
+			let l:font_size_pattern = '\v(:h)@<=(\d+)'
+		endif
+
+		" Update vim font size.
+		let &guifont = substitute(&guifont, l:font_size_pattern, l:font_size, '')
+	endfunction
+
+	function! GetFontInfo()
+		" Windows and macOS &guifont: Hack NF:h11:cANSI
+		"                             3270Medium_NF:h10:W500:cANSI:qDRAFT
+		" Linux &guifont: Hack Nerd Font Mono Regular 10
+
+		if matchstr(&guifont, ':') == '' " Linux guifont style.
+			" \v           Very magical.
+			" (^.{-1,})    Capture group:       Anchored at the start of the string, match any character one-or-more times non-greedy.
+			" ( \d+$)@=    Positive lookahead:  Match ' ' followed by [0-9] one-or-more times, at the end of the string.
+			let l:font_name_pattern = '\v(^.{-1,})( \d+$)@='
+
+			" \v           Very magical.
+			" (\d+$)       Capture group:       Match [0-9] one-or-more times, at the end of the string.
+			let l:font_size_pattern = '\v(\d+$)'
+		else " Windows and macOS guifont style.
+			" \v           Very magical.
+			" (^.{-1,})    Capture group:       Anchored at the start of the string, match any character one-or-more times non-greedy.
+			" (:)@=        Positive lookahead:  Match ':'.
+			let l:font_name_pattern = '\v(^.{-1,})(:)@='
+
+			" \v           Very magical.
+			" (:h)@<=      Positive lookbehind: Match ':h'.
+			" (\d+)        Capture group:       Match [0-9] one-or-more times.
+			let l:font_size_pattern = '\v(:h)@<=(\d+)'
+		endif
+
+		let l:font_name = matchstr(&guifont, l:font_name_pattern)
+		let l:font_size = matchstr(&guifont, l:font_size_pattern)
+
+		return { 'name' : l:font_name, 'size' : l:font_size }
+	endfunction
+
+	" Bind Control + Mouse-wheel to zoom text.
+	" NOTE: This event only works in Linux and macOS. SEE: :h scroll-mouse-wheel
+	map <silent> <C-ScrollWheelDown> :call AdjustFontSize('-')<CR>
+	map <silent> <C-ScrollWheelUp> :call AdjustFontSize('+')<CR>
+
+	" Decrease font size.
+	nnoremap <silent> <F11> :call AdjustFontSize('-')<CR>
+	inoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
+	vnoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
+	cnoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
+	onoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
+
+	" Increase font size.
+	nnoremap <silent> <F12> :call AdjustFontSize('+')<CR>
+	inoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
+	vnoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
+	cnoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
+	onoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
 endif
 
 
