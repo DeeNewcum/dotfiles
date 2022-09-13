@@ -327,3 +327,9 @@ if &term =~ '256color'
     " work properly when Vim is used inside tmux and GNU screen.
     set t_ut=
 endif
+
+
+" Use whole "words" when opening URLs.
+" This avoids cutting off parameters (after '?') and anchors (after '#'). 
+" See http://vi.stackexchange.com/q/2801/1631
+let g:netrw_gx="<cWORD>"
