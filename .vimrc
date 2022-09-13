@@ -92,7 +92,7 @@ else
     endif
 
     " hilight tabs that are used for alignment -- we only want to use them for indenting
-    "match ErrorMsg /\(	\|^\)\@<!	\+/
+    "match ErrorMsg /\( \|^\)\@<!   \+/
 
     if exists('+colorcolumn')
         set colorcolumn=+1        " highlight column after 'textwidth'
@@ -229,104 +229,104 @@ if has("gui_running")
     " if we don't set an initial guifont, the below code won't work
     set guifont=Liberation\ Mono\ 10
 
-	" from https://vim.fandom.com/wiki/Change_font_size_quickly
-	function! AdjustFontSize(amount)
-		if !has("gui_running")
-			return
-		endif
+    " from https://vim.fandom.com/wiki/Change_font_size_quickly
+    function! AdjustFontSize(amount)
+        if !has("gui_running")
+            return
+        endif
 
-		let l:min_font_size = 5
-		let l:max_font_size = 23
+        let l:min_font_size = 5
+        let l:max_font_size = 23
 
-		let l:font_info = GetFontInfo()
-		if l:font_info.name == '' || l:font_info.size == ''
-			return
-		endif
+        let l:font_info = GetFontInfo()
+        if l:font_info.name == '' || l:font_info.size == ''
+            return
+        endif
 
-		let l:font_name = l:font_info.name
-		let l:font_size = l:font_info.size
+        let l:font_name = l:font_info.name
+        let l:font_size = l:font_info.size
 
-		" Decrease font size.
-		if a:amount == '-'
-			let l:font_size = l:font_size - 1
+        " Decrease font size.
+        if a:amount == '-'
+            let l:font_size = l:font_size - 1
 
-		" Increase font size.
-		elseif a:amount == '+'
-			let l:font_size = l:font_size + 1
+        " Increase font size.
+        elseif a:amount == '+'
+            let l:font_size = l:font_size + 1
 
-		" Use a specific font size.
-		elseif str2nr(a:amount)
-			let l:font_size = str2nr(a:amount)
-		endif
+        " Use a specific font size.
+        elseif str2nr(a:amount)
+            let l:font_size = str2nr(a:amount)
+        endif
 
-		" Clamp font size.
-		let l:font_size = max([l:min_font_size, min([l:max_font_size, l:font_size])])
+        " Clamp font size.
+        let l:font_size = max([l:min_font_size, min([l:max_font_size, l:font_size])])
 
-		if matchstr(&guifont, ':') == '' " Linux guifont style.
-			" \v           Very magical.
-			" (\d+$)       Capture group:       Match [0-9] one-or-more times, at the end of the string.
-			let l:font_size_pattern = '\v(\d+$)'
-		else " Windows and macOS guifont style.
-			" \v           Very magical.
-			" (:h)@<=      Positive lookbehind: Match ':h'.
-			" (\d+)        Capture group:       Match [0-9] one-or-more times.
-			let l:font_size_pattern = '\v(:h)@<=(\d+)'
-		endif
+        if matchstr(&guifont, ':') == '' " Linux guifont style.
+            " \v           Very magical.
+            " (\d+$)       Capture group:       Match [0-9] one-or-more times, at the end of the string.
+            let l:font_size_pattern = '\v(\d+$)'
+        else " Windows and macOS guifont style.
+            " \v           Very magical.
+            " (:h)@<=      Positive lookbehind: Match ':h'.
+            " (\d+)        Capture group:       Match [0-9] one-or-more times.
+            let l:font_size_pattern = '\v(:h)@<=(\d+)'
+        endif
 
-		" Update vim font size.
-		let &guifont = substitute(&guifont, l:font_size_pattern, l:font_size, '')
-	endfunction
+        " Update vim font size.
+        let &guifont = substitute(&guifont, l:font_size_pattern, l:font_size, '')
+    endfunction
 
-	function! GetFontInfo()
-		" Windows and macOS &guifont: Hack NF:h11:cANSI
-		"                             3270Medium_NF:h10:W500:cANSI:qDRAFT
-		" Linux &guifont: Hack Nerd Font Mono Regular 10
+    function! GetFontInfo()
+        " Windows and macOS &guifont: Hack NF:h11:cANSI
+        "                             3270Medium_NF:h10:W500:cANSI:qDRAFT
+        " Linux &guifont: Hack Nerd Font Mono Regular 10
 
-		if matchstr(&guifont, ':') == '' " Linux guifont style.
-			" \v           Very magical.
-			" (^.{-1,})    Capture group:       Anchored at the start of the string, match any character one-or-more times non-greedy.
-			" ( \d+$)@=    Positive lookahead:  Match ' ' followed by [0-9] one-or-more times, at the end of the string.
-			let l:font_name_pattern = '\v(^.{-1,})( \d+$)@='
+        if matchstr(&guifont, ':') == '' " Linux guifont style.
+            " \v           Very magical.
+            " (^.{-1,})    Capture group:       Anchored at the start of the string, match any character one-or-more times non-greedy.
+            " ( \d+$)@=    Positive lookahead:  Match ' ' followed by [0-9] one-or-more times, at the end of the string.
+            let l:font_name_pattern = '\v(^.{-1,})( \d+$)@='
 
-			" \v           Very magical.
-			" (\d+$)       Capture group:       Match [0-9] one-or-more times, at the end of the string.
-			let l:font_size_pattern = '\v(\d+$)'
-		else " Windows and macOS guifont style.
-			" \v           Very magical.
-			" (^.{-1,})    Capture group:       Anchored at the start of the string, match any character one-or-more times non-greedy.
-			" (:)@=        Positive lookahead:  Match ':'.
-			let l:font_name_pattern = '\v(^.{-1,})(:)@='
+            " \v           Very magical.
+            " (\d+$)       Capture group:       Match [0-9] one-or-more times, at the end of the string.
+            let l:font_size_pattern = '\v(\d+$)'
+        else " Windows and macOS guifont style.
+            " \v           Very magical.
+            " (^.{-1,})    Capture group:       Anchored at the start of the string, match any character one-or-more times non-greedy.
+            " (:)@=        Positive lookahead:  Match ':'.
+            let l:font_name_pattern = '\v(^.{-1,})(:)@='
 
-			" \v           Very magical.
-			" (:h)@<=      Positive lookbehind: Match ':h'.
-			" (\d+)        Capture group:       Match [0-9] one-or-more times.
-			let l:font_size_pattern = '\v(:h)@<=(\d+)'
-		endif
+            " \v           Very magical.
+            " (:h)@<=      Positive lookbehind: Match ':h'.
+            " (\d+)        Capture group:       Match [0-9] one-or-more times.
+            let l:font_size_pattern = '\v(:h)@<=(\d+)'
+        endif
 
-		let l:font_name = matchstr(&guifont, l:font_name_pattern)
-		let l:font_size = matchstr(&guifont, l:font_size_pattern)
+        let l:font_name = matchstr(&guifont, l:font_name_pattern)
+        let l:font_size = matchstr(&guifont, l:font_size_pattern)
 
-		return { 'name' : l:font_name, 'size' : l:font_size }
-	endfunction
+        return { 'name' : l:font_name, 'size' : l:font_size }
+    endfunction
 
-	" Bind Control + Mouse-wheel to zoom text.
-	" NOTE: This event only works in Linux and macOS. SEE: :h scroll-mouse-wheel
-	map <silent> <C-ScrollWheelDown> :call AdjustFontSize('-')<CR>
-	map <silent> <C-ScrollWheelUp> :call AdjustFontSize('+')<CR>
+    " Bind Control + Mouse-wheel to zoom text.
+    " NOTE: This event only works in Linux and macOS. SEE: :h scroll-mouse-wheel
+    map <silent> <C-ScrollWheelDown> :call AdjustFontSize('-')<CR>
+    map <silent> <C-ScrollWheelUp> :call AdjustFontSize('+')<CR>
 
-	" Decrease font size.
-	nnoremap <silent> <F11> :call AdjustFontSize('-')<CR>
-	inoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
-	vnoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
-	cnoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
-	onoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
+    " Decrease font size.
+    nnoremap <silent> <F11> :call AdjustFontSize('-')<CR>
+    inoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
+    vnoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
+    cnoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
+    onoremap <silent> <F11> <Esc>:call AdjustFontSize('-')<CR>
 
-	" Increase font size.
-	nnoremap <silent> <F12> :call AdjustFontSize('+')<CR>
-	inoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
-	vnoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
-	cnoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
-	onoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
+    " Increase font size.
+    nnoremap <silent> <F12> :call AdjustFontSize('+')<CR>
+    inoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
+    vnoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
+    cnoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
+    onoremap <silent> <F12> <Esc>:call AdjustFontSize('+')<CR>
 endif
 
 
@@ -341,26 +341,26 @@ if ! &diff
     autocmd BufWinLeave ?* mkview
     autocmd BufWinEnter ?* silent loadview
 else
-	" see for more -- https://stackoverflow.com/questions/3878692/how-to-create-an-alias-for-a-command-in-vim
-	fun! SetupCommandAlias(from, to)
-		exec 'cnoreabbrev <expr> '.a:from
-			  \ .' ((getcmdtype() is# ":" && getcmdline() is# "'.a:from.'")'
-			  \ .'? ("'.a:to.'") : ("'.a:from.'"))'
-	endfun
+    " see for more -- https://stackoverflow.com/questions/3878692/how-to-create-an-alias-for-a-command-in-vim
+    fun! SetupCommandAlias(from, to)
+        exec 'cnoreabbrev <expr> '.a:from
+              \ .' ((getcmdtype() is# ":" && getcmdline() is# "'.a:from.'")'
+              \ .'? ("'.a:to.'") : ("'.a:from.'"))'
+    endfun
 
-	" remap :q to :qall, to allow the user to quit BOTH windows at once, within vimdiff
-	call SetupCommandAlias("q", "qall")
+    " remap :q to :qall, to allow the user to quit BOTH windows at once, within vimdiff
+    call SetupCommandAlias("q", "qall")
 
-	" allow the user to toggle back and forth between ignoring whitespace and not
-	function! IwhiteToggle()
-		if &diffopt =~ 'iwhite'
-			set diffopt-=iwhite
-		else
-			set diffopt+=iwhite
-			set diffexpr=""
-		endif
-	endfunction
-	nnoremap <leader>w :call IwhiteToggle()<CR>
+    " allow the user to toggle back and forth between ignoring whitespace and not
+    function! IwhiteToggle()
+        if &diffopt =~ 'iwhite'
+            set diffopt-=iwhite
+        else
+            set diffopt+=iwhite
+            set diffexpr=""
+        endif
+    endfunction
+    nnoremap <leader>w :call IwhiteToggle()<CR>
 endif
 
 
@@ -393,10 +393,10 @@ endfunction
 if has("win32")
     source $VIMRUNTIME/mswin.vim
 
-	" I really dislike that mswin.vim overwrites Ctrl-F, which I use often, and not for
-	" searching-within-a-file.
-	"		https://github.com/vim/vim/issues/1457
-	unmap <C-F>
+    " I really dislike that mswin.vim overwrites Ctrl-F, which I use often, and not for
+    " searching-within-a-file.
+    "       https://github.com/vim/vim/issues/1457
+    unmap <C-F>
 endif
 
 
