@@ -16,6 +16,8 @@ while ($pid > 0) {
 	}
 
 	$pid = $info->{ppid};
+
+	last if ($^O eq 'cygwin' && $pid <= 1);
 }
 
 exit 1;
@@ -25,7 +27,7 @@ sub get_proc_info {
 	my ($pid) = @_;
 
 	open my $fin, '<', "/proc/$pid/stat"
-		or die $!;
+		or die "Can't open /proc/$pid/stat: $!";
 	my %proc_info;
 	# see man proc(5)
 	# (this funky syntax is called a "assigning to a hash slice")
