@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+# Shows a summary of all .url files found.
+
+
+    use strict;
+    use warnings;
+
+    use File::Spec::Functions qw(catdir catfile);
+    use File::Basename qw(dirname);
+    use File::Path qw(mkpath);
+    use List::Util qw(min max);
+
+    use Data::Dumper;
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+my @url_mapping = read_url_mappings();
+@url_mapping = sort {natural_sort($a->[0], $b->[0], qr#/#)} @url_mapping;
+my $longest_url = max(map {length($_->[0])} @url_mapping);
+foreach my $map (@url_mapping) {
+    printf "%-${longest_url}s %s\n", $map->[0], $map->[1];
+}
+exit 0;
+
+
+
+
+sub read_url_mappings {
+    my @url_mapping;
+    foreach my $doturl_file (locate_doturl()) {
+        chomp $doturl_file;
+        my $dir = catfile(dirname($doturl_file), '');
+        foreach my $url (slurp($doturl_file)) {
+            chomp $url;
+            push @url_mapping, [$url, $dir];
+        }
+    }
+    
+    # Within the mappings, sometimes URLs overlap
+    #   (eg. http://example.com/ and http://example.com/cgi-bin/)
+    # but the paths they map to DON'T.  Give priority to longer (more specific) URLs.
+    @url_mapping = sort {length($b->[0]) <=> length($a->[0])} @url_mapping;
+
+    return @url_mapping;
+}
+
+
+
+# cache the output of    `locate -r '/\.url$'`
+#       (slocate can be pretty slow)
+sub locate_doturl {
+    ## bypass all caching functionality
+    #return readpipe q[locate -r '/\.url$'];
+
+    # don't cache unless the current system uses slocate
+    my $is_slocate = (qx[locate --help] =~ /Secure Locate/);
+
+    $ENV{XDG_CACHE_HOME} ||= catdir($ENV{HOME}, ".cache");
+    my $rurl_cache = catfile($ENV{XDG_CACHE_HOME}, "rurl");
+    #die "$rurl_cache\n\t";
+    if ($is_slocate && -e $rurl_cache && -M $rurl_cache < 3.0) {         # expire after 3.0 day(s)
+        return slurp($rurl_cache);
+    } else {
+        my @output = readpipe q[locate -r '/\.url$'];
+        mkpath($ENV{XDG_CACHE_HOME});
+        open my $pout, '>', $rurl_cache     or die $!;
+        print $pout @output;
+        return @output;
+    }
+}
+
+
+# like Sort::Key::Natural, it splits on all word boundaries
+sub natural_sort {
+    my ($str_a, $str_b, $split_regexp) = @_;
+
+    $split_regexp = qr/\b/      if (!defined($split_regexp));
+
+    my @str_a = split $split_regexp, $str_a;
+    my @str_b = split $split_regexp, $str_b;
+    for (my $ctr=0; $ctr<min(scalar(@str_a), scalar(@str_b)); $ctr++) {
+        my $cmp = 0;
+        my $_a = $str_a[$ctr];
+        my $_b = $str_b[$ctr];
+        if ($_a =~ /^\d+$/s && $_b =~ /^\d+$/s) {
+            $cmp = $_a <=> $_b;
+        } else {
+            $cmp = $_a cmp $_b;
+        }
+        return $cmp if ($cmp != 0);
+    }
+    # the first part of each string matched completely, so now compare the
+    # second part
+    return scalar(@str_a) <=> scalar(@str_b);
+}
+
+
+
+# quickly read a whole file
+sub slurp {my$p=open(my$f,"$_[0]")or return;my@o=<$f>;close$f;waitpid($p,0);wantarray?@o:join("",@o)}
