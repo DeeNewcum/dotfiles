@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+# Given a list of directories, reports which files under that directory are modified the most often.
+
+	use strict;
+	use warnings;
+
+	use Data::Dumper;
+	use File::Find qw();
+	use Linux::Inotify2;
+	use Time::HiRes qw( usleep gettimeofday tv_interval );
+
+#my $mask = IN_ALL_EVENTS;
+my $mask = IN_MODIFY;
+
+@ARGV >= 1
+	or die "Specify a path or paths to add inotify watches to.\n";
+
+my %seen;
+
+my $inotify = Linux::Inotify2->new();
+
+$inotify->blocking(0);
+
+# add watches
+foreach my $path (@ARGV) {
+	$inotify->watch($path, $mask, \&watch_event);	# don't forget to watch the top-level dir!
+
+	File::Find::find({
+			wanted => \&recurse_dir,
+			preprocess => sub {
+				# avoid the "Can't cd to" error, when the current user doesn't have permission to read the specified
+				# directory
+				return grep {-d && -r} @_;
+			},
+		}, $path);
+}
+
+my $clear = qx` clear `;
+my $last_update_time = [gettimeofday()];
+my $last_update_count = 0;
+while (1) {
+	usleep(50 * 1000);		# microseconds
+	$last_update_count += $inotify->poll();
+	if ($last_update_count > 0 && tv_interval($last_update_time) >= 1.0) {
+		print $clear;
+		my @sorted = sort {$seen{$b} <=> $seen{$a}} keys %seen;
+		for (my $ctr=0; $ctr<30 && $ctr<@sorted; $ctr++) {
+			my $key = $sorted[$ctr];
+			printf "%-5d %s\n", $seen{$key}, $key;
+		}
+
+		$last_update_time = [gettimeofday()];
+		$last_update_count = 0;
+	}
+}
+
+
+
+sub recurse_dir {
+	if (-d $File::Find::name) {
+		$inotify->watch($File::Find::name, $mask, \&watch_event);
+	}
+}
+
+sub watch_event {
+	my $e = shift;
+	$seen{$e->fullname}++;
+}
