@@ -13,15 +13,33 @@
     use Time::HiRes qw( usleep gettimeofday tv_interval );
 
     ## TODO:
+    ##  - rename inotifywaitstats => inotifywaitstat
     ##  - add proper argument-processing, and accept arguments that are almost exactly like
     ##                  inotifywait's arguments
     ##      - MOST IMPORTANT -- don't recurse into subdirectories unless -r is specified
     ##      - also, allow the user to specify $mask via the -e (events) argument
+    ##  - quality-of-life upgrade -- display numbers such as 45,000 as "45k" or 3,200,000 as "3.2m"
     ##  - quality-of-life upgrade -- allow use of EITHER the 'inotifywait' binary *or*
-    ##              the Linux::Inotify2 library, whichever happens to be installed
+    ##              the Linux::Inotify2 library, whichever interface happens to be installed
+    ##  - quality-of-life upgrade -- if neither 'inotifywait' or Linux::Inotify2 are available,
+    ##              check to see if 'cpanm' is installed, then recommend runnning
+    ##              'cpanm Linux::Inotify2', otherwise recommend running 'cpan Linux::Inotify2'
     ##  - quality-of-life upgrade -- if neither 'inotifywait' or Linux::Inotify2 is available,
     ##              *and* we're currently running as root, see if we have sudo'd, and if so, look
     ##              for a ~/perl5/lib/perl5/ in the original user's home dir
+    ##              (this one is mostly for my own benefit)
+    ##  - quality-of-life upgrade -- auto-detect the number of rows on the screen
+    ##  - (optional) display more than one column of numbers -- perhaps default to -e access,modify
+    ##              and display the two statistics in different columns
+    ##          - in this case, we would need to add another command-line arg to let the user
+    ##            specify which column to sort by
+    ##  - if this is a long-shot, then don't worry about it -- maybe even accept Linux::Inotify as a
+    ##          third optional interface, and since that's pure-Perl, use App::FatPacker to include
+    ##          Linux::Inotify with the main script
+    ##  - maybe even allow a FOURTH interface -- lsof -Fn -r2 /
+    ##          which would allow us to capture information system-wide, without hitting the dreaded
+    ##          "upper limit on inotify watches reached" error message
+    ##          (even though it would be somewhat "lossy")
     ##  - advertise the new script at a few places:
     ##      - https://old.reddit.com/r/commandline/ 
     ##      - https://old.reddit.com/r/dailyscripts/
