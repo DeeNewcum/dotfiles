@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
-# Given a list of directories, reports which files under that directory are modified the most often.
+# Just like 'inotifywait', except it collates statistics about the most frequently modified/touched
+# files. This is very useful when logging into an unfamiliar box, for instance, to see the
+# most-modified files under /var/log/.
 
     use strict;
     use warnings;
@@ -9,6 +11,21 @@
     use File::Find qw();
     use Linux::Inotify2;
     use Time::HiRes qw( usleep gettimeofday tv_interval );
+
+    ## TODO:
+    ##  - add proper argument-processing, and accept arguments that are almost exactly like
+    ##                  inotifywait's arguments
+    ##      - MOST IMPORTANT -- don't recurse into subdirectories unless -r is specified
+    ##      - also, allow the user to specify $mask via the -e (events) argument
+    ##  - quality-of-life upgrade -- allow use of EITHER the 'inotifywait' binary *or*
+    ##              the Linux::Inotify2 library, whichever happens to be installed
+    ##  - quality-of-life upgrade -- if neither 'inotifywait' or Linux::Inotify2 is available,
+    ##              *and* we're currently running as root, see if we have sudo'd, and if so, look
+    ##              for a ~/perl5/lib/perl5/ in the original user's home dir
+    ##  - advertise the new script at a few places:
+    ##      - https://old.reddit.com/r/commandline/ 
+    ##      - https://old.reddit.com/r/dailyscripts/
+    ##      - (TODO -- I swear there was one other "newly-released scripts" subreddit somewhere)
 
 #my $mask = IN_ALL_EVENTS;
 my $mask = IN_MODIFY;
