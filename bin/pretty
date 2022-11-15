@@ -12,30 +12,97 @@
 
     use LWP::UserAgent;
     use HTTP::Request::Common;
-    use Getopt::Long;
-    use Data::Dumper;
+    use Data::Dumper;           # in Perl core since v5.005
+    use IPC::Open3 ();          # in Perl core since v5.000
 
+die "This script under construction. To use the last working version, see\nhttps://github.com/DeeNewcum/dotfiles/blob/05b222173957480610a0f32da906e2ccbcf83c93/bin/pretty\n";
+
+my %mime_type_mapping = (
+        'application/xml' => \&pretty_xml,
+        #'text/html' => \&pretty_html,
+        # TODO -- .json files seem to be detected as "text/plain" or 
+        #               "UTF-8 Unicode text, with very long lines, with no line terminators"
+        #               Note that JSON::PP has been in Perl core since v5.13.9, Jan 2011
+    );
 
 ## process command line
-our %ARGV;
-process_cmdline();
+if (@ARGV != 1) {
+    die "Please specify one file to prettify.\n";
+}
+my $filename = shift @ARGV;
+process_one_file($filename);
 
-## get the contents of the file
-my $file_contents;
-if ($ARGV{file} eq '-') {
-    $file_contents = do {local $/=undef; <STDIN>};
-} elsif ($ARGV{file} =~ m#^https?://#i) {
-    my $ua = LWP::UserAgent->new;
-    $ua->agent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/29.0");
-    $file_contents = $ua->request(GET $ARGV{file})->content;
-} else {
-    $file_contents = slurp($ARGV{file});
+
+
+sub process_one_file {
+    my $filename = shift;
+
+    ## get the contents of the file
+    my $file_contents;
+    if ($filename eq '-') {
+        $file_contents = do {local $/=undef; <STDIN>};
+    } elsif ($filename =~ m#^https?://#i) {
+        my $ua = LWP::UserAgent->new;
+        $ua->agent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/29.0");
+        $file_contents = $ua->request(GET $filename)->content;
+    } else {
+        $file_contents = slurp($filename);
+    }
+
+    # file(1) / magic(5)
+    my $mime_type = pipe_to_file($file_contents);
+    $mime_type =~ s/; charset=.*//;
+    #print "magic(5) is >>$mime_type<<\n";      exit;
+    my $pretty_func = $mime_type_mapping{$mime_type};
+    if (is_json($file_contents)) {
+        $pretty_func = \&pretty_json;
+    }
+
+    ## pretty-print it
+    if (defined($pretty_func)) {
+        my $parsed = $pretty_func->($file_contents);
+    } else {
+        print STDERR "Unrecognized file type for $filename\n";
+    }
 }
 
-## pretty-print it
-my $pretty = function_exists("pretty_$ARGV{format}")     or die;
-my $parsed = $pretty->($file_contents);
 
+# pass the provided file-contents through STDIN into file(1)/magic(5), and
+# return the answer
+sub pipe_to_file {
+    my ($file_contents) = @_;
+
+    # because we're both piping into STDIN *and* piping out of STDOUT, we have
+    # to use IPC::Open3 (or IPC::Open2)
+    my $pid = IPC::Open3::open3(my $chld_in, my $chld_out, '>&STDERR',
+                    'file', '-bi', '-');
+
+    # I'm not sure why, but file(1) doesn't want to input all of the file
+    # contents. It appears to stop reading after a certain point (after it's
+    # decided it has processed enough of the header to know for sure what file
+    # type it is, perhaps?)
+    local $SIG{PIPE} = 'IGNORE';
+
+    print $chld_in $file_contents;
+    close $chld_in;
+
+    local $/ = undef;       # read in the whole thing at once
+    my $output = <$chld_out>;
+    $output =~ s/[\n\r]+$//s;       # chomp
+
+    waitpid($pid, 0);
+
+    return $output;
+}
+
+
+sub is_json {
+    my ($file_contents) = @_;
+
+    # from https://stackoverflow.com/a/3845829/1042525
+
+    ## TODO -- I left off here
+}
 
 
 sub pretty_json {
@@ -73,48 +140,9 @@ sub pretty_xml {
 
 
 
-
-sub process_cmdline {
-    GetOptions( \%ARGV,
-        'json|j',           # format: JSON
-        'xml|x',            # format: XML
-        'args', 'help',
-    ) or usage();
-    %ARGV = map {length()?$_:1} %ARGV;      # arguments are optional
-    $ARGV{help} and usage();
-
-    foreach my $format (qw( json xml )) {
-        if (exists $ARGV{$format}) {
-            delete $ARGV{$format};
-            $ARGV{format} = $format;
-            last;
-        }
-    }
-    usage("Please specify a format.")    unless $ARGV{format};
-
-    if (@ARGV && (-e $ARGV[0] || $ARGV[0] eq '-' || $ARGV[0] =~ m#^https?://#)) {
-        $ARGV{file} = shift @ARGV;
-    }
-    usage("Please specify a file to dumper.")    unless $ARGV{file};
-
-    $ARGV{args} and die Dumper {'%ARGV' => \%ARGV, '@ARGV' => \@ARGV};
-    #die Dumper {'%ARGV' => \%ARGV, '@ARGV' => \@ARGV};
-}
-
-
-
-
-sub usage {
-    print map {"$_\n"} @_, ""       if @_;
-    print "Usage:  dumper <format> <filename>\n";
-    usage_getopt();
-    exit;
-}
-
-
 sub die_modules_required {
     die join("\n\t",
-        "to parse " . uc($ARGV{format}) . ", you must install one of these modules:",
+        "to parse " . uc($ARGV{format}) . ", you must install ONE of these modules:",
         @_)     . "\n";
 }
 
