@@ -9,13 +9,13 @@
 
     use Data::Dumper;
     use File::Find qw();
-    use Linux::Inotify2;
     use Time::HiRes qw( usleep gettimeofday tv_interval );
 
     BEGIN {
-        eval {use Linux::Inotify2};
+        eval 'use Linux::Inotify2';
         if ($@) {
-            die "Linux::Inotify2 must be installed before this program can run. Paste this in:\n\tcpanm Linux::Inotify2\n";
+            print STDERR "Linux::Inotify2 must be installed before $0 can run. Paste this in:\n\tcpanm Linux::Inotify2\n";
+            exit;
         }
     }
 
