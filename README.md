@@ -8,7 +8,7 @@
 
     # Your dotfiles are safe.  DeeDot won't overwrite anything.
 
-This is my dotfile repo.  There are many like it, but this one is mine.
+This is my dotfile repo.  There are many like it, [but this one is mine](https://www.youtube.com/watch?v=nkGIxGdZoYY).
 
 ## Dotfile repos generally
 
