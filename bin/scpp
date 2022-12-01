@@ -45,9 +45,14 @@ if (qx|uname| =~ /^SunOS$|^AIX$/) {
     ($host = qx[hostname --long]) =~ s/\s//g;
 }
 if (-e "$ENV{HOME}/.hostname_override") {               # 'hostname' doesn't always return the correct name/address for other computers to be able to contact it
+    if (-x "$ENV{HOME}/.hostname_override") {
+        $host = qx($ENV{HOME}/.hostname_override);
+    } else {
         open FIN, "$ENV{HOME}/.hostname_override";
-        ($host = do {local $/=undef;<FIN>}) =~ s/[\n\r]$//s;
+        $host = do {local $/=undef;<FIN>};				# File::Slurp
         close FIN;
+    }
+    chomp $host;
 }
 
 ############### username ################
