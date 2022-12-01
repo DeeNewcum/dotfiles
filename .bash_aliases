@@ -337,3 +337,7 @@ function pstreegrep() {
 function watchpstreegrep() {
 	watch 'PID=$(pgrep -n '"$@"'); pstree -ap ${PID:-9999999}'
 }
+
+
+# very useful for finding out what the active logfiles are!
+alias logfiles='inotifywaitstats /var/log/'

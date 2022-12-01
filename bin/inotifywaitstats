@@ -12,6 +12,13 @@
     use Linux::Inotify2;
     use Time::HiRes qw( usleep gettimeofday tv_interval );
 
+    BEGIN {
+        eval {use Linux::Inotify2};
+        if ($@) {
+            die "Linux::Inotify2 must be installed before this program can run. Paste this in:\n\tcpanm Linux::Inotify2\n";
+        }
+    }
+
     ## TODO:
     ##  - rename inotifywaitstats => inotifywaitstat
     ##  - add proper argument-processing, and accept arguments that are almost exactly like
@@ -39,7 +46,6 @@
     ##  - maybe even allow a FOURTH interface -- lsof -Fn -r2 /
     ##          which would allow us to capture information system-wide, without hitting the dreaded
     ##          "upper limit on inotify watches reached" error message
-    ##          (even though it would be somewhat "lossy")
     ##  - advertise the new script at a few places:
     ##      - https://old.reddit.com/r/commandline/ 
     ##      - https://old.reddit.com/r/dailyscripts/
