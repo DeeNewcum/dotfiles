@@ -9,18 +9,27 @@
 
 set -x
 
-# Step 1 -- Download the latest version and unzip into /tmp/grc-master/.
+# Step 1 -- Is Python version >= 2.7?
+if python -c 'import sys; sys.exit(sys.version_info[0] >= 2 and sys.version_info[1] >= 7)'
+then
+    set +x
+    echo 'ERROR: grc (Generic Colouriser) requires Python v2.7 or greater.'
+    exit
+fi
+
+# Step 2 -- Download the latest version and unzip into /tmp/grc-master/.
 cd /tmp
 rm -rf /tmp/grc-master/
-wget https://github.com/garabik/grc/archive/refs/heads/master.zip
+wget -O master.zip https://github.com/garabik/grc/archive/refs/heads/master.zip
 unzip master.zip
 rm -f master.zip
 
-# Step 2 -- At this point, we could use the zip's install.sh script, but it doesn't get us much. 
+# Step 3 -- At this point, we could use the zip's install.sh script, but it doesn't get us much. 
 #           Just do the install ourselves.
 mkdir -p ~/.grc/
 rm -f -- ~/.grc/*
 cp -rpv /tmp/grc-master/colourfiles/* ~/.grc/
+cp -pv /tmp/grc-master/grc.conf ~/.grc/
 cp -pv /tmp/grc-master/{grc,grcat}.1 ~/man/man1/
 if type -p python3 > /dev/null; then
     cp -pv /tmp/grc-master/{grc,grcat} ~/apps/bin/
