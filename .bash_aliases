@@ -294,50 +294,65 @@ function parents() {
     ps -fq "$(pstree -lps $$ | perl -0400 -ple 's/\D+/ /g; s/^\s+|\s+$//g')"
 }
 
+
 ########################## pgrep combinations ##########################
 # pgrep + ps -f
 # 
 # Pass all arguments directly to pgrep, but the output that's displayed is
 # like the output of ps -f.
 function psgrep() {
-	PIDS=$(pgrep -d, "$@")
-	if [ -n "$PIDS" ]; then
-		ps -fp "$PIDS"
-	else
-		echo "No processes matched."
-	fi
+    PIDS=$(pgrep -d, "$@")
+    if [ -n "$PIDS" ]; then
+        ps -fp "$PIDS"
+    else
+        echo "No processes matched."
+    fi
 }
 
 # watch + pgrep + ps -f
 function watchpsgrep() {
-	watch 'ps -fp $(pgrep -d, '"$@"') 2>/dev/null'
+    watch 'ps -fp $(pgrep -d, '"$@"') 2>/dev/null'
 }
 
 # pgrep + top
 function topgrep() {
-	PIDS=$(pgrep -d, "$@")
-	if [ -n "$PIDS" ]; then
-		top -p "$PIDS"
-	else
-		echo "No processes matched."
-	fi
+    PIDS=$(pgrep -d, "$@")
+    if [ -n "$PIDS" ]; then
+        top -p "$PIDS"
+    else
+        echo "No processes matched."
+    fi
 }
 
 # pgrep -n + pstree
 function pstreegrep() {
-	PIDS=$(pgrep -n "$@")
-	if [ -n "$PIDS" ]; then
-		pstree -ap "$PIDS"
-	else
-		echo "No processes matched."
-	fi
+    PIDS=$(pgrep -n "$@")
+    if [ -n "$PIDS" ]; then
+        pstree -ap "$PIDS"
+    else
+        echo "No processes matched."
+    fi
 }
 
 # watch + pstree + pgrep -n
 function watchpstreegrep() {
-	watch 'PID=$(pgrep -n '"$@"'); pstree -ap ${PID:-9999999}'
+    watch 'PID=$(pgrep -n '"$@"'); pstree -ap ${PID:-9999999}'
 }
+########################## pgrep combinations ##########################
 
 
 # very useful for finding out what the active logfiles are!
 alias logfiles='inotifywaitstats /var/log/'
+
+# make 'ps auxf' appear in color!
+function psauxf() {
+    # is grc (the generic coloriser) available?
+    if type -p grc > /dev/null; then
+        grc --colour=on ps auxf "$@" | less -rF 
+    elif type -p strec > /dev/null; then
+        # "grc" is being renamed to "strec"
+        strec --colour=on ps auxf "$@" | less -rF 
+    else
+        ps auxf "$@" | less -F
+    fi
+}
