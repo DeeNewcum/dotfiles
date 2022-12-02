@@ -48,7 +48,7 @@
         #
         # if the below doesn't work, you might want to do:   git reset --hard origin/master
         # but that can overwrite unstaged (uncommited?) changes
-    yolopull = !git fetch --all && git reset origin/master
+    yolopull = "!if git diff --name-only --exit-code >/dev/null && git diff --name-only --cached --exit-code >/dev/null; then git fetch --all && git reset --hard origin/master; else echo 'Aborting to avoid overwriting file changes.'; fi"
 
     # In Git v2.0, `git add --all` changed to include any changes in the entire working tree.
     # In the lead-up to v2.0, Git started complaining if you used --all without specifying which you
