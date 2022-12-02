@@ -35,17 +35,26 @@
 
     # I often want to look at the most recent commit, just after I create it.
     difflast = diff HEAD^ HEAD
-    
+
+    # (╯°□°)╯︵ ┻━┻
+    # explanation: https://olivierpicault.medium.com/my-git-aliases-e9b5434045b7
         # if someone has only the default settings, decent fallbacks are:
         #       git log --decorate --color
         #       git log --decorate --color --oneline
     yolo = !git add --all . && git commit --amend --reuse-message=HEAD --no-verify --allow-empty && git push --force
 
-	# In Git v2.0, `git add --all` changed to include any changes in the entire working tree.
-	# In the lead-up to v2.0, Git started complaining if you used --all without specifying which you
-	# wanted -- the whole working tree, or just under the current directory.
-	# Use this alias if you want to force pre-2.0 Git to include the whole working tree. 
-	a = add --all :/
+        # if you know someone has done a 'push --force', this sort of does the 'pull --force' on the
+        # other side
+        #
+        # if the below doesn't work, you might want to do:   git reset --hard origin/master
+        # but that can overwrite unstaged (uncommited?) changes
+    yolopull = !git fetch --all && git reset origin/master
 
-	# a "quick status", which is sometimes necessary for massive repos
-	qstatus = status --untracked-files=no
+    # In Git v2.0, `git add --all` changed to include any changes in the entire working tree.
+    # In the lead-up to v2.0, Git started complaining if you used --all without specifying which you
+    # wanted -- the whole working tree, or just under the current directory.
+    # Use this alias if you want to force pre-2.0 Git to include the whole working tree. 
+    a = add --all :/
+
+    # a "quick status", which is sometimes necessary for massive repos
+    qstatus = status --untracked-files=no
