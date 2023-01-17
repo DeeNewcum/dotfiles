@@ -208,13 +208,19 @@ nnoremap <leader>L :call clearmatches()<cr>
 " are too complicated. This just loads what extension matches in
 " $VIMHOME/templates/. For example the contents of html.tmpl would be loaded
 " for new html documents.
-augroup BufNewFileFromTemplate
-au!
-autocmd BufNewFile * silent! 0r $HOME/.vim/templates/%:e.tmpl
-autocmd BufNewFile * normal! G"_dd1G
-autocmd BufNewFile * silent! match Todo /TODO/
-augroup BufNewFileFromTemplate
+function _BufNewFileFromTemplate()
+    " BUG -- For some reason, when ~/.vim/templates/md.tmpl is read in, the :read command stops at
+    "        the line that starts with a hash.
+    silent! 0read $HOME/.vim/templates/%:e.tmpl
+    normal! G"_dd1G
+    match Todo /TODO/
+endfunction
 
+
+augroup BufNewFileFromTemplate
+    autocmd!
+    autocmd BufNewFile * :call _BufNewFileFromTemplate()
+augroup END
 
 autocmd BufWrite *.pl silent !chmod a+x %
 autocmd BufWrite *.py silent !chmod a+x %
