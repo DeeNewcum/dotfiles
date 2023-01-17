@@ -11,6 +11,7 @@
 set nocompatible encoding=utf8 nobackup                         " sane defaults
 set ignorecase hlsearch incsearch nowrapscan                    " search settings
 set tabstop=4 softtabstop=4 shiftwidth=4 expandtab autoindent   " tab and indent settings
+set wrap linebreak                                              " enable line wrap, and don't wrap in the middle of a word
 set backspace=indent,eol,start
 set ruler                                                       " display row/col
 set hidden                                                      " make it possible to use buffers
