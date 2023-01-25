@@ -1,22 +1,24 @@
 #!/usr/bin/perl
 
-# a quick script to grab excerpts from local logs, just to make sure
-# they get stored away, in case the log files get rotated away
+# Grabs excerpts from local log files (or other text files), and generates a
+# .html report from them, highlighting where the regexp matched.
 
 # CURRENT STATUS -- PRE-ALPHA, NOT COMPLETE
     
-    use feature 'state';        # Perl v5.10 or later
-
     use strict;
     use warnings;
 
-    use File::Temp ();
+    use File::Temp ();              # Perl core
     use Getopt::Long ();            # Perl core
-    use IO::Uncompress::Gunzip ();
+    use IO::Uncompress::Gunzip ();  # Perl core
+    use Text::Wrap ();              # Perl core
+
+    use Syntax::Highlight::Engine::Simple ();   # not Perl core
 
     use Data::Dumper;
-    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
 
+# like grep's --before-context and --after-context
+sub CONTEXT_LINES { 10 }
 
 ###########################################
 ## parse the command-line arguments
@@ -43,6 +45,19 @@ usage() unless (@ARGV >= 2);
 
 
 ###########################################
+## read in the list of filenames
+###########################################
+my @local_log_files;
+$/ = chr(0);            # $INPUT_RECORD_SEPARATOR
+while (<STDIN>) {
+    chomp;
+    push @local_log_files, $_;
+}
+
+$/ = "\n";            # $INPUT_RECORD_SEPARATOR
+
+
+###########################################
 ## grep through each file
 ###########################################
 
@@ -50,58 +65,250 @@ usage() unless (@ARGV >= 2);
 # system resources
 setpriority(0, 0, 19);
 
-my $tempdir = File::Temp::tempdir(CLEANUP => 1);
+# TODO: CHANGE THIS TO CLEANUP => 1 BEFORE RELEASING.
+#my $zip_tempdir = File::Temp::tempdir(CLEANUP => 0);
+    # TODO: DELETE THESE
+    use File::Path ();
+    my $zip_tempdir = '/tmp/nIMMGw9XLq';
+    File::Path::remove_tree($zip_tempdir);
+    mkdir($zip_tempdir);
+    print ">> tempdir:   $zip_tempdir\n";
 my $long_hostname = readpipe('hostname');
-chomp $long_hostname;
+$long_hostname =~ s/[\n\r]+$//s;
+
+my @last_n_lines;
 
 foreach my $logfilename (@local_log_files) {
     my $logfile_fh;
     if ($logfilename =~ /\.gz$/) {
-        IO::Uncompress::Gunzip::gunzip($logfilename, \$logfile_fh)
+        #IO::Uncompress::Gunzip::gunzip($logfilename => \$logfile_fh)
+            #or die $IO::Uncompress::Gunzip::GunzipError;
+        $logfile_fh = IO::Uncompress::Gunzip->new($logfilename)
             or die $IO::Uncompress::Gunzip::GunzipError;
     } else {
         open $logfile_fh, '<', $logfilename
             or die "Error when openening $logfilename: $!\n";
     }
 
+    my $last_match_lineno = -999;
     while (defined(my $line = <$logfile_fh>)) {
         if ($line =~ /$ARGV{regexp}/o) {
             #print "matched $logfilename\n"; 
-            report_file_match($logfilename, $line, $.);
+
+            # display all lines that lie within @last_n_lines
+            foreach my $line_ref (@last_n_lines) {
+                report_file_match($logfilename, $line_ref->[1], $line_ref->[0]);
+            }
+            @last_n_lines = ();
+
+            # now display this particular line
+            report_file_match($logfilename, $line, $.);     # $. = $INPUT_LINE_NUMBER
+            $last_match_lineno = $.;
+
+        } elsif ($. - $last_match_lineno < CONTEXT_LINES) {
+            report_file_match($logfilename, $line, $.);     # $. = $INPUT_LINE_NUMBER
+
+        } else {
+            push @last_n_lines, [$., $line];        # $. = $INPUT_LINE_NUMBER
+
+            # delete all but the last 'n' lines
+            #if (@last_n_lines > CONTEXT_LINES) {
+            #    splice(@last_n_lines, 0, CONTEXT_LINES - scalar(@last_n_lines));
+            #}
+            while (scalar(@last_n_lines) > CONTEXT_LINES) {
+                shift @last_n_lines;
+            }
         }
     }
+
+    close $logfile_fh;
+
+    process_one_report_file();
 }
 
+exit;
 
-sub report_file_match {
-    my ($logfilename, $line, $lineno) = @_;
-    
-    state $last_logfilename = '';
-    state $fout;
 
-    # remove any line-endings
-    $line =~ s/(\012|\015\012?)$//s;
 
-    if ($last_logfilename ne $logfilename) {
-        my $logfilename_fixed = $logfilename;
-        $logfilename_fixed =~ s#^[/\\]##s;
-        $logfilename_fixed =~ s#[/\\]#_#g;
-        $logfilename_fixed =~ s/\.gz$//;
+BEGIN {
+    my $last_logfilename = '';
+    my $last_lineno = -1;
+    my $fout;
+    my $accum_line_numbers = '';     # this is the "left column-table", per https://stackoverflow.com/a/35815198/1042525
+    my $accum_matches = '';          # this is the "right column-table", per https://stackoverflow.com/a/35815198/1042525
+    my $highlight;
 
-        open $fout, '>', "$tempdir/$long_hostname/$logfilename_fixed.html"
-            or die $!;
+    sub report_file_match {
+        my ($logfilename, $line, $lineno) = @_;
 
-        print $fout <<"EOF";
-<h1>this is an excerpt of $logfilename from $long_hostname</h1>
-EOF
+        # remove any line-endings
+        $line =~ s/(\012|\015\012?)$//s;
 
-        # where I left off:
-        #
-        # TODO -- figure out how to add line numbers to the beginning of lines
-        # within <pre>
-        #
-        # https://stackoverflow.com/questions/40842277/create-line-numbers-on-pre-with-css-only
+        if (!defined($highlight)) {
+            $highlight = Syntax::Highlight::Engine::Simple->new();
+
+            $highlight->setSyntax(
+                    syntax => [
+                        {
+                            class => 'user_regexp',
+                            regexp => $ARGV{regexp},
+                        },
+                        {
+                            class => 'error',
+                            regexp => '(?i)\berror\b',
+                        },
+                        {
+                            class => 'warning',
+                            regexp => '(?i)\bwarn(ing)?\b',
+                        },
+                        {
+                            class => 'datetime',        # just date actually
+                            regexp => '\b2\d\d\d[-/]\d\d[-/]\d\d\b',
+                        },
+                        {
+                            class => 'datetime',        # just time actually
+                            regexp => '\b\d\d:\d\d(:\d\d)?\b',
+                        },
+                    ]
+                );
+        }
+
+        if ($last_logfilename ne $logfilename) {
+            if ($last_lineno >= 0) {
+                process_one_report_file();
+            }
+
+            my $logfilename_fixed = $logfilename;
+            $logfilename_fixed =~ s#^[/\\]##s;
+            $logfilename_fixed =~ s#[/\\]#_#g;
+
+            my $parent_dir = "$zip_tempdir/$long_hostname";
+            mkdir $parent_dir       unless (-d $parent_dir);
+
+            my $excerpt_filename = "$zip_tempdir/$long_hostname/$logfilename_fixed.html";
+            open $fout, '>', $excerpt_filename
+                or die "Unable to write to $excerpt_filename: $!\n";
+
+            print $fout <<"EOF";
+<style>
+    /* Syntax::Highlight::Engine::Simple stuff */
+    .user_regexp {background-color: #ff6}
+    .error       {background-color: #f99}
+    .warning     {background-color: #89f}
+    .datetime {
+        color: #a0a;
+        font-weight: bold;
     }
 
-    # TODO -- write the line
+    td {
+        vertical-align: top;
+        /* border:1px solid #aaa; */
+
+        /* make all table cells look like a <pre> */
+        font-family: monospace;
+        white-space: pre;
+    }
+
+
+    /* prevent line-wraps from being copied into the clipboard */
+    label {
+        user-select: none;
+    }
+
+    /* ======== the line-number side ======== */
+    td:nth-child(1) table {
+        margin-right: 0.5em;
+        border-right: 1px solid #000;
+        padding-right: 0.5em;
+    }
+    td:nth-child(1) table td {
+        text-align: right;
+    }
+
+    table tr td:nth-child(1) table tr.ellipsis td {
+        text-align: right;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        padding-right: 0.5em;
+    }
+
+    /* ======== the log-text side ======== */
+    td:nth-child(2) table td {
+        /* a hanging indent https://www.thesitewizard.com/css/hanging-indents.shtml */
+        padding-left: 40px;
+        text-indent: -40px;
+    }
+
+    table tr td:nth-child(2) table tr.ellipsis td {
+        text-align: left;
+        padding-top: 1em;
+        padding-bottom: 1em;
+        /* stop the hanging-indent */
+        padding-left: 1em;
+        text-indent: 0;
+    }
+
+    td.evenline {background-color:#ddd}
+</style>
+
+<title>an excerpt of $logfilename from $long_hostname</title>
+<h1>an excerpt of $logfilename from $long_hostname</h1>
+
+<table>
+EOF
+
+            $accum_line_numbers = "<table>\n";
+
+            $accum_matches = "<table>\n";
+
+            $last_logfilename = $logfilename;
+        }
+
+        # do we need to display an ellipsis?
+        if ($last_lineno >= 0 && $lineno - $last_lineno > 1) {
+            $accum_line_numbers .= "<tr class=ellipsis><td>.\n.\n.\n.\n.</td></tr>\n";
+            $accum_matches      .= "<tr class=ellipsis><td>.\n.\n.\n.\n.</td></tr>\n";
+        }
+        $last_lineno = $lineno;
+
+        $Text::Wrap::columns = 150;
+        $line = Text::Wrap::wrap("", "", $line);
+        # the so-called "goatse operator"; count the number of times it matches
+        $line =~ s/\n+$//s;
+        my $num_extra_lines =()= $line =~ /\n/sg;
+        $line = $highlight->doStr(str => $line);
+        #$line =~ s#\n#\n<ins>&rarr;</ins>#sg;      # hanging indent
+        $line =~ s#\n#<label>\n</label>#sg;     # prevent line-wraps from being copied into the clipboard
+        my $odd_even = ($lineno % 2) ? "oddline" : "evenline";
+        $accum_matches .= "<tr><td class='$odd_even'>$line</td></tr>\n";
+
+        $accum_line_numbers .= "<tr><td>" . commify($lineno)
+                . "<br/> " x $num_extra_lines
+                . "</td></tr>\n";
+    }
+
+    # should be called, once, after the very last call to report_file_match()
+    sub process_one_report_file {
+        return unless ($last_lineno >= 0);
+
+        print $fout "<tr><td>\n$accum_line_numbers</table>\n</td>\n",
+                    "<td>\n$accum_matches</table>\n</td>\n",
+                    "</table>\n";
+    
+        print ">> finished processing $last_logfilename\n";
+        
+        close $fout;
+
+        # reset everything, so that it's clear that this information has been
+        # output already
+        $last_logfilename = '';
+        $last_lineno = -1;
+        $fout = undef;
+        $accum_line_numbers = '';
+        $accum_matches = '';
+    }
 }
+
+
+# add commas to a number
+sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}

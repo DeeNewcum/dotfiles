@@ -65,9 +65,12 @@ function 0find()	{ find $PWD "$@" -print0; }
 # system grep, since that automatically greps inside .gz files and such.
 function 0xgrep()   { nice -n 19 xargs -0 tcgrep "$@"; }
 function sudo_0xgrep()   { sudo -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
-function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 tcgrep "$@"; }
+function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
 	# ^^^ to be clear, these take null-separated records on INPUT, but if 
 	# 	  the '-l' flag is used, the output is newline-separated
+
+function sudo_0excerpt() { sudo "$(which 0excerpt)" "$@"; }
+function sudoE_0excerpt() { sudo -E "$(which 0excerpt)" "$@"; }
 
 # Just for convenience, change the null-record-separator to a newline, to make
 # it easier for the user to read the list. Hopefully this gets used for
