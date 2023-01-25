@@ -46,6 +46,41 @@ function xlgrep()  { xargs_newline grep -l "$@" /dev/null    | xargs less    -p 
 function xlgrepi() { xargs_newline grep -l -i "$@" /dev/null | xargs less -i -p "$1"; }
 
 
+################################################################################
+##
+## For aliases and scripts whose name starts with "0", that means it processes
+## a list of null-separated records, along the lines of `find -print0` or
+## `xargs -0`. TYPICALLY these will be a list of filenames, but it could
+## potentially be a list of other things.
+##
+
+# Call just like `find`, though it has a few defaults that I prefer.
+function 0find()	{ find $PWD "$@" -print0; }
+
+# Call just like `xargs -0 grep`, with all arguments passed through to grep.
+# Set it to the lowest scheduling priority to avoid impacting resources on
+# important servers.
+#function 0xgrep()   { nice -n 19 xargs -0 grep "$@"; }
+# Actually, use 'tcpgrep' (Tom Christiansen's rewrite of grep) instead of the
+# system grep, since that automatically greps inside .gz files and such.
+function 0xgrep()   { nice -n 19 xargs -0 tcgrep "$@"; }
+function sudo_0xgrep()   { sudo -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
+function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 tcgrep "$@"; }
+	# ^^^ to be clear, these take null-separated records on INPUT, but if 
+	# 	  the '-l' flag is used, the output is newline-separated
+
+# Just for convenience, change the null-record-separator to a newline, to make
+# it easier for the user to read the list. Hopefully this gets used for
+# diagnostic purposes only, and not as a way to use non-null versions of xargs
+# et al.
+alias 0print='perl -0 -l012 -p -e "1"'
+
+################################################################################
+
+
+
+
+## TODO -- This overlaps in functionality with function cd() below. Consider deleting this.
 # just like 'cd', except that it can also accept filenames, in which case it will CD to the directory *containing* that file
 function cdd { if [ -f "$1" ]; then cd $(dirname "$1"); else cd "$1"; fi; }
 

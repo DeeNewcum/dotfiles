@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+# a quick script to grab excerpts from local logs, just to make sure
+# they get stored away, in case the log files get rotated away
+
+# CURRENT STATUS -- PRE-ALPHA, NOT COMPLETE
+    
+    use feature 'state';        # Perl v5.10 or later
+
+    use strict;
+    use warnings;
+
+    use File::Temp ();
+    use Getopt::Long ();            # Perl core
+    use IO::Uncompress::Gunzip ();
+
+    use Data::Dumper;
+    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
+
+
+###########################################
+## parse the command-line arguments
+###########################################
+sub usage {
+    print <<'EOF';
+usage: 0excerpt <zip_file_name> <regexp>
+
+<zip_file_name>
+        The name of the zipfile to create within /var/tmp/
+
+<regexp>
+        The Perl regexp to search all log files for.
+EOF
+    exit;
+}
+
+usage() unless (@ARGV >= 2);
+
+%::ARGV = (
+    zipfilename => $ARGV[0],
+    regexp => $ARGV[1],
+);
+
+
+###########################################
+## grep through each file
+###########################################
+
+# set us to the lowest scheduling priority, because grepping can take a lot of
+# system resources
+setpriority(0, 0, 19);
+
+my $tempdir = File::Temp::tempdir(CLEANUP => 1);
+my $long_hostname = readpipe('hostname');
+chomp $long_hostname;
+
+foreach my $logfilename (@local_log_files) {
+    my $logfile_fh;
+    if ($logfilename =~ /\.gz$/) {
+        IO::Uncompress::Gunzip::gunzip($logfilename, \$logfile_fh)
+            or die $IO::Uncompress::Gunzip::GunzipError;
+    } else {
+        open $logfile_fh, '<', $logfilename
+            or die "Error when openening $logfilename: $!\n";
+    }
+
+    while (defined(my $line = <$logfile_fh>)) {
+        if ($line =~ /$ARGV{regexp}/o) {
+            #print "matched $logfilename\n"; 
+            report_file_match($logfilename, $line, $.);
+        }
+    }
+}
+
+
+sub report_file_match {
+    my ($logfilename, $line, $lineno) = @_;
+    
+    state $last_logfilename = '';
+    state $fout;
+
+    # remove any line-endings
+    $line =~ s/(\012|\015\012?)$//s;
+
+    if ($last_logfilename ne $logfilename) {
+        my $logfilename_fixed = $logfilename;
+        $logfilename_fixed =~ s#^[/\\]##s;
+        $logfilename_fixed =~ s#[/\\]#_#g;
+        $logfilename_fixed =~ s/\.gz$//;
+
+        open $fout, '>', "$tempdir/$long_hostname/$logfilename_fixed.html"
+            or die $!;
+
+        print $fout <<"EOF";
+<h1>this is an excerpt of $logfilename from $long_hostname</h1>
+EOF
+
+        # where I left off:
+        #
+        # TODO -- figure out how to add line numbers to the beginning of lines
+        # within <pre>
+        #
+        # https://stackoverflow.com/questions/40842277/create-line-numbers-on-pre-with-css-only
+    }
+
+    # TODO -- write the line
+}
