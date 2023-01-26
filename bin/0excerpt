@@ -11,6 +11,7 @@
     use File::Temp ();              # Perl core
     use Getopt::Long ();            # Perl core
     use IO::Uncompress::Gunzip ();  # Perl core
+    use POSIX ();                   # Perl core
     use Text::Wrap ();              # Perl core
 
     use Syntax::Highlight::Engine::Simple ();   # not Perl core
@@ -202,7 +203,7 @@ BEGIN {
         font-weight: bold;
     }
 
-    td {
+    table table td {
         vertical-align: top;
         /* border:1px solid #aaa; */
 
@@ -211,17 +212,15 @@ BEGIN {
         white-space: pre;
     }
 
-
     /* prevent line-wraps from being copied into the clipboard */
     label {
         user-select: none;
     }
 
+
     /* ======== the line-number side ======== */
     td:nth-child(1) table {
         margin-right: 0.5em;
-        border-right: 1px solid #000;
-        padding-right: 0.5em;
     }
     td:nth-child(1) table td {
         text-align: right;
@@ -233,6 +232,7 @@ BEGIN {
         padding-bottom: 1em;
         padding-right: 0.5em;
     }
+
 
     /* ======== the log-text side ======== */
     td:nth-child(2) table td {
@@ -259,17 +259,19 @@ BEGIN {
 <table>
 EOF
 
-            $accum_line_numbers = "<table>\n";
+            $accum_line_numbers = "<!-- the line-number side -->\n"
+                                    . "<table>\n";
 
-            $accum_matches = "<table>\n";
+            $accum_matches = "<!-- the log-text side -->\n"
+                                    . "<table>\n";
 
             $last_logfilename = $logfilename;
         }
 
-        # do we need to display an ellipsis?
         if ($last_lineno >= 0 && $lineno - $last_lineno > 1) {
-            $accum_line_numbers .= "<tr class=ellipsis><td>.\n.\n.\n.\n.</td></tr>\n";
-            $accum_matches      .= "<tr class=ellipsis><td>.\n.\n.\n.\n.</td></tr>\n";
+            # indicate that we just jumped to a new group of lines
+            $accum_line_numbers .= "<tr class=ellipsis><td>.\n.\n.\n.\n.\n.</td></tr>\n";
+            $accum_matches      .= "<tr class=ellipsis><td>.\n.\n.\n.\n.\n.</td></tr>\n";
         }
         $last_lineno = $lineno;
 
@@ -295,10 +297,19 @@ EOF
         print $fout "<tr><td>\n$accum_line_numbers</table>\n</td>\n",
                     "<td>\n$accum_matches</table>\n</td>\n",
                     "</table>\n";
-    
-        print ">> finished processing $last_logfilename\n";
-        
+
+        print $fout "<p>If you're familiar with ",
+                    "<a href='https://cheatography.com/davechild/cheat-sheets/regular-expressions/'>regular expressions</a>, ",
+                    "the exact regexp used here is <tt style='color: #060; font-weight: bold'>/",
+                    Syntax::Highlight::Engine::Simple::_html_escape($ARGV{regexp}), "/</tt>.\n";
+
+        # $^T is $BASETIME, the time that the program began running
+        print $fout "<p>This report was generated at ", scalar(localtime($^T)), " local time ",
+                    "(this system's timezone is ", POSIX::strftime("%Z", localtime()), ").\n";
+
         close $fout;
+
+        print "finished processing $last_logfilename\n";
 
         # reset everything, so that it's clear that this information has been
         # output already
