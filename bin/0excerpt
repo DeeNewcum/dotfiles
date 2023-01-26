@@ -2,6 +2,11 @@
 
 # Searches local log files for a regular expression, and produces an .html
 # report that shows the matches, as well as some nearby lines for context.
+#
+# The "0" prefix means, for my personal scripts and shell aliases, that these
+# tools process records separated by null characters. For this particular
+# script, it expects the list of filenames to search to be piped to its 
+# STDIN.
 
 # CURRENT STATUS -- PRE-ALPHA, NOT COMPLETE
     
@@ -44,6 +49,10 @@ usage() unless (@ARGV >= 2);
     regexp => $ARGV[1],
 );
 
+if (-t STDIN) {
+    die "A list of file names to grep should be piped into this script.\n";
+}
+
 
 ###########################################
 ## read in the list of filenames
@@ -52,7 +61,24 @@ my @local_log_files;
 $/ = chr(0);            # $INPUT_RECORD_SEPARATOR
 while (<STDIN>) {
     chomp;
-    push @local_log_files, $_;
+    push @local_log_files, $_
+        if (length($_));
+}
+
+    sub _wrong_delimiter {
+        # "goatse operator"
+        my $num_newlines =()= $local_log_files[0] =~ /\n/sg;
+        if (@local_log_files == 1 && $num_newlines > 3) {
+            print STDERR "\nWARNING: The list of filenames piped into 0excerpt should be null-delimited,\n"
+                    . "and it looks like you may have accidentally used a newline-delimited list.\n\n";
+        }
+    }
+
+_wrong_delimiter();
+
+# do this at the very end, just to make sure the user sees it
+END {
+    _wrong_delimiter();
 }
 
 $/ = "\n";            # $INPUT_RECORD_SEPARATOR
@@ -68,7 +94,7 @@ setpriority(0, 0, 19);
 
 # TODO: CHANGE THIS TO CLEANUP => 1 BEFORE RELEASING.
 #my $zip_tempdir = File::Temp::tempdir(CLEANUP => 0);
-    # TODO: DELETE THESE
+    # TODO: DELETE THESE LINES
     use File::Path ();
     my $zip_tempdir = '/tmp/nIMMGw9XLq';
     File::Path::remove_tree($zip_tempdir);
@@ -80,6 +106,10 @@ $long_hostname =~ s/[\n\r]+$//s;
 my @last_n_lines;
 
 foreach my $logfilename (@local_log_files) {
+    if (! -f $logfilename) {
+        print STDERR "File '$logfilename' not found.\n";
+    }
+
     my $logfile_fh;
     if ($logfilename =~ /\.gz$/) {
         #IO::Uncompress::Gunzip::gunzip($logfilename => \$logfile_fh)
@@ -271,7 +301,7 @@ EOF
         if ($last_lineno >= 0 && $lineno - $last_lineno > 1) {
             # indicate that we just jumped to a new group of lines
             $accum_line_numbers .= "<tr class=ellipsis><td>.\n.\n.\n.\n.\n.</td></tr>\n";
-            $accum_matches      .= "<tr class=ellipsis><td>.\n.\n.\n.\n.\n.</td></tr>\n";
+            $accum_matches      .= "<tr class=ellipsis><td> \n \n \n \n \n </td></tr>\n";
         }
         $last_lineno = $lineno;
 
@@ -309,7 +339,7 @@ EOF
 
         close $fout;
 
-        print "finished processing $last_logfilename\n";
+        print "matches were found in $last_logfilename\n";
 
         # reset everything, so that it's clear that this information has been
         # output already
