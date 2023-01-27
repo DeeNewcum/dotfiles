@@ -8,8 +8,6 @@
 # script, it expects the list of filenames to search to be piped to its 
 # STDIN.
 
-# CURRENT STATUS -- PRE-ALPHA, NOT COMPLETE
-    
     use strict;
     use warnings;
 
@@ -105,14 +103,6 @@ $long_hostname =~ s/[\n\r]+$//s;
 my $short_hostname = readpipe('hostname -s');
 $short_hostname =~ s/[\n\r]+$//s;
 
-my $zip = Archive::Zip->new();
-if (-f $ARGV{zipfile}) {
-    $zip->read($ARGV{zipfile})
-        == AZ_OK or die "Error reading $ARGV{zipfile}\n";
-}
-
-delete_host_logfiles();
-
 
 ###########################################
 ## grep through each file
@@ -176,12 +166,23 @@ foreach my $logfilename (@local_log_files) {
 }
 
 
-###########################################
-## write the zip file out
-###########################################
-$zip->addTree($tempdir, '');
-    # TODO -- where I left off -- test that the above line works correctly
+###############################################
+## make all our changes to the zip file at once
+###############################################
 
+# initialization
+my $zip = Archive::Zip->new();
+if (-f $ARGV{zipfile}) {
+    $zip->read($ARGV{zipfile})
+        == AZ_OK or die "Error reading $ARGV{zipfile}\n";
+}
+
+delete_host_logfiles();
+
+# update our files
+$zip->addTree($tempdir, '');
+
+# write the zip file out
 if (-f $ARGV{zipfile}) {
     $zip->overwrite()
         == AZ_OK or die "Unable to write to $ARGV{zipfile}.\n";
@@ -261,7 +262,7 @@ BEGIN {
 <style>
     /* Syntax::Highlight::Engine::Simple stuff */
     .user_regexp {background-color: #ff6}
-    .error       {background-color: #f99}
+    .error       {background-color: #fcc}
     .warning     {background-color: #89f}
     .datetime {
         color: #a0a;
