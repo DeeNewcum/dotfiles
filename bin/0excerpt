@@ -19,12 +19,14 @@
     use POSIX ();                   # Perl core
     use Text::Wrap ();              # Perl core
 
+    use Archive::Zip qw( AZ_OK );            # not Perl core
     use Syntax::Highlight::Engine::Simple ();   # not Perl core
 
     use Data::Dumper;
 
 # like grep's --before-context and --after-context
 sub NUM_CONTEXT_LINES { 10 }
+
 
 ###########################################
 ## parse the command-line arguments
@@ -45,7 +47,7 @@ EOF
 usage() unless (@ARGV >= 2);
 
 %::ARGV = (
-    zipfilename => $ARGV[0],
+    zipfile => $ARGV[0],
     regexp => $ARGV[1],
 );
 
@@ -66,6 +68,8 @@ while (<STDIN>) {
 }
 
     sub _wrong_delimiter {
+        return unless @local_log_files;
+
         # "goatse operator"
         my $num_newlines =()= $local_log_files[0] =~ /\n/sg;
         if (@local_log_files == 1 && $num_newlines > 3) {
@@ -85,26 +89,38 @@ $/ = "\n";            # $INPUT_RECORD_SEPARATOR
 
 
 ###########################################
-## grep through each file
+## various setup
 ###########################################
 
 # set us to the lowest scheduling priority, because grepping can take a lot of
 # system resources
 setpriority(0, 0, 19);
 
-# TODO: CHANGE THIS TO CLEANUP => 1 BEFORE RELEASING.
-#my $zip_tempdir = File::Temp::tempdir(CLEANUP => 0);
-    # TODO: DELETE THESE LINES
-    use File::Path ();
-    my $zip_tempdir = '/tmp/nIMMGw9XLq';
-    File::Path::remove_tree($zip_tempdir);
-    mkdir($zip_tempdir);
-    print ">> tempdir:   $zip_tempdir\n";
+my $tempdir = File::Temp::tempdir(CLEANUP => 1);
+#print ">> tempdir:   $tempdir\n";
+
 my $long_hostname = readpipe('hostname');
 $long_hostname =~ s/[\n\r]+$//s;
 
+my $short_hostname = readpipe('hostname -s');
+$short_hostname =~ s/[\n\r]+$//s;
+
+my $zip = Archive::Zip->new();
+if (-f $ARGV{zipfile}) {
+    $zip->read($ARGV{zipfile})
+        == AZ_OK or die "Error reading $ARGV{zipfile}\n";
+}
+
+delete_host_logfiles();
+
+
+###########################################
+## grep through each file
+###########################################
+
 my @last_n_lines;
 
+## scan all log files
 foreach my $logfilename (@local_log_files) {
     if (! -f $logfilename) {
         print STDERR "File '$logfilename' not found.\n";
@@ -121,6 +137,7 @@ foreach my $logfilename (@local_log_files) {
             or die "Error when openening $logfilename: $!\n";
     }
 
+    ## scan one log file
     my $last_match_lineno = -999;
     while (defined(my $line = <$logfile_fh>)) {
         if ($line =~ /$ARGV{regexp}/o) {
@@ -158,9 +175,30 @@ foreach my $logfilename (@local_log_files) {
     process_one_report_file();
 }
 
+
+###########################################
+## write the zip file out
+###########################################
+$zip->addTree($tempdir, '');
+    # TODO -- where I left off -- test that the above line works correctly
+
+if (-f $ARGV{zipfile}) {
+    $zip->overwrite()
+        == AZ_OK or die "Unable to write to $ARGV{zipfile}.\n";
+} else {
+    $zip->writeToFileNamed($ARGV{zipfile})
+        == AZ_OK or die "Unable to write to $ARGV{zipfile}.\n";
+}
+
 exit;
 
 
+
+
+
+################################################################################
+## HTML report generation
+################################################################################
 
 BEGIN {
     my $last_logfilename = '';
@@ -215,10 +253,7 @@ BEGIN {
             $logfilename_fixed =~ s#^[/\\]##s;
             $logfilename_fixed =~ s#[/\\]#_#g;
 
-            my $parent_dir = "$zip_tempdir/$long_hostname";
-            mkdir $parent_dir       unless (-d $parent_dir);
-
-            my $excerpt_filename = "$zip_tempdir/$long_hostname/$logfilename_fixed.html";
+            my $excerpt_filename = "$tempdir/${short_hostname}___$logfilename_fixed.html";
             open $fout, '>', $excerpt_filename
                 or die "Unable to write to $excerpt_filename: $!\n";
 
@@ -283,8 +318,8 @@ BEGIN {
     td.evenline {background-color:#ddd}
 </style>
 
-<title>an excerpt of $logfilename from $long_hostname</title>
-<h1>an excerpt of $logfilename from $long_hostname</h1>
+<title>an excerpt of $logfilename, located on $long_hostname</title>
+<h1>an excerpt of $logfilename, located on $long_hostname</h1>
 
 <table>
 EOF
@@ -330,7 +365,7 @@ EOF
 
         print $fout "<p>If you're familiar with ",
                     "<a href='https://cheatography.com/davechild/cheat-sheets/regular-expressions/'>regular expressions</a>, ",
-                    "the exact regexp used here is <tt style='color: #060; font-weight: bold'>/",
+                    "the exact regexp used here is <tt style='color: #090; font-weight: bold'>/",
                     Syntax::Highlight::Engine::Simple::_html_escape($ARGV{regexp}), "/</tt>.\n";
 
         # $^T is $BASETIME, the time that the program began running
@@ -354,3 +389,21 @@ EOF
 
 # add commas to a number
 sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}
+
+
+################################################################################
+## zip file handling
+################################################################################
+
+# look inside the .zip file, and if there are any files related to the current
+# hostname, delete all of those files, to make sure there aren't any stale files
+# left over
+sub delete_host_logfiles {
+    #my @members = $zip->members();
+    #print Dumper \@members; exit;
+    my @members = $zip->membersMatching('^' . quotemeta($short_hostname) . '___.*');
+
+    foreach my $mmbr (@members) {
+        $zip->removeMember($mmbr);
+    }
+}
