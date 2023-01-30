@@ -396,4 +396,9 @@ function @ {
 
 alias @psauxf='@ ps -auxf'
 alias @lsof='@ lsof'
+
+# filter out all of the non-regular files
+function @lsof_regularfiles {
+	lsof "$@" | grep -v ' /proc/\| /dev/\| pipe$\| /$\| [^/][^ ]*$' | grcat conf.lsof | less -rF
+}
 ########################## grc combinations ##########################
