@@ -382,15 +382,18 @@ function watchpstreegrep() {
 # very useful for finding out what the active logfiles are!
 alias logfiles='inotifywaitstats /var/log/'
 
-# make 'ps auxf' appear in color!
-function psauxf() {
-    # is grc (the generic coloriser) available?
+
+########################## colorizer filters ##########################
+# run any command through grc (the generic coloriser)
+function @ {
+    # is grc available?
     if type -p grc > /dev/null; then
-        grc --colour=on ps auxf "$@" | less -rF 
-    elif type -p strec > /dev/null; then
-        # "grc" is being renamed to "strec"
-        strec --colour=on ps auxf "$@" | less -rF 
+        grc --colour=on "$@" | less -rF 
     else
-        ps auxf "$@" | less -F
+        "$@" | less -F
     fi
 }
+
+alias @psauxf='@ ps -auxf'
+alias @lsof='@ lsof'
+########################## grc combinations ##########################
