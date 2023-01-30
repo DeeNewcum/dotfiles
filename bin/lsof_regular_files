@@ -1,0 +1,271 @@
+#!/usr/bin/perl
+
+# This is a FILTER for the output of lsof -- It only reads in strings and
+# outputs strings, nothing else.
+#
+# It removes any path that isn't what the man page calls a "regular file", as
+# well as any path that I find annoying.
+
+    use strict;
+    use warnings;
+
+    use English;
+
+    use Data::Dumper;
+
+
+# Some of the headers are actually located right relative to the contents of
+# that column. This is VERY IMPORTANT to fix while processing the headers-line.
+# 
+# where I left off:
+#   - This is where 'lsof' both 1) calculates how wide each column should be,
+#     and 2) has the actual mechanism for printing each field, at the proper
+#     width.
+#           https://github.com/lsof-org/lsof/blob/master/print.c#L654-L1091
+our %header_position_move_back = (
+        FD   => -1,
+        NODE => -6,
+        TID  => -3,
+        PID  => -2,     # -3?
+        USER => -4,
+    );
+
+ 
+
+# put the main loop into a block so that tests can load this as a module                                                
+if (! caller()) {
+
+    if (-t STDIN) {
+        die "You should pipe the output of (some, any) lsof command into this.\n";
+    }
+
+    my $headers_line = <STDIN>;
+    my %field_locations     # maps $field_name => [ $char_start, $char_end ]
+        = lsof_parse_headers($headers_line);
+    #die Dumper \%field_locations;
+    print $headers_line;
+
+
+    # read everything after the first line
+    while (<STDIN>) {
+        my $original = $_;
+        my %fields = lsof_parse_fields(\%field_locations, $_);
+
+        if (exists $fields{TYPE}) {
+            next unless ($fields{TYPE} eq 'REG' || $fields{TYPE} eq 'DIR');
+        }
+        if (exists $fields{NAME}) {
+            next if ($fields{NAME} eq '/');
+            next if ($fields{NAME} =~ m#^/(?:proc|dev|sys)/#);
+        }
+        if (exists $fields{FD}) {
+            next if ($fields{FD} eq 'mem');
+        }
+
+        print $headers_line, $original;
+        $Data::Dumper::Sortkeys = 1;
+        print Dumper \%fields;
+    }
+
+    exit;
+}
+
+
+
+
+
+# parse the first line of the output of 'lsof'  (when -F is NOT used!)
+sub lsof_parse_headers {
+    my ($headers) = @_;
+
+   # figure out the character position of each field
+    my %field_locations;    # maps $field_name => [ $char_start, $char_end ]
+    my $last_field_name;
+    while ($headers =~ /(\S+)/g) {
+        #print Dumper [ $1, $-[0], $+[0] ];
+
+        my $field_name = $1;
+
+        $field_locations{$field_name} = [
+                $-[0],          # @LAST_MATCH_START
+            ];
+
+        if (exists $header_position_move_back{$field_name}) {
+            $field_locations{$field_name}[0] += $header_position_move_back{$field_name};
+        }
+        #if ($field_name eq 'FD') {
+        #    # the header is moved to the right one space, relative to the start of the field contents
+        #    $field_locations{$field_name}[0]--;
+        #} elsif ($field_name eq 'NODE') {
+        #    $field_locations{$field_name}[0] -= 6;
+        #} elsif ($field_name eq 'USER') {
+        #    $field_locations{$field_name}[0] -= 2;
+        #}
+
+        # go back and set the 'end' position of the previous field
+        if (defined($last_field_name)) {
+            $field_locations{$last_field_name}[1] = $field_locations{$field_name}[0] - 1;
+        }
+        $last_field_name = $field_name;
+    }
+    # finally, set the last field's end position
+    push @{ $field_locations{$last_field_name} }, 9999;
+
+    # DEBUG ONLY -- what string do we get back when we try to use the start->stop locations?
+    if (0) {
+        $headers =~ s/[\n\r]$//s;
+        foreach my $listref (values %field_locations) {
+            my $str = substr($headers, $listref->[0], $listref->[1] - $listref->[0]);
+            push @$listref, $str;
+        }
+    }
+
+    return %field_locations;
+}
+
+
+# parse any row after the first row
+sub lsof_parse_fields {
+    my ($field_locations, $line) = @_;
+
+    $line =~ s/[\n\r]+$//s;     # chomp
+
+    # DEBUG ONLY -- DELETE ME!
+    #print $line, "\n";
+
+    my %field_values;
+    while (my ($field_name, $start_end) = each %$field_locations) {
+        my $field_val = substr($line, $start_end->[0], $start_end->[1] - $start_end->[0]);
+        $field_val =~ s/^\s+| +$//sg;        # TODO -- UNCOMMENT THIS BEFORE SENDING TO PRODUCTION
+        $field_values{$field_name} = $field_val;
+
+        # DEBUG ONLY -- DELETE ME!
+        if (0) {
+            no warnings 'substr';
+            my $debug_before;
+            if ($start_end->[0] > 0) {
+                $debug_before = substr($line, $start_end->[0] - 1, 1);
+            } else {
+                $debug_before = '';
+            }
+            my $debug_after = substr($line, $start_end->[1], 1);
+            $debug_after = 'undef' if (!defined($debug_after));
+            printf "%-15s %-7s %-30s %s\n",
+                $field_name,
+                ">$debug_before<",
+                ">$field_values{$field_name}<",
+                ">$debug_after<";
+        }
+    }
+
+    # DEBUG ONLY -- DELETE ME!
+    #print "\n";
+    #$field_values{'*'} = $line;
+
+    return %field_values;
+}
+
+
+
+# Runs some checks to verify if the values in %header_position_move_back seem
+# correct or not.
+#
+# To run this routine, paste this in at the command line:
+#       perl -e 'do "lsof_regular_files"; test_header_moveback(@ARGV)'
+# 
+# Optionally, you can include some additional command-line args, on that same 
+# command-line, that will be passed directly to 'lsof'.
+sub test_header_moveback {
+    open(my $lsof_machine_fh, '-|', 'lsof', '-F', '-T', @_)
+        or die $!;
+
+    #while (<$lsof_machine_fh>) { chomp; print ">>>$_<<<\n"; } exit;
+
+    while (scalar(my %rec = read_lsof_F_record($lsof_machine_fh))) {
+        print Dumper \%rec;
+    }
+    exit;
+
+
+    open(my $lsof_human_fh, '-|', 'lsof', @_)
+        or die $!;
+
+    my $headers_line = <$lsof_human_fh>;
+    my %field_locations = lsof_parse_headers($headers_line);                                                                             
+}
+
+
+
+BEGIN {
+    my $last_pid;
+
+    # Originally from https://github.com/lsof-org/lsof/blob/master/Lsof.8#L3345-L3392
+    #
+    # Confusing issues:
+    #   - 'SIZE/OFF' is a combination of s => q(file size) and
+    #     o => q(file offset)
+    #   - 'FD' is f => q(file descriptor) plus a => q(access mode)
+    my %field_map = (
+        a => '=access mode',
+        c => 'COMMAND',
+        C => '=file structure share count',
+        d => '=file\'s device character code',
+        D => 'DEVICE',
+        f => 'FD',
+        F => '=file structure address',
+        g => 'PGID',
+        G => 'FILE-FLAG',
+        i => 'NODE',
+        k => 'NLINK',
+        K => '=task id',
+        l => '=file\'s lock status',
+        L => 'USER',
+        n => 'NAME',
+        N => 'NODE-ID',
+        o => '=file\'s offset',
+        p => 'PID',
+        P => '=protocol name',
+        r => '=raw device number',
+        R => 'PPID',
+        s => '=file size',
+        S => '=file\'s stream identification / stream module and device names',
+        t => 'TYPE',
+        T => '=tcp/tpi info',
+        u => '=user id',
+        z => 'ZONE',
+        Z => 'SECURITY-CONTEXT',
+    );
+
+    # Given an open file-handle, that's a pipe from 'lsof -F0', this will read
+    # in and parse one record. Returns a key=>val hash.
+    sub read_lsof_F_record {
+        my ($fh, $field_separator) = @_;
+
+        # $field_separator is an optional field
+        $field_separator = "\n" unless (defined($field_separator));
+
+        local $/ = $field_separator;        # $INPUT_RECORD_SEPARATOR
+
+        my %fields;
+        if (defined($last_pid)) {
+            $fields{PID} = $last_pid;
+            $last_pid = undef;
+        }
+        while (<$fh>) {
+            s/$field_separator$//s;     # chomp
+            s/^(.)//s;
+            my $field = $1;
+            #print Dumper [$field, $_];
+            if ($field eq 'p' && exists $fields{PID}) {
+                $last_pid = $_;
+                last;
+            }
+            $fields{$field_map{$field}} = $_;
+        }
+
+        return %fields;
+    }
+}
+
+
+1;

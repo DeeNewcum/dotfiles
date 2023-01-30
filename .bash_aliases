@@ -399,6 +399,6 @@ alias @lsof='@ lsof'
 
 # filter out all of the non-regular files
 function @lsof_regularfiles {
-	lsof "$@" | grep -v ' /proc/\| /dev/\| pipe$\| /$\| [^/][^ ]*$' | grcat conf.lsof | less -rF
+	lsof "$@" | \grep -P '^(\S+\s+){4}(REG|TYPE) ' | \grep -vP ' /(dev|proc)/\S*$| (?!NAME$)[^/]\S*$' | grcat conf.lsof | less -rF
 }
 ########################## grc combinations ##########################
