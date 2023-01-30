@@ -55,6 +55,9 @@ fi
 #### make various dotfiles work from root's $HOME ####
 ######################################################
 
+# this is necessary for grc ($HOME/.config/grc/grc.cnf), and ...
+export XDG_CONFIG_HOME=$STDIN_OWNERS_HOME/.config
+
 export INPUTRC=$STDIN_OWNERS_HOME/.inputrc
 
 export VIMINIT='let $MYVIMRC = "'$STDIN_OWNERS_HOME'/.sudo_vimrc" | source $MYVIMRC'
