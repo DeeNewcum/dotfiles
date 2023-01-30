@@ -8,6 +8,19 @@
 # script, it expects the list of filenames to search to be piped to its 
 # STDIN.
 
+    # TODO:
+    #
+    # - try to auto-parse some dates out of each log file line, and then add a
+    #   cmdline argument that allows restriction of matches to a specific time
+    #   period
+    #       - date-parsing modules that might help with this:
+    #           - Date::Manip::Date
+    #           - Date::Parse
+    #           - Time::ParseDate
+    #       - For the lines that don't have any parsable date in them... should
+    #         we report the count of those?   <= Maybe that would work, as long
+    #         as they're a cmdline arg to suppress these warnings.
+
     use strict;
     use warnings;
 
