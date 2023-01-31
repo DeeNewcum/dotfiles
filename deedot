@@ -15,8 +15,8 @@
     # an improved version of 'use FindBin'
     BEGIN {$FindBin::Bin = dirname( abs_path $0 );}
 
-    use Getopt::Long;
     use File::Find;
+    use Getopt::Long;
 
     use Data::Dumper;
     $Data::Dumper::Useqq++;
@@ -62,7 +62,12 @@ if ($ARGV{install}) {
             } else {
                 install_symlink($_);
             }
+
+        } elsif (-l $_) {
+            # if it's a symlink, copy it to $HOME
+            copy_symlink($_);
         }
+
     }, no_chdir=>1}, ".";
 }
 
@@ -308,6 +313,30 @@ sub install_text_substitution {
         open my $fout, '>', $active_filename        or die "Unable to write to $active_filename:  $!";
         print $fout @active_new_contents;
         close $fout;
+    }
+}
+
+
+sub copy_symlink {
+    my ($file) = @_;
+
+    my $to   = "$ENV{HOME}/$file";
+    my $from = "$FindBin::Bin/$file";
+
+    my $readlink_from = readlink($from);
+
+    if (!-e $to) {
+        symlink($readlink_from, $to)
+            or die "Unable to create symlink for '$file'.\n";
+    } elsif (-l $to) {
+        # has this symlink already been installed correctly?
+        my $readlink_to = readlink($to);
+        if ($readlink_from ne $readlink_to) {
+            print "WARNING: ~/$file  already exists\n";
+        }
+
+    } else {
+        print "WARNING: ~/$file  already exists\n";
     }
 }
 
