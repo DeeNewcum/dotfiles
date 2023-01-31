@@ -56,15 +56,18 @@ if (! caller()) {
         }
         if (exists $fields{NAME}) {
             next if ($fields{NAME} eq '/');
-            next if ($fields{NAME} =~ m#^/(?:proc|dev|sys)/#);
+            next if ($fields{NAME} =~ m#^/(?:proc|dev|sys)(?:/|$)#);
+            next if ($fields{NAME} =~ m#^/SYSV#);       # what are these paths?
         }
         if (exists $fields{FD}) {
             next if ($fields{FD} eq 'mem');
         }
 
-        print $headers_line, $original;
-        $Data::Dumper::Sortkeys = 1;
-        print Dumper \%fields;
+        #print $headers_line, $original;
+        #$Data::Dumper::Sortkeys = 1;
+        #print Dumper \%fields;
+
+        print $original;
     }
 
     exit;
@@ -93,14 +96,6 @@ sub lsof_parse_headers {
         if (exists $header_position_move_back{$field_name}) {
             $field_locations{$field_name}[0] += $header_position_move_back{$field_name};
         }
-        #if ($field_name eq 'FD') {
-        #    # the header is moved to the right one space, relative to the start of the field contents
-        #    $field_locations{$field_name}[0]--;
-        #} elsif ($field_name eq 'NODE') {
-        #    $field_locations{$field_name}[0] -= 6;
-        #} elsif ($field_name eq 'USER') {
-        #    $field_locations{$field_name}[0] -= 2;
-        #}
 
         # go back and set the 'end' position of the previous field
         if (defined($last_field_name)) {
@@ -111,20 +106,16 @@ sub lsof_parse_headers {
     # finally, set the last field's end position
     push @{ $field_locations{$last_field_name} }, 9999;
 
-    # DEBUG ONLY -- what string do we get back when we try to use the start->stop locations?
-    if (0) {
-        $headers =~ s/[\n\r]$//s;
-        foreach my $listref (values %field_locations) {
-            my $str = substr($headers, $listref->[0], $listref->[1] - $listref->[0]);
-            push @$listref, $str;
-        }
-    }
-
     return %field_locations;
 }
 
 
 # parse any row after the first row
+#
+# The part about %header_position_move_back is VERY unreliable -- the output of 
+# lsof_parse_fields() should only be trusted for a few specific fields, only if
+# you've varified manually that the field positions are capturing the correct
+# data.
 sub lsof_parse_fields {
     my ($field_locations, $line) = @_;
 
@@ -158,13 +149,21 @@ sub lsof_parse_fields {
         }
     }
 
-    # DEBUG ONLY -- DELETE ME!
-    #print "\n";
-    #$field_values{'*'} = $line;
-
     return %field_values;
 }
 
+
+1;
+
+
+
+
+
+__END__
+
+############## The below code has been moth-balled -- It may or may not
+############## work. It ended up being more of a rabbit hole than I had
+############## anticipated. It needs to be fixed before it's restored.
 
 
 # Runs some checks to verify if the values in %header_position_move_back seem
