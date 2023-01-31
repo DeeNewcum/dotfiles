@@ -52,12 +52,14 @@ if (! caller()) {
         my %fields = lsof_parse_fields(\%field_locations, $_);
 
         if (exists $fields{TYPE}) {
-            next unless ($fields{TYPE} eq 'REG' || $fields{TYPE} eq 'DIR');
+            #next unless ($fields{TYPE} eq 'REG' || $fields{TYPE} eq 'DIR');
+            next unless ($fields{TYPE} eq 'REG');
         }
         if (exists $fields{NAME}) {
             next if ($fields{NAME} eq '/');
             next if ($fields{NAME} =~ m#^/(?:proc|dev|sys)(?:/|$)#);
             next if ($fields{NAME} =~ m#^/SYSV#);       # what are these paths?
+            next unless ($fields{NAME} =~ m#^/#);
         }
         if (exists $fields{FD}) {
             next if ($fields{FD} eq 'mem');

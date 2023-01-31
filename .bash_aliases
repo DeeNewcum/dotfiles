@@ -205,7 +205,7 @@ function mmboxgrep() { local tmp=$(mktemp); mboxgrep "$@" > $tmp; mutt -f $tmp; 
 alias gitk_everything='gitk --all $( git rev-list --all --walk-reflogs ) &'
 
 
-if [ "$(type -p apt-get)" ];  then
+if type -p apt-get > /dev/null;  then
     function upup() {
         sudo apt update
         # dist-upgrade is better than upgrade https://itsfoss.com/apt-get-upgrade-vs-dist-upgrade/
@@ -399,6 +399,10 @@ alias @lsof='@ lsof'
 
 # filter out all of the non-regular files
 function @lsof_regularfiles {
-	lsof "$@" | lsof_regular_files | grcat conf.lsof | less -rF
+	if type -p grcat > /dev/null; then
+		lsof "$@" | lsof_regular_files | grcat conf.lsof | less -rF
+	else
+		lsof "$@" | lsof_regular_files | less -F
+	fi
 }
 ########################## grc combinations ##########################
