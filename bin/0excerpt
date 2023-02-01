@@ -265,6 +265,10 @@ BEGIN {
                             regexp => '\b2\d\d\d[-/]\d\d[-/]\d\d\b',
                         },
                         {
+                            class => 'datetime',        # this regexp is just a date
+                            regexp => '\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b[^a-zA-Z0-9]*\d+',
+                        },
+                        {
                             class => 'datetime',        # this regexp is just a time
                             regexp => '\b\d\d:\d\d(:\d\d)?\b',
                         },
