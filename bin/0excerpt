@@ -332,8 +332,8 @@ BEGIN {
     td.evenline {background-color:#ddd}
 </style>
 
-<title>an excerpt of $logfilename, located on $long_hostname</title>
-<h1>an excerpt of $logfilename, located on $long_hostname</h1>
+<title>an excerpt of $logfilename &mdash; located on $long_hostname</title>
+<h1>an excerpt of $logfilename &mdash; located on $long_hostname</h1>
 
 <table>
 EOF
