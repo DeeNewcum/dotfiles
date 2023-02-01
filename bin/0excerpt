@@ -273,6 +273,15 @@ BEGIN {
 
             print $fout <<"EOF";
 <style>
+    /* useful for debugging, in cases where the line numbers get misaligned
+     * from their corresponding text lines */
+    /*
+     body > table > tbody > tr > td {vertical-align:top}
+     table table    {border:1px solid #faa}
+     table table td {border:1px solid #6b6}
+     td             {border:1px solid #aaf}
+    */
+
     /* Syntax::Highlight::Engine::Simple stuff */
     .user_regexp {background-color: #ff6}
     .error       {background-color: #fcc}
@@ -362,6 +371,7 @@ EOF
         $line = $highlight->doStr(str => $line);
         $line =~ s#\n#<label>\n</label>#sg;     # prevent line-wraps from being copied into the clipboard
         my $odd_even = ($lineno % 2) ? "oddline" : "evenline";
+        $line = '&nbsp;'    if (length($line) == 0);    # if there's no text, this table cell's height gets minimized
         $accum_matches .= "<tr><td class='$odd_even'>$line</td></tr>\n";
 
         $accum_line_numbers .= "<tr><td>" . commify($lineno)
