@@ -13,13 +13,27 @@
     # - try to auto-parse some dates out of each log file line, and then add a
     #   cmdline argument that allows restriction of matches to a specific time
     #   period
-    #       - date-parsing modules that might help with this:
+    #       - DateTime::Format::DateParse would probably do the parsing
+    #         of the cmdline argument, and we would store the start/end dates as DateTime objects
+    #       - for parsing generic date strings found in logs, we might try some of these:
     #           - Date::Manip::Date
     #           - Date::Parse
     #           - Time::ParseDate
     #       - For the lines that don't have any parsable date in them... should
     #         we report the count of those?   <= Maybe that would work, as long
     #         as they're a cmdline arg to suppress these warnings.
+    #
+    #   - if the start of the cmdline-specified time range is after the mtime
+    #         of the file, then we can probably just skip that file!
+    #
+    #   - similarly, if the last lines of the log file are before the start of
+    #         the cmdline-specified time range, then we can also skip that file!
+    #
+    #   - maybe come up with a system for caching the byte offset => line number
+    #         information, so that we can do binary search within a log file
+    #         (which requires random access, normally impossible with text files
+    #         where you want to maintain the line number information) as
+    #         suggested here: https://paperlined.org/dev/perl/modules/related_modules/text_files_line_numbers.md
 
     use strict;
     use warnings;
