@@ -4,9 +4,9 @@
 # report that shows the matches, as well as some nearby lines for context.
 #
 # The "0" prefix means, for my personal scripts and shell aliases, that these
-# tools process records separated by null characters. For this particular
-# script, it expects the list of filenames to search to be piped to its 
-# STDIN.
+# tools process records separated by null characters (like find's -print0).
+# For this particular script, it expects the list of filenames to search to be
+# piped to its STDIN.
 
     # TODO:
     #
@@ -16,9 +16,9 @@
     #       - DateTime::Format::DateParse would probably do the parsing
     #         of the cmdline argument, and we would store the start/end dates as DateTime objects
     #       - for parsing generic date strings found in logs, we might try some of these:
-    #           - Date::Manip::Date
-    #           - Date::Parse
-    #           - Time::ParseDate
+    #           - Date::Manip::Date     (not in Perl core)
+    #           - Date::Parse           (not in Perl core)
+    #           - Time::ParseDate       (not in Perl core)
     #       - For the lines that don't have any parsable date in them... should
     #         we report the count of those?   <= Maybe that would work, as long
     #         as they're a cmdline arg to suppress these warnings.
@@ -92,7 +92,7 @@ while (<STDIN>) {
         if (length($_));
 }
 
-    sub _wrong_delimiter {
+    sub _check_if_wrong_delimiter {
         return unless @local_log_files;
 
         # "goatse operator"
@@ -103,11 +103,11 @@ while (<STDIN>) {
         }
     }
 
-_wrong_delimiter();
+_check_if_wrong_delimiter();
 
 # do this at the very end, just to make sure the user sees it
 END {
-    _wrong_delimiter();
+    _check_if_wrong_delimiter();
 }
 
 $/ = "\n";            # $INPUT_RECORD_SEPARATOR
@@ -132,7 +132,7 @@ $short_hostname =~ s/[\n\r]+$//s;
 
 
 ###########################################
-## grep through each file
+## search through every file
 ###########################################
 
 my @last_n_lines;
@@ -154,33 +154,39 @@ foreach my $logfilename (@local_log_files) {
             or die "Error when openening $logfilename: $!\n";
     }
 
-    ## scan one log file
+    ###########################################
+    ## search through one file
+    ###########################################
     my $last_match_lineno = -999;
     while (defined(my $line = <$logfile_fh>)) {
         if ($line =~ /$ARGV{regexp}/o) {
-            #print "matched $logfilename\n"; 
+            ####==--  the user's regexp matched a line  --==####
 
-            # display all lines that lie within @last_n_lines
-            # (this is like grep's --before-context)
+            # go back and display all lines that lie within @last_n_lines
+            # (this is similar to grep's --before-context)
             foreach my $line_ref (@last_n_lines) {
                 report_file_match($logfilename, $line_ref->[1], $line_ref->[0]);
             }
             @last_n_lines = ();
 
-            # now display this particular line
+            # now display the current line
             report_file_match($logfilename, $line, $.);     # $. = $INPUT_LINE_NUMBER
             $last_match_lineno = $.;
 
         } elsif ($. - $last_match_lineno < NUM_CONTEXT_LINES) {
-            # this is like grep's --after-context
+            ####==--  display the appropriate number of lines after the last match  --==####
+
+            # (similar to grep's --after-context)
             report_file_match($logfilename, $line, $.);     # $. = $INPUT_LINE_NUMBER
 
         } else {
-            # this isn't a line that obviously needs to be included in the report,
-            # but save it in the queue, just in case
+            ####==--  There isn't an apparent need to display this line   --==####
+            ####==--  ...right now. Remember it in case we need it soon.  --==####
+
+            # add it to the queue
             push @last_n_lines, [$., $line];        # $. = $INPUT_LINE_NUMBER
 
-            # delete all but the last 'n' lines
+            # if the queue is too big now, remove any unwanted lines
             while (scalar(@last_n_lines) > NUM_CONTEXT_LINES) {
                 shift @last_n_lines;
             }
@@ -193,9 +199,10 @@ foreach my $logfilename (@local_log_files) {
 }
 
 
-###############################################
-## make all our changes to the zip file at once
-###############################################
+################################################################################
+## make all our changes to the zip file at once, to avoid race conditions when
+## running on different servers simultaneously
+################################################################################
 
 # initialization
 my $zip = Archive::Zip->new();
@@ -225,7 +232,7 @@ exit;
 
 
 ################################################################################
-## HTML report generation
+## HTML report generation, for a single file
 ################################################################################
 
 BEGIN {
