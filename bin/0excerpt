@@ -44,8 +44,27 @@
     use POSIX ();                   # Perl core
     use Text::Wrap ();              # Perl core
 
-    use Archive::Zip qw( AZ_OK );            # not Perl core
-    use Syntax::Highlight::Engine::Simple ();   # not Perl core
+    # tries to 'require' the specified module, and provides a user-friendly error if not
+       #>> maybe replace this with the popular and well-tested Module::Runtime?                                            
+    sub can_require {
+        eval "require $_[0]";
+        if ($@) {
+            if ($@ =~ /^Can't locate /s) {
+                warn "$_[0] is required, but isn't currently installed.\n";
+            } else {
+                warn $@;
+            }
+            exit 1;
+        }
+    }
+
+    BEGIN {
+        can_require 'Archive::Zip';                 # not Perl core, but uniquely critical to this script's functioning
+        Archive::Zip->import qw( AZ_OK );
+        can_require 'DateTime';                     # not Perl core, but river stage 4
+        can_require 'DateTime::Format::Natural';    # not Perl core, but river stage 3
+        can_require 'Syntax::Highlight::Engine::Simple';    # not Perl core, but it's pure Perl, and it saves me a lot of work
+    }
 
     use Data::Dumper;
 
@@ -158,9 +177,26 @@ foreach my $logfilename (@local_log_files) {
     ## search through one file
     ###########################################
     my $last_match_lineno = -999;
+    my $last_parsed_date = undef;
     while (defined(my $line = <$logfile_fh>)) {
-        if ($line =~ /$ARGV{regexp}/o) {
-            ####==--  the user's regexp matched a line  --==####
+        # TODO: ugh, this line really slows this script down
+        my ($datetime, $original_date_text) = parse_date($line);
+
+        if (defined($datetime)) {
+            $last_parsed_date = $datetime;
+        }
+
+        if ($line =~ /$ARGV{regexp}/o
+                && is_date_within_user_criteria($last_parsed_date)) {
+            ####==--  the user-specified criteria was met  --==####
+
+            ## DEBUG ONLY -- REMOVE ME!
+            #use Term::ANSIColor qw(colored);
+            #if (defined($datetime)) {
+            #    print $line, "\t\t", colored(['red'], $datetime->iso8601), "\n";
+            #} else {
+            #    print $line, "\t\t", colored(['red'], "(no date found)"), "\n";
+            #}
 
             # go back and display all lines that lie within @last_n_lines
             # (this is similar to grep's --before-context)
@@ -170,7 +206,16 @@ foreach my $logfilename (@local_log_files) {
             @last_n_lines = ();
 
             # now display the current line
-            report_file_match($logfilename, $line, $.);     # $. = $INPUT_LINE_NUMBER
+            my @extra_syntax;
+            if (defined($original_date_text)) {
+                # for documentation on this, see https://metacpan.org/pod/Syntax::Highlight::Engine::Simple#setSyntax
+                push @extra_syntax, {
+                        class  => 'parsed_date',
+                        regexp => quotemeta($original_date_text),
+                    };
+            }
+            report_file_match($logfilename, $line, $., \@extra_syntax);     # $. = $INPUT_LINE_NUMBER
+
             $last_match_lineno = $.;
 
         } elsif ($. - $last_match_lineno < NUM_CONTEXT_LINES) {
@@ -243,44 +288,68 @@ BEGIN {
     my $accum_matches = '';          # this is the "right column-table", per https://stackoverflow.com/a/35815198/1042525
     my $highlight;
 
+    # A single logfile line is passed into this, but we can end up outputting
+    # the HTML header info first, if that's needed.
     sub report_file_match {
-        my ($logfilename, $line, $lineno) = @_;
+        my ($logfilename, $line, $lineno, $additional_syntax) = @_;
+            
+            # $additional_syntax is optional. If present, it should be a list-ref
+            # that could be passed into
+            # Syntax::Highlight::Engine::Simple::Perl->setSyntax() 
+            # (but is actually passed to appendSyntax()).
+            # 
+            # For example:
+            #       $additional_syntax = [
+            #           {
+            #               class => 'tag',
+            #               regexp => "<.+?>",
+            #           },
+            #           {
+            #               class => 'quote',
+            #               regexp => "'.*?'",
+            #               container => 'tag',
+            #           },
+            #       ];
 
         # remove any line-endings
         $line =~ s/(\012|\015\012?)$//s;
 
         if (!defined($highlight)) {
             $highlight = Syntax::Highlight::Engine::Simple->new();
+        }
 
-            # the 'class' here is the DOM/CSS class name
-            $highlight->setSyntax(
-                    syntax => [
-                        {
-                            class => 'user_regexp',
-                            regexp => $ARGV{regexp},
-                        },
-                        {
-                            class => 'error',
-                            regexp => '(?i)\berror\b',
-                        },
-                        {
-                            class => 'warning',
-                            regexp => '(?i)\bwarn(ing)?\b',
-                        },
-                        {
-                            class => 'datetime',        # this regexp is just a date
-                            regexp => '\b2\d\d\d[-/]\d\d[-/]\d\d\b',
-                        },
-                        {
-                            class => 'datetime',        # this regexp is just a date
-                            regexp => '\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b[^a-zA-Z0-9]*\d+',
-                        },
-                        {
-                            class => 'datetime',        # this regexp is just a time
-                            regexp => '\b\d\d:\d\d(:\d\d)?\b',
-                        },
-                    ]
-                );
+        # recreate the syntax... overwrite any existing syntax rules
+        # the 'class' here is the DOM/CSS class name
+        $highlight->setSyntax(
+            syntax => [
+                {
+                    class => 'user_regexp',
+                    regexp => $ARGV{regexp},
+                },
+                {
+                    class => 'error',
+                    regexp => '(?i)\berror\b',
+                },
+                {
+                    class => 'warning',
+                    regexp => '(?i)\bwarn(ing)?\b',
+                },
+                #{
+                #    class => 'datetime',        # this regexp is just a date
+                #    regexp => '\b2\d\d\d[-/]\d\d[-/]\d\d\b',
+                #},
+                #{
+                #    class => 'datetime',        # this regexp is just a date
+                #    regexp => '\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b[^a-zA-Z0-9]*\d+',
+                #},
+                #{
+                #    class => 'datetime',        # this regexp is just a time
+                #    regexp => '\b\d\d:\d\d(:\d\d)?\b',
+                #},
+            ]
+        );
+        if (defined($additional_syntax) && scalar(@$additional_syntax) > 0) {
+            $highlight->appendSyntax(syntax => @$additional_syntax);
         }
 
         if ($last_logfilename ne $logfilename) {
@@ -315,6 +384,7 @@ BEGIN {
         color: #a0a;
         font-weight: bold;
     }
+    .parsed_date {background-color: #f9f}
 
     table table td {
         vertical-align: top;
@@ -455,4 +525,60 @@ sub delete_host_logfiles {
     foreach my $mmbr (@members) {
         $zip->removeMember($mmbr);
     }
+}
+
+
+################################################################################
+## date selection logic, i.e. --earliest and --latest
+################################################################################
+
+# Check if we can parse some sort of date/time out of the middle of this string.
+#
+# This is a small wrapper for DateTime::Format::Natural::extract_datetime()
+# which does almost all of the heavy lifting.
+#
+# If a date/time is found, it returns a DateTime object.
+# When called in list context, it returns ($datetime_object, $datetime_string).
+#
+# Otherwise, returns undef to indicate no date/time was found.
+sub parse_date {
+    my ($log_line) = @_;
+
+    my $date_parser = DateTime::Format::Natural->new();
+    my @excerpts = $date_parser->extract_datetime($log_line);
+
+    if (@excerpts) {
+        # we found at least one date string, so parse the first one found
+        my $datetime_obj = $date_parser->parse_datetime($excerpts[0]);
+        if (wantarray) {
+            return ($datetime_obj, $excerpts[0]);
+        } else {
+            return $datetime_obj;
+        }
+
+    } else {
+        # no date string found
+        return;
+    }
+}
+
+
+# given the specified DateTime object, return whether that DateTime lies within
+# the --earliest and/or --latest criteria that the user specified
+sub is_date_within_user_criteria {
+    my ($datetime_obj) = @_;
+
+    # if no date has been parsed yet for this log file, then by default display
+    # all log lines
+    return 1 if (!defined($datetime_obj));
+
+    # TODO -- implement me
+    use feature 'state';
+    state $is_first_time = 1;
+    if ($is_first_time) {
+        warn "implement me, please!\n\t";
+        $is_first_time = 0;
+    }
+
+    return 1;
 }
