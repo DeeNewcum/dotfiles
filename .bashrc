@@ -70,6 +70,13 @@ else
     alias ls='ls -F --color=auto'
 fi
 
+# $LS_COLORS
+if type -p dircolors >/dev/null; then
+    eval "$(dircolors -b)"
+
+    function @tree { tree -C -F "$@" | less -rF; }
+fi
+
 # man pages
 export GROFF_NO_SGR=1
 export LESS_TERMCAP_mb=$'\E[01;34m'         # begin blinking
