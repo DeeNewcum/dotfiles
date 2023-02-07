@@ -41,7 +41,7 @@ else
     function largedirs_onelevel() { /bin/ls -1 | perl -nle 'print qq[$ENV{PWD}/$_] if -d' | xargs_newline du -sk | sort -n | perl -ple 's/^(\d+?)\d\d\d\s/\1mb\t/'; }
     function large_txtfiles() { /bin/find $PWD ! -local -prune -o -type f -print | perl -nle 'print if -T' | xargs_newline /bin/ls -l | filesize_sort | tail -100; }
 fi
-function xgrep()   { xargs_newline -i grep "$@" /dev/null {} ; }
+function xgrep()   { xargs_newline -i grep "$@" /dev/null ; }
 function xlgrep()  { xargs_newline grep -l "$@" /dev/null    | xargs less    -p "$1"; }
 function xlgrepi() { xargs_newline grep -l -i "$@" /dev/null | xargs less -i -p "$1"; }
 

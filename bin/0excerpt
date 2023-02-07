@@ -83,7 +83,7 @@
     use Data::Dumper;
 
 # like grep's --before-context and --after-context
-sub NUM_CONTEXT_LINES { 15 }
+sub NUM_CONTEXT_LINES { 50 }
 
 
 ###########################################
