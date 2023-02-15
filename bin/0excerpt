@@ -171,6 +171,7 @@ $short_hostname =~ s/[\n\r]+$//s;
 my @last_n_lines;
 
 ## scan all log files
+my $num_files_scanned = 0;
 my $num_files_matched = 0;
 foreach my $logfilename (@local_log_files) {
     if (! -f $logfilename) {
@@ -187,6 +188,10 @@ foreach my $logfilename (@local_log_files) {
         open $logfile_fh, '<', $logfilename
             or die "Error when openening $logfilename: $!\n";
     }
+
+    $num_files_scanned++;
+    clear_line_move_to_col1();
+    print "Scanning file $num_files_scanned of ", scalar(@local_log_files), " ...";
 
     ###########################################
     ## search through one file
@@ -261,6 +266,8 @@ foreach my $logfilename (@local_log_files) {
 
     process_one_report_file();
 }
+
+clear_line_move_to_col1();
 
 
 if ($num_files_matched == 0) {
@@ -524,6 +531,7 @@ EOF
 
         close $fout;
 
+        clear_line_move_to_col1();
         print "matches were found in $last_logfilename\n";
 
         # reset everything, so that it's clear that this information has been
@@ -535,10 +543,6 @@ EOF
         $accum_matches = '';
     }
 }
-
-
-# add commas to a number
-sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}
 
 
 ################################################################################
@@ -615,4 +619,15 @@ sub is_date_within_user_criteria {
     }
 
     return 1;
+}
+
+
+# add commas to a number
+sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}
+
+
+sub clear_line_move_to_col1 {
+    $| = 1;             # enable $OUTPUT_AUTOFLUSH
+    print "\e[2k",      # the ANSI sequence for "erase the entire line"
+          "\e[1G";      # the ANSI sequence for "move cursor to column 1"
 }
