@@ -628,6 +628,6 @@ sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reve
 
 sub clear_line_move_to_col1 {
     $| = 1;             # enable $OUTPUT_AUTOFLUSH
-    print "\e[2k",      # the ANSI sequence for "erase the entire line"
+    print "\e[2K",      # the ANSI sequence for "erase the entire line"
           "\e[1G";      # the ANSI sequence for "move cursor to column 1"
 }
