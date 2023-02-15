@@ -171,6 +171,7 @@ $short_hostname =~ s/[\n\r]+$//s;
 my @last_n_lines;
 
 ## scan all log files
+my $num_files_matched = 0;
 foreach my $logfilename (@local_log_files) {
     if (! -f $logfilename) {
         print STDERR "File '$logfilename' not found.\n";
@@ -253,9 +254,24 @@ foreach my $logfilename (@local_log_files) {
         }
     }
 
-    close $logfile_fh;
+    if ($last_match_lineno >= 0) {
+        close $logfile_fh;
+        $num_files_matched++;
+    }
 
     process_one_report_file();
+}
+
+
+if ($num_files_matched == 0) {
+    # Without this, the people who look inside the .zip might be unsure whether
+    # we searched this specific host.
+    open my $logfile_fh, '>', "$tempdir/nothing_found_at_$short_hostname.txt"
+        or die $!;
+
+    print $logfile_fh "All the logfiles at $long_hostname were searched, but no matches were found.\n";
+
+    close $logfile_fh;
 }
 
 
@@ -535,10 +551,13 @@ sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reve
 sub delete_host_logfiles {
     #my @members = $zip->members();
     #print Dumper \@members; exit;
-    my @members = $zip->membersMatching('^' . quotemeta($short_hostname) . '___.*');
 
-    foreach my $mmbr (@members) {
-        $zip->removeMember($mmbr);
+    foreach ($zip->membersMatching('^' . quotemeta($short_hostname) . '___.*')) {
+        $zip->removeMember($_);
+    }
+
+    foreach ($zip->membersMatching('^nothing_found_at_' . quotemeta($short_hostname) . '.*')) {
+        $zip->removeMember($_);
     }
 }
 
