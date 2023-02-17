@@ -5,6 +5,9 @@
 #       [ -f "$STDIN_OWNERS_HOME"/.sudo_bashrc ] && source "$STDIN_OWNERS_HOME"/.sudo_bashrc
 
 
+
+# auto-magically determine what $STDIN_OWNERS_HOME should be
+# (basically, who was the user that initiated the sudo?)
 if [ -z "$STDIN_OWNERS_HOME" ]; then
     # Allow ~/.sudo_bashrc to be 'source'd directly, without first setting $STDIN_OWNERS_HOME.
     # (or even just symlink it to /root/.bashrc!)
@@ -87,7 +90,7 @@ PROMPT_HOSTNAME='\h'
 [ -e $STDIN_OWNERS_HOME/.short_hostname_override ] && PROMPT_HOSTNAME="$(cat $STDIN_OWNERS_HOME/.short_hostname_override)"
 XTERM_TITLE='\[\033]0;'$PROMPT_HOSTNAME'\007\]'
 [ "$IS_VIRTUAL_CONSOLE" ] && XTERM_TITLE=''         # don't use the Xterm title when at the Linux Virtual Console
-PS1=$XTERM_TITLE'\[\033[01;32m\]\u@'$PROMPT_HOSTNAME'\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+PS1=$XTERM_TITLE'\[\033[01;32m\]##==--SUDO--==##  \u@'$PROMPT_HOSTNAME'\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 # custom-compiled apps that override the system ones
 [ -d $STDIN_OWNERS_HOME/apps/bin/ ] && export PATH=$STDIN_OWNERS_HOME/apps/bin/:$PATH
