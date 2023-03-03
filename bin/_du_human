@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+# Pipe the output of 'du' into this (possibly after filtering it through 'sort -n'), and this
+# will slightly modify each line, to give the size in a human-readable format (as if the
+# -h human readable flag had been used in the first place).
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+
+if (-t STDIN) {
+    die "$0 is intended to have the output of 'du' piped into it.\n";
+}
+
+while (<STDIN>) {
+    s/^(\d+)(\s+)//;
+    my $char_width = length($1 . $2);
+    my $human = human_readable_bytes($1);
+}
+
+
+
+sub human_readable_bytes {
+    my $bytes = shift;
+
+    if ($bytes < 1024) {
+    } elsif ($bytes < 1024*1024) {
+        return sprintf "%2.1fk", $bytes / 1024;
+    }
+}

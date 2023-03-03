@@ -26,6 +26,11 @@ if [ "`uname`" != "SunOS" ]; then
     function largefiles() { find ${1:-~} -type f -print0 | xargs -0 ls -l | sort -n -k 5 | tail -100 | perl -ple 's/^(?:\S+\s+){4}//; s/$ENV{HOME}/~/; $_=reverse;s/(\d\d\d)(?=\d)(?!\d*\.)(?=[\d,]*$)/$1,/g;$_=reverse'; }
     function largedirs() { du -k ${1:-~} | sort -n | tail -100; }
     function largeindividualdirs() { du -Sk ${1:-~} | sort -n | tail -1000; }
+
+    ## The above functions don't work very well when you run them on the root-dir, because 
+    ## they navigate down /proc/ and others. The below functions fix this.
+    function largeindividualdirs_rootdir { find / -maxdepth 1 -path /proc -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -Sk | sort -n | tail -50; }
+    function largedirs_rootdir { find / -maxdepth 1 -path /proc -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -k | sort -n | tail -50; }
 else
     # Try to make the fundamental Solaris tools a wee bit easier to use
     function find- { find2perl "$@" -print | perl; }
