@@ -3,6 +3,9 @@
 # Pipe the output of 'du' into this (possibly after filtering it through 'sort -n'), and this
 # will slightly modify each line, to give the size in a human-readable format (as if the
 # -h human readable flag had been used in the first place).
+#
+# The purpose of this is to be able to sort by size AND still be able to display in human-readable
+# sizes.
 
     use strict;
     use warnings;
@@ -14,18 +17,32 @@ if (-t STDIN) {
 }
 
 while (<STDIN>) {
-    s/^(\d+)(\s+)//;
-    my $char_width = length($1 . $2);
+    s/^(\d+)\s+//;
     my $human = human_readable_bytes($1);
+    my $remainder = $_;
+    printf "%-8s%s", $human, $remainder;
 }
 
 
 
 sub human_readable_bytes {
-    my $bytes = shift;
+    my $kb = shift;
 
-    if ($bytes < 1024) {
-    } elsif ($bytes < 1024*1024) {
-        return sprintf "%2.1fk", $bytes / 1024;
+    if ($kb == 0) {
+        return "0";
+    } elsif ($kb < 10) {
+        return sprintf "%2.1fK", $kb;
+    } elsif ($kb < 1024) {
+        return sprintf "%dK",    $kb;
+    } elsif ($kb < 10*1024) {
+        return sprintf "%2.1fM", $kb / 1024;
+    } elsif ($kb < 1024*1024) {
+        return sprintf "%dM",    $kb / 1024;
+    } elsif ($kb < 10*1024*1024) {
+        return sprintf "%2.1fG", $kb / (1024*1024);
+    } elsif ($kb < 1024*1024*1024) {
+        return sprintf "%dG",    $kb / (1024*1024);
+    } else {
+        return $kb;
     }
 }
