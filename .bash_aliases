@@ -410,4 +410,10 @@ function @lsof_regularfiles {
 		lsof "$@" | lsof_regular_files | less -F
 	fi
 }
+
+# 'grc' doesn't support 'top', so we'll use 'ps' instead
+function @top {
+    watch -n 1 -c 'ps aux --sort -%cpu | grcat conf.ps'
+}
+
 ########################## grc combinations ##########################
