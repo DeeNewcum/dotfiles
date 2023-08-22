@@ -14,6 +14,8 @@ puniq() { perl -nle 'print unless $SEEN{$_}++' "$@"; }
 
 function xargs_newline() { perl -e 'my@a=map{chomp;$_}<STDIN>;system@ARGV,splice(@a,0,200)while(@a)' "$@"; }
 if [ "`uname`" != "SunOS" ]; then
+	######## not SunOS ########
+	
     # lgrep = grep, and display the results in less   (where you use :n and :p to view all results)
     # xgrep = pipe a list of filenames in, and it greps only those files
     function lgrep()  { grep -Zls  "$@" | xargs -0 less    -p "$1"; }
@@ -30,8 +32,11 @@ if [ "`uname`" != "SunOS" ]; then
     ## The above functions don't work very well when you run them on the root-dir, because 
     ## they navigate down /proc/ and others. The below functions fix this.
     function largeindividualdirs_rootdir { find / -maxdepth 1 -path /proc -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -Sk | sort -n | tail -50 | _du_human; }
+		## TODO vvvvv doesn't seem to work at all on our webserver
     function largedirs_rootdir { find / -maxdepth 1 -path /proc -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -k | sort -n | tail -50 | _du_human; }
 else
+	######## SunOS ########
+
     # Try to make the fundamental Solaris tools a wee bit easier to use
     function find- { find2perl "$@" -print | perl; }
 
