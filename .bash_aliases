@@ -421,4 +421,8 @@ function @top {
     watch -n 1 -c 'ps aux --sort -%cpu | grcat conf.ps'
 }
 
+function @tree {
+	tree -C "$@" | less -raw
+}
+
 ########################## grc combinations ##########################
