@@ -31,9 +31,9 @@ if [ "`uname`" != "SunOS" ]; then
 
     ## The above functions don't work very well when you run them on the root-dir, because 
     ## they navigate down /proc/ and others. The below functions fix this.
-    function largeindividualdirs_rootdir { find / -maxdepth 1 -path /proc -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -Sk | sort -n | tail -50 | _du_human; }
+    function largeindividualdirs_rootdir { find / -maxdepth 1 -path /dev -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -Sk | sort -n | tail -50 | _du_human; }
 		## TODO vvvvv doesn't seem to work at all on our webserver
-    function largedirs_rootdir { find / -maxdepth 1 -path /proc -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -k | sort -n | tail -50 | _du_human; }
+    function largedirs_rootdir { find / -maxdepth 1 -path /dev -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -k | sort -n | tail -50 | _du_human; }
 else
 	######## SunOS ########
 
