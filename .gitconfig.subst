@@ -58,3 +58,6 @@
 
     # a "quick status", which is sometimes necessary for massive repos
     qstatus = status --untracked-files=no
+
+    # even quicker, and even less information, when 'status' and 'qstatus' run too slow
+    qqstatus = rev-parse --abbrev-ref HEAD
