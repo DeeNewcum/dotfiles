@@ -83,6 +83,9 @@ function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 "$(which tcgrep)" "$@
 	# ^^^ to be clear, these take null-separated records on INPUT, but if 
 	# 	  the '-l' flag is used, the output is newline-separated
 
+# Just search the filenames.
+alias 0grep="tr '\00' '\n' | grep"
+
 function sudo_0excerpt() { sudo "$(which 0excerpt)" "$@"; }
 function sudoE_0excerpt() { sudo -E "$(which 0excerpt)" "$@"; }
 
