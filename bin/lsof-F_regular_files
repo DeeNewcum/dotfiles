@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+# This is a FILTER for the output of lsof -- It only reads in strings and
+# outputs strings, nothing else.
+#
+# It removes any path that isn't what the man page calls a "regular file", as
+# well as any path that I find annoying.
+#
+# It's very similar to 'lsof_regular_files'. However, because it only works on
+# 'lsof -F' output, its implementation can be MUCH simplified. For more info,
+# see the "OUTPUT FOR OTHER PROGRAMS" section of the lsof manfile:
+#       https://manpages.ubuntu.com/manpages/jammy/en/man8/lsof.8.html#output%20for%20other%20programs
+
+    use strict;
+    use warnings;
+
+    use English;
+
+    use Data::Dumper;
+
+
+my $is_just_filename = grep /^-j$/, @ARGV;
+
+
+my $accumulator = '';
+my $this_file = '';
+while (<STDIN>) {
+    my ($field, $val) = ($_ =~ /^(.)([^\n\r]*)/s);
+
+    if ($field eq 'a') {
+        $accumulator .= $_;
+        process_entry($accumulator, $this_file);
+        # reset things
+        $accumulator = '';
+        $this_file = '';
+    } elsif ($field eq 'n') {
+        $this_file = $val;
+        $accumulator .= $_;
+    } else {
+        $accumulator .= $_;
+    }
+}
+
+if ($accumulator) {
+    process_entry($accumulator, $this_file);
+}
+
+exit;
+
+
+
+
+sub process_entry {
+    my ($lines, $file) = @_;
+
+    return if ($file eq '');
+    return if ($file eq '/');
+    return if ($file =~ m#^/(?:proc|dev|sys|run)(?:/|$)#);
+    return if ($file =~ m#^/SYSV#);       # what are these paths?
+    return if ($file !~ m#^/#);
+
+    if ($is_just_filename) {
+        print "$file\n";
+    } else {
+        print $lines;
+    }
+}
