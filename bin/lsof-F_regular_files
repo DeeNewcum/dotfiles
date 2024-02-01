@@ -35,6 +35,11 @@ while (<STDIN>) {
         $this_file = '';
     } elsif ($field eq 'n') {
         $this_file = $val;
+
+        # sometimes lsof appends things to filenames -- remove those
+        $this_file =~ s/ \(deleted\)$//;
+        $this_file =~ s# \(\S+:/.*\)$##;        # NSF mounts
+
         $accumulator .= $_;
     } else {
         $accumulator .= $_;

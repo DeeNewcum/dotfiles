@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+# Auto-magically finds the important directories for programs that match the
+# specified search term. This is based on the information from 'lsof', so it
+# can only find currently-running programs.
+
+    use strict;
+    use warnings;
+
+    use List::MoreUtils qw( first_index );
+    use Data::Dumper;
+
+
+if (!@ARGV) {
+    print STDERR "Error: A search term must be given.\n";
+    exit 1;
+}
+
+my $search_pattern = $ARGV[0];
+
+open LSOF, '-|', 'lsof -F | lsof-F_regular_files -j'
+        or die $!;
+
+my %seen;
+my %count;
+while (<LSOF>) {
+    chomp;
+    my $dir = $_;
+    next if ($seen{$dir}++);
+
+    my @dir_parts = split '/', $dir;
+
+    # check if any part matches, and then truncate everything after the part
+    # that matches
+    my $idx = first_index { /$search_pattern/o } @dir_parts;
+    next if ($idx == -1);       # there were no matches
+    if ($#dir_parts > $idx) {
+        splice(@dir_parts, $idx+1);     # truncate
+        push(@dir_parts, '');           # add final backslash to indicate it's a directory
+    } else{
+        splice(@dir_parts, $idx+1);     # truncate
+    }
+
+    my $dir_truncated = join('/', @dir_parts);
+    $count{$dir_truncated}++;
+}
+
+
+my @keys = keys %count;
+@keys = sort {$count{$a} <=> $count{$b} || $a cmp $b} @keys;
+foreach my $key (@keys) {
+    printf "%4d %s\n",
+        $count{$key},
+        $key;
+}
