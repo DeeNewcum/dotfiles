@@ -42,6 +42,10 @@ while (<LSOF>) {
     }
 
     my $dir_truncated = join('/', @dir_parts);
+    if ($dir_truncated !~ m#/$# && -d $dir_truncated) {
+        # double-check:  do we need to append a slash to indicate this is a dir?
+        $dir_truncated .= "/";
+    }
     $count{$dir_truncated}++;
 }
 
