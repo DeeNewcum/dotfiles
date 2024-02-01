@@ -431,5 +431,15 @@ function @top {
 function @tree {
 	tree -C "$@" | less -raw
 }
+########################## colorizer filters ##########################
 
-########################## grc combinations ##########################
+
+
+
+########################## find files when visiting a new server ##########################
+/etc() { find /etc -type f -iname "*$1*"         | xargs -r ls -ld -rt --color=auto -F; }
+/var/log() { find /var/log -type f -iname "*$1*" | xargs -r ls -ld -rt --color=auto -F; }
+# 'sudo' variants of the above
+/etc_() { sudo find /etc -type f -iname "*$1*"         | xargs -r ls -ld -rt --color=auto -F; }
+/var/log_() { sudo find /var/log -type f -iname "*$1*" | xargs -r ls -ld -rt --color=auto -F; }
+########################## find files when visiting a new server ##########################
