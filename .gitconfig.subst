@@ -29,6 +29,9 @@
     # see: https://github.com/github/gitignore/tree/master/Global
     excludesfile = <<$HOME>>/.gitignore
 
+    # don't use the pager if it's less than one screen
+    pager=less -F -X
+
 [alias]
     # credit: http://www.jukie.net/bart/blog/pimping-out-git-log
     lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
