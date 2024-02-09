@@ -98,9 +98,19 @@ usage: 0excerpt <zip_file_name> <regexp>
 
 <regexp>
         The Perl regexp to search all log files for.
+
+--earliest <date>
+        Don't look for matches any earlier than this. Can speed things up
+        significantly. Examples of date strings accepted can be found under
+        Date::Parse.
+
+--latest <date>
+        Don't look for matches any later than this. Might speed things up some.
 EOF
     exit;
 }
+
+# TODO: replace the below with Getopt::Long
 
 usage() unless (@ARGV >= 2);
 
@@ -169,10 +179,10 @@ $short_hostname =~ s/[\n\r]+$//s;
 ###########################################
 
 # sum up the total logfile size
-my $total_disk_size = 0;
+my $total_bytes_to_read = 0;
 foreach my $logfilename (@local_log_files) {
     if (-f $logfilename) {
-        $total_disk_size += -s $logfilename;
+        $total_bytes_to_read += -s $logfilename;
     }
 }
 
@@ -180,7 +190,7 @@ foreach my $logfilename (@local_log_files) {
 my @last_n_lines;
 my $num_files_scanned = 0;
 my $num_files_matched = 0;
-my $current_disk_size = 0;
+my $bytes_read_in_previous_files = 0;
 foreach my $logfilename (@local_log_files) {
     if (! -f $logfilename) {
         print STDERR "File '$logfilename' not found.\n";
@@ -188,23 +198,20 @@ foreach my $logfilename (@local_log_files) {
     }
 
     my $logfile_fh;
+    my $progress_fh;        # which filehandle do we use with tell() inside update_progress() ?
     if ($logfilename =~ /\.gz$/) {
         #IO::Uncompress::Gunzip::gunzip($logfilename => \$logfile_fh)
             #or die $IO::Uncompress::Gunzip::GunzipError;
         $logfile_fh = IO::Uncompress::Gunzip->new($logfilename)
             or die $IO::Uncompress::Gunzip::GunzipError;
+        $progress_fh = $logfile_fh->{FH};
     } else {
         open $logfile_fh, '<', $logfilename
             or die "Error when openening $logfilename: $!\n";
+        $progress_fh = $logfile_fh;
     }
 
     $num_files_scanned++;
-    clear_line_move_to_col1();
-    printf "Scanning file %d of %d  (%d%% complete, based on bytes processed) ...",
-        $num_files_scanned,
-        scalar(@local_log_files),
-        100 * $current_disk_size / $total_disk_size;
-    $current_disk_size += -s $logfilename;
 
     ###########################################
     ## search through one file
@@ -212,6 +219,8 @@ foreach my $logfilename (@local_log_files) {
     my $last_match_lineno = -999;
     my $last_parsed_date = undef;
     while (defined(my $line = <$logfile_fh>)) {
+        update_progress($bytes_read_in_previous_files, $progress_fh);
+
         # TODO: ugh, this line really slows this script down
         #my ($datetime, $original_date_text) = parse_date($line);
         my ($datetime, $original_date_text);        # stub out the above, for now
@@ -271,6 +280,8 @@ foreach my $logfilename (@local_log_files) {
             }
         }
     }
+
+    $bytes_read_in_previous_files += -s $logfilename;
 
     if ($last_match_lineno >= 0) {
         close $logfile_fh;
@@ -634,8 +645,37 @@ sub is_date_within_user_criteria {
 }
 
 
-# add commas to a number
-sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}
+################################################################################
+## progress updates
+################################################################################
+
+
+BEGIN {
+    my $last_update_at = 0;
+
+    sub update_progress {
+        my ($bytes_read_in_previous_files, $progress_fh) = @_;
+
+        # don't update any faster than every 2 seconds
+        return unless (time() - $last_update_at >= 2);
+
+        $last_update_at = time();
+
+        my $bytes_read_in_this_file = tell($progress_fh);
+        my $total_bytes_read = $bytes_read_in_previous_files + $bytes_read_in_this_file;
+
+        my $seconds_so_far    = time() - $^T;
+        my $seconds_total     = ($seconds_so_far / $total_bytes_read) * $total_bytes_to_read;
+        my $seconds_remaining = $seconds_total - $seconds_so_far;
+
+        clear_line_move_to_col1();
+        printf "Scanning file %d of %d  (%0.1f%% complete, %d minutes left)   ",
+            $num_files_scanned,
+            scalar(@local_log_files),
+            100 * $total_bytes_read / $total_bytes_to_read,
+            $seconds_remaining / 60;
+    }
+}
 
 
 sub clear_line_move_to_col1 {
@@ -643,3 +683,9 @@ sub clear_line_move_to_col1 {
     print "\e[2K",      # the ANSI sequence for "erase the entire line"
           "\e[1G";      # the ANSI sequence for "move cursor to column 1"
 }
+
+
+
+
+# add commas to a number
+sub commify {(my$text=reverse$_[0])=~s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;scalar reverse$text}
