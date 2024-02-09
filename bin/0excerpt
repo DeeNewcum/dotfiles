@@ -200,7 +200,7 @@ foreach my $logfilename (@local_log_files) {
 
     $num_files_scanned++;
     clear_line_move_to_col1();
-    printf "Scanning file %d of %d  (%d%% complete) ...",
+    printf "Scanning file %d of %d  (%d%% complete, based on bytes processed) ...",
         $num_files_scanned,
         scalar(@local_log_files),
         100 * $current_disk_size / $total_disk_size;
