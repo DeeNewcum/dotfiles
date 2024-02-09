@@ -204,7 +204,7 @@ foreach my $logfilename (@local_log_files) {
             #or die $IO::Uncompress::Gunzip::GunzipError;
         $logfile_fh = IO::Uncompress::Gunzip->new($logfilename)
             or die $IO::Uncompress::Gunzip::GunzipError;
-        $progress_fh = $logfile_fh->{FH};
+        $progress_fh = *$logfile_fh->{FH};
     } else {
         open $logfile_fh, '<', $logfilename
             or die "Error when openening $logfilename: $!\n";
