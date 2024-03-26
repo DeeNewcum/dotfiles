@@ -9,30 +9,31 @@ use warnings;
 my $pid = $$;
 
 while ($pid > 0) {
-	my $info = get_proc_info($pid);
+    my $info = get_proc_info($pid);
 
-	if ($info->{comm} eq '(screen)') {
-		exit 0;
-	}
+    if ($info->{comm} eq '(screen)') {
+        exit 0;
+    }
 
-	$pid = $info->{ppid};
+    $pid = $info->{ppid};
 
-	last if ($^O eq 'cygwin' && $pid <= 1);
+    last if ($^O eq 'cygwin' && $pid <= 1);
+    last if ($pid eq 'S');
 }
 
 exit 1;
 
 
 sub get_proc_info {
-	my ($pid) = @_;
+    my ($pid) = @_;
 
-	open my $fin, '<', "/proc/$pid/stat"
-		or die "Can't open /proc/$pid/stat: $!";
-	my %proc_info;
-	# see man proc(5)
-	# (this funky syntax is called a "assigning to a hash slice")
-	@proc_info{qw(pid comm state ppid pgrep session tty_nr)} = split ' ', <$fin>;
-	close $fin;
+    open my $fin, '<', "/proc/$pid/stat"
+        or die "Can't open /proc/$pid/stat: $!";
+    my %proc_info;
+    # see man proc(5)
+    # (this funky syntax is called a "assigning to a hash slice")
+    @proc_info{qw(pid comm state ppid pgrep session tty_nr)} = split ' ', <$fin>;
+    close $fin;
 
-	return \%proc_info;
+    return \%proc_info;
 }
