@@ -160,7 +160,8 @@ print_cmd() {
       else
         cmd=$(echo ${cmdline} | awk '{print $1}')
       fi
-      echo -ne "\033k${cmd}\033\\" 1>&2
+      echo -ne "\033k${cmd}\033"\\ 1>&2
+      [ -n "$TMUX" ] && tmux rename-window "$cmd"
       look_for_cmd=0
     else
       return
@@ -172,7 +173,8 @@ print_cmd() {
 }
 
 print_default() {
-  echo -ne "\033kbash\033\\" 1>&2
+  echo -ne "\033kbash\033"\\ 1>&2
+      [ -n "$TMUX" ] && tmux rename-window "bash"
   look_for_cmd=1
 }
 
