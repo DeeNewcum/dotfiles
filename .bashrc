@@ -194,7 +194,7 @@ if [ -n "$TMUX" ]; then
     # set long hostname
     export HOSTNAME=$(hostname)
     [ -e ~/.hostname_override ] && HOSTNAME="$(cat ~/.hostname_override)"
-    tmux setenv -g HOST $HOSTNAME
+    tmux setenv -g HOST "$HOSTNAME"
 
 fi
 
