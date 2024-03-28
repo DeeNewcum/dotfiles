@@ -47,14 +47,6 @@ else
     export TERM=$(termdetect -t)
 fi
 
-
-# show the OS release date  (for my work machines, which are often very old)
-if [ -e /etc/system-release-cpe ]; then
-    # This only works on RHEL and CentOS machines.
-    perl -MPOSIX -le 'printf "\e[41m" . "\e[1;37m" . "==== This OS was released %d years ago. ====" . "\e[0m" . "\n", (-M "/etc/system-release-cpe")/365'
-fi
-
-
 # display
 if [ -z "$DISPLAY" ]; then
     # avoid problems with git fetch / git pull on RHEL when $DISPLAY isn't set
@@ -204,6 +196,40 @@ if [ -n "$TMUX" ]; then
     tmux setenv -g HOST "$HOSTNAME"
 
 fi
+
+
+###################################################
+################### WORK ##########################
+###################################################
+
+# show the OS release date  (for my work machines, which are often very old)
+if [ -e /etc/system-release-cpe ]; then
+    # This only works on RHEL and CentOS machines.
+    perl -MPOSIX -le 'printf "\e[41m" . "\e[1;37m" . "==== This OS was released %d years ago. ====" . "\e[0m" . "\n", (-M "/etc/system-release-cpe")/365'
+fi
+
+
+# update both things -- do an automated 'git pull' followed by a ~/dotfiles/deedot
+function _deedot {
+	if [ -e ~/dotfiles/ ]; then
+		pushd ~/dotfiles/		> /dev/null
+		git pull origin
+		popd		> /dev/null
+	fi
+
+	if [ -e /mnt/global/newcum ]; then
+		/mnt/global/newcum/dotfiles-update_symlinks.pl
+
+		pushd /mnt/global/newcum/UIC_dotfiles/		> /dev/null
+		./deedot
+		popd		> /dev/null
+	else
+		pushd ~/dotfiles/		> /dev/null
+		./deedot
+		popd		> /dev/null
+	fi
+}
+
 
 ###################################################
 ###################################################
