@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 # Accepts any number of filenames on the command line. Checks each file, and if
-# it's 1) a text file, and 2) uses both spaces and tabs for indentation, and it
-# prints out that filename, so the human can further review it.
+# it's 1) a text file, and 2) uses both spaces and tabs for indentation -- then
+# it prints out that filename, so the human can further review it.
 
     use strict;
     use warnings;
