@@ -182,9 +182,7 @@ alias   srm=sr
 # then you can define your own local alias/function named 'resumescreen_and_exit'
 
 # reattach to the screen named 'main'   (or create it if it doesn't exist)
-alias   tmx='tmux attach -t main || tmux new -s main'
-
-
+alias   tmx='tmux new -AD -s main'
 
 # uperl makes it easier to write command-line one-liners that output UTF-8 characters
 #        for example,    uperl -le 'print "\x{221e}"'    displays the infinity symbol
