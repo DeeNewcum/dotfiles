@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+# Accepts any number of filenames on the command line. Checks each file, and if
+# it's 1) a text file, and 2) uses both spaces and tabs for indentation, and it
+# prints out that filename, so the human can further review it.
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+
+foreach my $filename (@ARGV) {
+
+    # skip all binary files
+    next if (-B $filename);
+
+    open my $fh, '<', $filename
+        or die "Unable to open $filename: $!\n\t";
+
+    my $is_indented_with_spaces = 0;
+    my $is_indented_with_tabs = 0;
+
+    while (<$fh>) {
+        
+        if (/^ +/s) {
+            $is_indented_with_spaces++;
+        } elsif (/^\t+/s) {
+            $is_indented_with_tabs++;
+        }
+
+        if ($is_indented_with_tabs && $is_indented_with_spaces) {
+            print "$filename\n";
+            last;
+        }
+
+        if (tell($fh) > 50 * 1024) {
+            # Only scan the first 50 kb of each file, since there are super-long
+            # .csv files and such.
+            last;
+        }
+    }
+
+    close $fh;
+}
