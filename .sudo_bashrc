@@ -59,8 +59,8 @@ fi
 ######################################################
 
 if [ ! -r $STDIN_OWNERS_HOME ]; then
-	# this sometimes happens when you 'sudo -u other_user' and "other_user" doesn't have read-access to your homedir
-	echo "======== ERROR: $STDIN_OWNERS_HOME is unreadable ========" >&2
+    # this sometimes happens when you 'sudo -u other_user' and "other_user" doesn't have read-access to your homedir
+    echo "======== ERROR: $STDIN_OWNERS_HOME is unreadable ========" >&2
 fi
 
 # this is necessary for grc ($HOME/.config/grc/grc.cnf), and ...

@@ -211,23 +211,23 @@ fi
 
 # update both things -- do an automated 'git pull' followed by a ~/dotfiles/deedot
 function _deedot {
-	if [ -e ~/dotfiles/ ]; then
-		pushd ~/dotfiles/		> /dev/null
-		git pull origin
-		popd		> /dev/null
-	fi
+    if [ -e ~/dotfiles/ ]; then
+        pushd ~/dotfiles/       > /dev/null
+        git pull origin
+        popd        > /dev/null
+    fi
 
-	if [ -e /mnt/global/newcum ]; then
-		/mnt/global/newcum/dotfiles-update_symlinks.pl
+    if [ -e /mnt/global/newcum ]; then
+        /mnt/global/newcum/dotfiles-update_symlinks.pl
 
-		pushd /mnt/global/newcum/UIC_dotfiles/		> /dev/null
-		./deedot
-		popd		> /dev/null
-	else
-		pushd ~/dotfiles/		> /dev/null
-		./deedot
-		popd		> /dev/null
-	fi
+        pushd /mnt/global/newcum/UIC_dotfiles/      > /dev/null
+        ./deedot
+        popd        > /dev/null
+    else
+        pushd ~/dotfiles/       > /dev/null
+        ./deedot
+        popd        > /dev/null
+    fi
 }
 
 
