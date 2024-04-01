@@ -14,8 +14,8 @@ puniq() { perl -nle 'print unless $SEEN{$_}++' "$@"; }
 
 function xargs_newline() { perl -e 'my@a=map{chomp;$_}<STDIN>;system@ARGV,splice(@a,0,200)while(@a)' "$@"; }
 if [ "`uname`" != "SunOS" ]; then
-	######## not SunOS ########
-	
+    ######## not SunOS ########
+    
     # lgrep = grep, and display the results in less   (where you use :n and :p to view all results)
     # xgrep = pipe a list of filenames in, and it greps only those files
     function lgrep()  { grep -Zls  "$@" | xargs -0 less    -p "$1"; }
@@ -32,14 +32,14 @@ if [ "`uname`" != "SunOS" ]; then
     ## The above functions don't work very well when you run them on the root-dir, because 
     ## they navigate down /proc/ and others. The below functions fix this.
     function largeindividualdirs_rootdir { find / -maxdepth 1 -path /dev -o -path /proc -o -path /sys -prune -o -not -path / -print0 | du --files0-from=- -Sk | sort -n | tail -50 | _du_human; }
-		## TODO vvvvv doesn't seem to work at all on our webserver
+        ## TODO vvvvv doesn't seem to work at all on our webserver
     function largedirs_rootdir { find / -maxdepth 1 -path /dev -o -path /proc -o -path /sys -prune -o -not -path / -print0 | xargs -0 du -k | sort -n | tail -50 | _du_human; }
 
     ### TODO: try to get the below working. It should be more reliable than the above.
     ### 
     ### find / -type d -fstype 'sysfs' -o -fstype 'proc' -o -fstype 'devtmpfs' -o -fstype 'tmpfs' -prune -o -print0 | du --files0-from=- -Sk | sort -n | tail -50 | _du_human
 else
-	######## SunOS ########
+    ######## SunOS ########
 
     # Try to make the fundamental Solaris tools a wee bit easier to use
     function find- { find2perl "$@" -print | perl; }
@@ -69,7 +69,7 @@ function xlgrepi() { xargs_newline grep -l -i "$@" /dev/null | xargs less -i -p 
 ##
 
 # Call just like `find`, though it has a few defaults that I prefer.
-function 0find()	{ find $PWD "$@" -print0; }
+function 0find()    { find $PWD "$@" -print0; }
 
 # Call just like `xargs -0 grep`, with all arguments passed through to grep.
 # Set it to the lowest scheduling priority to avoid impacting resources on
@@ -80,8 +80,8 @@ function 0find()	{ find $PWD "$@" -print0; }
 function 0xgrep()   { nice -n 19 xargs -0 tcgrep "$@"; }
 function sudo_0xgrep()   { sudo -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
 function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
-	# ^^^ to be clear, these take null-separated records on INPUT, but if 
-	# 	  the '-l' flag is used, the output is newline-separated
+    # ^^^ to be clear, these take null-separated records on INPUT, but if 
+    #     the '-l' flag is used, the output is newline-separated
 
 # Just search the filenames.
 alias 0grep="tr '\00' '\n' | grep"
@@ -416,11 +416,11 @@ alias @lsof='@ lsof'
 
 # filter out all of the non-regular files
 function @lsof_regularfiles {
-	if type -p grcat > /dev/null; then
-		lsof "$@" | lsof_regular_files | grcat conf.lsof | less -rF
-	else
-		lsof "$@" | lsof_regular_files | less -F
-	fi
+    if type -p grcat > /dev/null; then
+        lsof "$@" | lsof_regular_files | grcat conf.lsof | less -rF
+    else
+        lsof "$@" | lsof_regular_files | less -F
+    fi
 }
 
 # 'grc' doesn't support 'top', so we'll use 'ps' instead
@@ -429,7 +429,7 @@ function @top {
 }
 
 function @tree {
-	tree -C "$@" | less -raw
+    tree -C "$@" | less -raw
 }
 ########################## colorizer filters ##########################
 
