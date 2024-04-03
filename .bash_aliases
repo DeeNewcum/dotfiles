@@ -95,6 +95,10 @@ function sudoE_0excerpt() { sudo -E "$(which 0excerpt)" "$@"; }
 # et al.
 alias 0print='perl -0 -l012 -p -e "1"'
 
+
+# The opposite of what '0print' does -- changes newlines back to nulls.
+alias 0unprint='tr "\n" "\000"'
+
 ################################################################################
 
 
