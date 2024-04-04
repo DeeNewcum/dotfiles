@@ -206,7 +206,7 @@ fi
 if [ -e /etc/system-release-cpe ]; then
     # This only works on RHEL and CentOS machines.
     perl -e 'print "\e[41m" . "\e[1;37m" . "==== "'
-    cat /etc/redhat-release | perl -pe 'chomp; s/Linux release //; s/ \(Core\)//; s/\.\d{4}$//'
+    cat /etc/redhat-release | perl -pe 'chomp; s/Linux release //; s/Red Hat Enterprise/RHEL/; s/ \(\w+\)//; s/\.\d{4}$//'
     perl -e 'printf " was released %d years ago. ====" . "\e[0m" . "\n", (-M "/etc/system-release-cpe")/365'
 fi
 
