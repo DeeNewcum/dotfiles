@@ -205,7 +205,9 @@ fi
 # show the OS release date  (for my work machines, which are often very old)
 if [ -e /etc/system-release-cpe ]; then
     # This only works on RHEL and CentOS machines.
-    perl -MPOSIX -le 'printf "\e[41m" . "\e[1;37m" . "==== This OS was released %d years ago. ====" . "\e[0m" . "\n", (-M "/etc/system-release-cpe")/365'
+    perl -e 'print "\e[41m" . "\e[1;37m" . "==== "'
+    cat /etc/redhat-release | perl -pe 'chomp; s/Linux release //; s/ \(Core\)//; s/\.\d{4}$//'
+    perl -e 'printf " was released %d years ago. ====" . "\e[0m" . "\n", (-M "/etc/system-release-cpe")/365'
 fi
 
 
