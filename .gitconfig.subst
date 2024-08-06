@@ -33,12 +33,16 @@
     pager=less -F -X
 
 [alias]
+    # git log, but more attractive and useful
+    #
     # credit: http://www.jukie.net/bart/blog/pimping-out-git-log
     lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 
     # I often want to look at the most recent commit, just after I create it.
     difflast = diff HEAD^ HEAD
 
+    # git add --all + git push --force
+    #
     # (╯°□°)╯︵ ┻━┻
     # explanation: https://olivierpicault.medium.com/my-git-aliases-e9b5434045b7
         # if someone has only the default settings, decent fallbacks are:
@@ -64,3 +68,6 @@
 
     # even quicker, and even less information, when 'status' and 'qstatus' run too slow
     qqstatus = rev-parse --abbrev-ref HEAD
+
+    # list all commits, across all branches
+    allcommits = !git lg --branches="*"
