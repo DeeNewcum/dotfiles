@@ -13,7 +13,7 @@ startup_message off
 escape ``
 
 # use a bigger scrollback buffer!
-defscrollback 1000
+defscrollback 5000
 
 # How long to display temporary messages for.
 msgwait 1
