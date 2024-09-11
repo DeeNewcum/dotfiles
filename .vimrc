@@ -121,9 +121,6 @@ endif
     set sidescroll=1 nowrap sidescrolloff=10    " scroll sideways like every other normal editor
 " endif
 
-nnoremap <leader>s :setl spell!<CR>|            " toggle spell-check
-nnoremap <leader>x :exec getreg('*')<CR>        " take what's in the buffer, and execute it as VimScript
-
 " we don't enable spell-checking here...  rather, it gets enabled on a per-filetype basis
 " in the ~/.vim/ftplugin/ files   (see :help ftplugin-overrule)
 function! Enable_Spell_Check()
@@ -189,16 +186,51 @@ inoremap <F1> <ESC>
 nnoremap <F1> <ESC>
 vnoremap <F1> <ESC>
 
-" take the line under the cursor, and run it as a vim command
-nnoremap <leader>S ^vg_y:execute @@<CR>
+" ,s = toggle spell-check
+nnoremap <leader>s :setl spell!<CR>|
 
-" <leader>l  = lock in the current-search pattern
-" <leader>L  = clear all locked-in search patterns
+" ,S = take the line under the cursor, and run it as a vim command
+" ,x = take what's in the main buffer, and execute it as VimScript
+nnoremap <leader>S ^vg_y:execute @@<CR>
+nnoremap <leader>x :exec getreg('*')<CR>        
+
+" ,l  = lock in the current-search pattern
+" ,L  = clear all locked-in search patterns
 nnoremap <leader>l :call matchadd('Visual', @/)<cr>
 nnoremap <leader>L :call clearmatches()<cr>
 
+" ,t = toggle between plain-(t)ext mode and programming mode
+nnoremap <leader>t :call TogglePlainText()<cr>
+
 " ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================
+
+
+" toggle between plain-(t)ext mode and programming mode
+function TogglePlainText()
+    if &textwidth==0
+        " programming mode
+        set textwidth=100
+        if exists('+colorcolumn')
+            set colorcolumn=+1        " highlight column after 'textwidth'
+        else
+            match ErrorMsg "\%>79v.\+"      " before Vim 7.3, we have to do something different
+        endif
+        set list listchars=tab:› 
+        set nowrap
+        echom "programming mode enabled"
+    else
+        " text mode
+        set textwidth=0
+        call clearmatches()     " I use matches on Vims that are too old to support tw
+        silent!   set colorcolumn=
+        set nolist
+        set wrap
+        set expandtab
+        echom "plain-text mode enabled"
+    endif
+endfunction
+
 
 " Originally from http://www.noah.org/engineering/dotfiles/.vimrc
 " License unclear.
