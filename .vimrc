@@ -218,7 +218,7 @@ function TogglePlainText()
         else
             match ErrorMsg "\%>79v.\+"      " before Vim 7.3, we have to do something different
         endif
-        set list listchars=tab:› 
+        set list listchars=tab:##
         set nowrap
         echom "programming mode enabled"
     else
