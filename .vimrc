@@ -38,7 +38,7 @@ if $LOGNAME != "root"       " modeline can compromise security
 endif
 
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
-"set t_Co=256
+set t_Co=256
 if &diff
     syntax off
     colorscheme evening
@@ -73,6 +73,7 @@ else
         if !has("win32")                    " if we're running on Windows, then we're missing most files, only the .vimrc has been copied over
             silent! colorscheme solarized
         endif
+        hi! NonText ctermbg=242 guibg=DarkGrey          " TODO: This doesn't work. Why not?
     else
             " Solarized looks ugly in 16 colors, so fallback to something else
             " Also, Solarized doesn't work in 88 colors  (urxvt)
@@ -95,6 +96,7 @@ else
     " hilight tabs that are used for alignment -- we only want to use them for indenting
     "match ErrorMsg /\( \|^\)\@<!   \+/
 
+    " hilight where the "textwidth" setting lies
     if exists('+colorcolumn')
         set colorcolumn=+1        " highlight column after 'textwidth'
             " NOTE: colorcolumn has a negative side-effect:  when you copy-n-paste things
@@ -226,8 +228,16 @@ function TogglePlainText()
         silent!   set colorcolumn=
         set nolist
         set wrap
+        set linebreak               " indicate lines that are wrapped
+        let &showbreak = '  '       " indicate lines that are wrapped
         set expandtab
         echom "plain-text mode enabled"
+    endif
+    " indicate lines that are wrapped
+    if &t_Co == 256 || has('gui_running')
+        hi! NonText ctermbg=242 guibg=DarkGrey
+    else
+        hi! NonText ctermbg=4 guibg=DarkGrey
     endif
 endfunction
 
