@@ -210,7 +210,7 @@ nnoremap <leader>t :call TogglePlainText()<cr>
 
 " toggle between plain-(t)ext mode and programming mode
 function TogglePlainText()
-    if &textwidth==0
+    if &textwidth==0 && &wrap==1
         " programming mode
         set textwidth=100
         if exists('+colorcolumn')
