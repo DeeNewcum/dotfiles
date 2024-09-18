@@ -1,8 +1,6 @@
 # .bash_profile is for login shells, .bashrc is for interactive non-login shells
 
 
-export STDIN_OWNERS_HOME=$(perl -e'print((getpwuid((stat shift)[4]))[7])' $(tty))
-
 if [[ "$(uname)" == "Linux" && "$(tty)" == "/dev/tty"* ]]; then
     export IS_VIRTUAL_CONSOLE=1
 
