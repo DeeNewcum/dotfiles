@@ -110,6 +110,14 @@ else
     endif
 endif
 
+" needed for visual consistency with TogglePlainText()
+if &t_Co == 256 || has('gui_running')
+    hi! NonText ctermbg=242 guibg=DarkGrey
+else
+    hi! NonText ctermbg=7 ctermfg=0 guibg=DarkGrey
+endif
+
+
 if has("spell")             " spell-check settings
     set spelllang=en_us
     hi clear SpellBad
@@ -237,7 +245,7 @@ function TogglePlainText()
     if &t_Co == 256 || has('gui_running')
         hi! NonText ctermbg=242 guibg=DarkGrey
     else
-        hi! NonText ctermbg=4 guibg=DarkGrey
+        hi! NonText ctermbg=7 ctermfg=0 guibg=DarkGrey
     endif
 endfunction
 
