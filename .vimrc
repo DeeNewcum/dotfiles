@@ -212,6 +212,8 @@ nnoremap <leader>L :call clearmatches()<cr>
 " ,t = toggle between plain-(t)ext mode and programming mode
 nnoremap <leader>t :call TogglePlainText()<cr>
 
+nnoremap <leader>z :call ShowSynStack()<cr>
+
 " ========================= ^^^^^^^^^^^^^^^^^^^ ===================
 " ========================= http://vimbits.com/ ===================
 
@@ -246,6 +248,35 @@ function TogglePlainText()
         hi! NonText ctermbg=242 guibg=DarkGrey
     else
         hi! NonText ctermbg=7 ctermfg=0 guibg=DarkGrey
+    endif
+endfunction
+
+
+" Show the hierarchy of the synstack() -- the hierarchy of syntax IDs -- and the highlight groups
+" associated with them. This is useful for debugging highlighting and syntaxes.
+" 
+" Originally from https://github.com/dylnmc/synstack.vim/blob/master/autoload/synstack.vim
+function! ShowSynStack()
+    let first = 1
+    unsilent echon "\r"
+    for id in reverse(synstack(line('.'), col('.')))
+        if first
+            let first = 0
+        else
+            unsilent echon ' <- '
+        endif
+        let syn = synIDattr(id, 'name')
+        let transId = synIDtrans(id)
+        execute 'echohl ' syn
+        unsilent echon syn
+        if id !=# transId
+            unsilent echon ' [' synIDattr(transId, 'name') ']'
+        endif
+        echohl NONE
+    endfor
+    echohl NONE
+    if first
+        unsilent echon 'No syntax groups under cursor'
     endif
 endfunction
 
