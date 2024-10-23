@@ -41,11 +41,11 @@ HISTTIMEFORMAT="%F %T -- "
 
 
 # https://github.com/DeeNewcum/termdetect
-if [ -e ~/git/termdetect/src/termdetect ]; then
-    export TERM=$(~/git/termdetect/src/termdetect -t)
-else
-    export TERM=$(termdetect -t)
-fi
+#if [ -e ~/git/termdetect/src/termdetect ]; then
+#    export TERM=$(~/git/termdetect/src/termdetect -t)
+#else
+#    export TERM=$(termdetect -t)
+#fi
 
 # display
 if [ -z "$DISPLAY" ]; then
