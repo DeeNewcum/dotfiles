@@ -7,6 +7,18 @@ alias ea='${EDITOR:-vi} ~/.bash_aliases; rl'
 function where { type -pa "$@" | perl -nle 'print unless $seen{$_}++'; }
 alias rehash='hash -r'
 
+# A quick way to update my dotfiles from Github.
+function _deedot {
+    DOTFILES_DIR=$( dirname $( readlink ~/.lesskey ) )
+    (
+        cd $DOTFILES_DIR;
+        [ -d .git/ ] && git pull origin;
+        echo;
+        ./deedot
+    )
+}
+
+
 
 # Perl replacement for 'uniq'; unlike the system version, this doesn't require the input to be sorted
 #       note: RAM usage is O(n)    (probably;  Perl's hash algorithm may be complex)
