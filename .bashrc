@@ -208,6 +208,12 @@ if [ -e /etc/system-release-cpe ]; then
     perl -e 'print "\e[41m" . "\e[1;37m" . "==== "'
     cat /etc/redhat-release | perl -pe 'chomp; s/Linux release //; s/Red Hat Enterprise/RHEL/; s/ \(\w+\)//; s/\.\d{4}$//'
     perl -e 'printf " was released %d years ago. ====" . "\e[0m" . "\n", (-M "/etc/system-release-cpe")/365'
+
+    ## TODO: Some other options for getting the date include:
+    ##
+    ##      rpm -q --queryformat '%{RELEASE}' centos-release | perl -nle 'print $1 if /\b(20\d\d)\b/'
+    ##
+    ##      dnf repoquery --installed --queryformat '%{buildtime}' redhat-release
 fi
 
 
