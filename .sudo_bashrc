@@ -74,6 +74,10 @@ export LESSKEY=$STDIN_OWNERS_HOME/.less
 
 export ACKRC=$STDIN_OWNERS_HOME/.ackrc
 
+if [ -d $STDIN_OWNERS_HOME/perl5/lib/perl5/ ]; then
+    export PERL5LIB="$PERL5LIB:$STDIN_OWNERS_HOME/perl5/lib/perl5/"
+fi
+
 function perltidy { command perltidy --profile=$STDIN_OWNERS_HOME/.perltidyrc "$@"; }
 
 # Use the correct ~/.gitconfig.
