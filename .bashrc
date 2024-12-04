@@ -289,7 +289,7 @@ mkdir -p ~/apps/build/
 
 
 # PerlBrew and local::lib
-ROOTS_HOME="$( perl -e 'print((getpwuid(0))[7])' )"
+ROOTS_HOME="$( eval echo ~root )"
 if [ "$HOME" != "$ROOTS_HOME" ]; then		# don't use local::lib for root
     [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
     [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
