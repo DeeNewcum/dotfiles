@@ -289,11 +289,13 @@ mkdir -p ~/apps/build/
 
 
 # PerlBrew and local::lib
-[ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
-[ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
-[ -f ~/perl5/lib/perl5/local/lib.pm ] && perl -le 'exit 1 unless $^V ge v5.8.1' && eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
-[ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
-
+ROOTS_HOME="$( perl -e 'print((getpwuid(0))[7])' )"
+if [ "$HOME" != "$ROOTS_HOME" ]; then		# don't use local::lib for root
+    [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
+    [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
+    [ -f ~/perl5/lib/perl5/local/lib.pm ] && perl -le 'exit 1 unless $^V ge v5.8.1' && eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
+    [ -f ~/perl5/perlbrew/etc/bashrc ] && source ~/perl5/perlbrew/etc/bashrc
+fi
 
 # install all the 'fasd' aliases -- "a", "S", "sd","sf", "d", "f", "z", "zz", etc.
 type -p fasd >/dev/null && eval "$(fasd --init auto)"
