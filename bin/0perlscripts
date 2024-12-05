@@ -87,13 +87,17 @@ sub is_perl_code {
     return 1
         if ($filename =~ /\.pm$/);
 
-    # Most Perl scripts need to be chmod +x to be able to work.
-    # Also, disabling this heuristic check slows this script wayyy down.
+    # This check is error-prone. Most Perl scripts will be chmod +x, otherwise
+    # they won't function properly. Also, disabling this heuristic check slows
+    # this script wayyy down.
     # (TODO: why does it slow this script down so much?)
-    return 0
-        if (! -x $filename && $filename !~ /\.t$/);
+    #return 0
+    #    if (! -x $filename && $filename !~ /\.t$/);
 
-    open my $pipe, '-|', 'file', '--brief', $filename
+    open my $pipe, '-|',
+        #'file', '--brief', $filename
+        "head --bytes=1024 '$filename' | file --brief -"
+                # ^^ 1024 bytes should be enough to read an entire pl2bat header
         or die $!;
     local $/ = undef;       # input record separator
     my $classification = <$pipe>;
