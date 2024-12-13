@@ -1,5 +1,25 @@
-# An example of how to stuff basic debug commands into the type-ahead buffer.
-#sub afterinit { push @DB::typeahead, "b 4", "b 6"; }
+use Term::ANSIColor;
+
+sub afterinit {
+    # An example of how to stuff basic debug commands into the type-ahead buffer.
+    #push @DB::typeahead, "b 4", "b 6"; }
+
+    check_readline();
+}
+
+
+# If Term::ReadLine::Gnu isn't installed, then backspace doesn't work right, so warn the user.
+sub check_readline {
+    # try to load Term::ReadLine
+    $DB::term || DB::setterm();
+    # Was it able to be loaded successfully?
+    if (@Term::ReadLine::ISA == 1) {
+        print color('black', 'on_red');
+        print "Backspace won't work properly without installing Term::ReadLine::Gnu.\n";
+        print color('reset');
+    }
+}
+
 
 # Always show the couple of lines around the current line, before every prompt.
 # https://perldoc.perl.org/perldebug#%7B-%5B-command-%5D
