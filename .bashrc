@@ -31,13 +31,25 @@ type -p less >/dev/null   &&   export PAGER='less -i'
 #type -p vimpager >/dev/null   &&   type -p vim >/dev/null   &&   export PAGER=vimpager
 
 
-# history
-HISTCONTROL=ignoredups      # don't put duplicate lines in history
-shopt -s histappend         # append to the history file, don't overwrite it
-HISTSIZE=1000
-HISTFILESIZE=2000
+# History commands that I consider essential for ALL users.
+#
+# Work hard to ensure Bash history is recorded, despite multiple concurrent
+# sessions by one user, multiple su users, etc.
+shopt -s histappend         # support multiple sessions / users
+HISTSIZE=10000              # remember the last 10,000 commands (lines of text)
+HISTFILESIZE=$HISTSIZE      # the differences between these two is confusing,
+                            # see https://stackoverflow.com/q/19454837/1042525
+HISTTIMEFORMAT="%F %T -- "  # timestamps are normally disabled; enable them
+if [ -e "$HISTFILE" -a ! -w "$HISTFILE" ]; then
+    echo -ne "\033[41m"     # red background
+    echo -ne "\033[0;30m"   # black forground
+    echo -n  "The permissions on $HISTFILE mean Bash history won't be saved."
+    echo -e  "\033[0m"      # reset color
+fi
+
+
+# additional tweaks to history
 HISTIGNORE="&:ls:clear"
-HISTTIMEFORMAT="%F %T -- "
 
 
 # https://github.com/DeeNewcum/termdetect
