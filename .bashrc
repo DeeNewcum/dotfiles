@@ -31,24 +31,24 @@ type -p less >/dev/null   &&   export PAGER='less -i'
 #type -p vimpager >/dev/null   &&   type -p vim >/dev/null   &&   export PAGER=vimpager
 
 
-# History commands that I consider essential for ALL users.
-#
-# Work hard to ensure Bash history is recorded, despite multiple concurrent
-# sessions by one user, multiple su users, etc.
+# Make sure that ALL Bash history is recorded, even when there are multiple
+# concurrent sessions by a user, different su users at the same time, etc.
 shopt -s histappend         # support multiple sessions / users
-HISTSIZE=10000              # remember the last 10,000 commands (lines of text)
+HISTSIZE=10000              # remember the last 10,000 commands
 HISTFILESIZE=$HISTSIZE      # the differences between these two is confusing,
                             # see https://stackoverflow.com/q/19454837/1042525
 HISTTIMEFORMAT="%F %T -- "  # timestamps are normally disabled; enable them
 if [ -e "$HISTFILE"  -a  ! -w "$HISTFILE" ]; then
+    echo
     echo -ne "\033[41m"     # red background
     echo -ne "\033[97m"     # bright white foreground
     echo -n  "ERROR: The permissions on $HISTFILE mean Bash history won't be saved."
     echo -e  "\033[0m"      # reset color
+    echo
 fi
 
 
-# additional tweaks to history
+# more personalized tweaks to history
 HISTIGNORE="&:ls:clear"
 
 
