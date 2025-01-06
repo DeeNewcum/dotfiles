@@ -40,10 +40,10 @@ HISTSIZE=10000              # remember the last 10,000 commands (lines of text)
 HISTFILESIZE=$HISTSIZE      # the differences between these two is confusing,
                             # see https://stackoverflow.com/q/19454837/1042525
 HISTTIMEFORMAT="%F %T -- "  # timestamps are normally disabled; enable them
-if [ -e "$HISTFILE" -a ! -w "$HISTFILE" ]; then
+if [ -e "$HISTFILE"  -a  ! -w "$HISTFILE" ]; then
     echo -ne "\033[41m"     # red background
-    echo -ne "\033[0;30m"   # black forground
-    echo -n  "The permissions on $HISTFILE mean Bash history won't be saved."
+    echo -ne "\033[97m"     # bright white foreground
+    echo -n  "ERROR: The permissions on $HISTFILE mean Bash history won't be saved."
     echo -e  "\033[0m"      # reset color
 fi
 
