@@ -32,7 +32,8 @@ type -p less >/dev/null   &&   export PAGER='less -i'
 
 
 # Make sure that ALL Bash history is recorded, even when there are multiple
-# concurrent sessions by a user, different su users at the same time, etc.
+# concurrent sessions by a person, different people su'd at the same time, etc.
+history -r                  # read in existing history from the file
 shopt -s histappend         # support multiple sessions / users
 HISTSIZE=10000              # remember the last 10,000 commands
 HISTFILESIZE=$HISTSIZE      # the differences between these two is confusing,
@@ -46,6 +47,9 @@ if [ -e "$HISTFILE"  -a  ! -w "$HISTFILE" ]; then
     echo -e  "\033[0m"      # reset color
     echo
 fi
+# record extra info about this new login or new su
+[ -n "$PS1" ] && history -s "# new shell -- Bash pid $BASHPID -- $(who am i)"
+# for a more complex history solution, see https://unix.stackexchange.com/a/375092/52831
 
 
 # more personalized tweaks to history
