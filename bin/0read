@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+# The opposite of 0print. This script reads in relatively unformatted
+# text from some other process, and tries to create a file list out of it.
+#
+# This script may do some extra work to try to "do the right thing", as it were.
+#           What is the "right thing"? https://ell.stackexchange.com/a/27146
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+
+if (-t STDIN) {
+    print STDERR "This script is expecting some text to be piped to input.\n";
+    exit;
+}
+
+my %seen;
+
+while (<>) {
+    chomp;
+
+    my $filename = '';
+
+    # Try to parse the output of 'grep' when the text includes both the filename
+    # and the lines that match it.
+    # 
+    # Note that filenames CAN HAVE COLONS in them, and when that happens, that
+    # will BREAK this heuristic code.
+    if ( m#^(/[^:]*):# ) {
+        $filename = $1;
+    }
+
+    # TODO: Maybe attempt to parse the output format of 'lsof'?
+    
+    if ($filename) {
+        if (! $seen{$filename}++) {       # remove duplicates
+            print "$filename\0";
+        }
+    }
+}
