@@ -32,13 +32,37 @@ my %prune_dirs = map {$_ => 1} qw(
 setpriority(0, $$, 19);
 
 
-#test_one("/usr/local/csomenu-test/XYR-Csomenu/blib/lib/XYR/Csomenu/Auth.pm");
-
-find( \&wanted, "/" );
+#wanted_just_one("/usr/local/csomenu-test/XYR-Csomenu/blib/lib/XYR/Csomenu/Auth.pm");
 
 
-# run a test on a single filename
-sub test_one {
+my @start_dirs = ( "/" );
+
+# Users can specify the starting dirs as command-line arguments.
+if (@ARGV) {
+	@start_dirs = @ARGV;
+	foreach (@start_dirs) {
+		if (! -e $_) {
+			die "File or directory doesn't exist:  $_\n";
+		}
+	}
+
+# Users can also pipe a list of FILES (not directories) into STDIN.
+} elsif (! -t STDIN) {
+	$/ = "\0";		# $INPUT_RECORD_SEPARATOR
+	while (<STDIN>) {
+		chomp;
+		wanted_just_one($_);
+	}
+	exit;
+}
+
+
+find( \&wanted, @start_dirs );
+
+
+
+# run wanted() on a single filename
+sub wanted_just_one {
     my ($filename) = @_;
 
     $File::Find::name = $filename;
@@ -115,9 +139,4 @@ sub is_perl_code {
         return 1;
     }
     return 0;
-}
-
-
-
-    return $classification =~ /^perl5?(?! Storable)/i;
 }

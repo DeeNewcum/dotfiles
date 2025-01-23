@@ -83,6 +83,15 @@ function xlgrepi() { xargs_newline grep -l -i "$@" /dev/null | xargs less -i -p 
 # Call just like `find`, though it has a few defaults that I prefer.
 function 0find()    { find $PWD "$@" -print0; }
 
+# This doesn't search the contents of the files, rather it searches through the
+# *names* of the files.
+function 0grep { tcgrep -P '\0' "$@"; }
+    # ^^ You can't change the line-delimeter in normal grep, but tcgrep lets
+    #    you do this.
+    #
+    # TODO: BROKEN. The above outputs with \n separators instead of \0.
+    #               See https://stackoverflow.com/questions/36066536/how-to-make-grep-separate-output-by-null-characters
+
 # Call just like `xargs -0 grep`, with all arguments passed through to grep.
 # Set it to the lowest scheduling priority to avoid impacting resources on
 # important servers.
@@ -109,6 +118,7 @@ alias 0print='perl -0 -l012 -p -e "1"'
 
 
 # The opposite of what '0print' does -- changes newlines back to nulls.
+# See also:  the Perl script '0read'
 alias 0unprint='tr "\n" "\000"'
 
 ################################################################################
