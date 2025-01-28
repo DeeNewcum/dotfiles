@@ -73,7 +73,6 @@ else
         if !has("win32")                    " if we're running on Windows, then we're missing most files, only the .vimrc has been copied over
             silent! colorscheme solarized
         endif
-        hi! NonText ctermbg=242 guibg=DarkGrey          " TODO: This doesn't work. Why not?
     else
             " Solarized looks ugly in 16 colors, so fallback to something else
             " Also, Solarized doesn't work in 88 colors  (urxvt)
@@ -110,19 +109,42 @@ else
     endif
 endif
 
-" needed for visual consistency with TogglePlainText()
-if &t_Co == 256 || has('gui_running')
-    hi! NonText ctermbg=242 guibg=DarkGrey
-else
-    hi! NonText ctermbg=7 ctermfg=0 guibg=DarkGrey
-endif
+" Tweaks to the syntax, that should OVERRIDE any new colorscheme or filetype settings.
+autocmd ColorScheme * call Dee_colorscheme_overrides()
 
+                " This gets run whenever the colorscheme changes.
+function! Dee_colorscheme_overrides()
+    " =========================================================================
+    " =========================================================================
 
-if has("spell")             " spell-check settings
-    set spelllang=en_us
-    hi clear SpellBad
-    hi link SPellBad ErrorMsg
-endif
+    " I use visual mode whenever I yank something, so people looking over my shoulder can see
+    " what I yank. Make that more prominent and even easier to see.
+    hi Visual   term=standout ctermfg=15 ctermbg=4 guifg=White guibg=Red
+
+    " needed for visual consistency with TogglePlainText()
+    if &t_Co == 256 || has('gui_running')
+        hi! NonText ctermbg=242 guibg=DarkGrey
+    else
+        hi! NonText ctermbg=7 ctermfg=0 guibg=DarkGrey
+    endif
+
+    if has("spell")             " spell-check settings
+        set spelllang=en_us
+        hi clear SpellBad
+        hi link SPellBad ErrorMsg
+    endif
+
+    " The color of "black space" at the bottom of a file, and the line-wrap indicator.
+    if ! &diff && (&t_Co == 256 || has('gui_running'))
+        hi NonText ctermbg=242 guibg=DarkGrey
+    endif
+
+    " =========================================================================
+    " =========================================================================
+endfunction
+
+" If the colorscheme never changes, we still want to apply these changes once.
+call Dee_colorscheme_overrides()
 
 " Features that don't work well over a slow terminal.  TODO: have a way to disable them when needed.
 "           http://vimdoc.sourceforge.net/htmldoc/term.html#slow-fast-terminal
