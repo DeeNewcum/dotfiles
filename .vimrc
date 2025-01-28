@@ -115,10 +115,12 @@ autocmd ColorScheme * call Dee_colorscheme_overrides()
                 " This gets run whenever the colorscheme changes.
 function! Dee_colorscheme_overrides()
     " =========================================================================
+    " vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     " =========================================================================
 
-    " I use visual mode whenever I yank something, so people looking over my shoulder can see
-    " what I yank. Make that more prominent and even easier to see.
+    " I use visual mode whenever I yank something, so people looking over my
+    " shoulder can see what I yank. Make that yank more prominent and even
+    " easier to see.
     hi Visual   term=standout ctermfg=15 ctermbg=4 guifg=White guibg=Red
 
     " needed for visual consistency with TogglePlainText()
@@ -140,6 +142,7 @@ function! Dee_colorscheme_overrides()
     endif
 
     " =========================================================================
+    " ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     " =========================================================================
 endfunction
 
