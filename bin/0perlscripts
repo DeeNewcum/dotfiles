@@ -98,7 +98,7 @@ sub wanted {
                                 #     useful.
         && -T                   # text, not binary
         #&& Perl::Metrics::Simple->is_perl_file($File::Find::name)
-        && is_perl_code($File::Find::name)
+        && is_perl_code($_)
     ) {
         print $File::Find::name, chr(0);
     }
