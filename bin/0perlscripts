@@ -39,21 +39,21 @@ my @start_dirs = ( "/" );
 
 # Users can specify the starting dirs as command-line arguments.
 if (@ARGV) {
-	@start_dirs = @ARGV;
-	foreach (@start_dirs) {
-		if (! -e $_) {
-			die "File or directory doesn't exist:  $_\n";
-		}
-	}
+    @start_dirs = @ARGV;
+    foreach (@start_dirs) {
+        if (! -e $_) {
+            die "File or directory doesn't exist:  $_\n";
+        }
+    }
 
 # Users can also pipe a list of FILES (not directories) into STDIN.
 } elsif (! -t STDIN) {
-	$/ = "\0";		# $INPUT_RECORD_SEPARATOR
-	while (<STDIN>) {
-		chomp;
-		wanted_just_one($_);
-	}
-	exit;
+    $/ = "\0";      # $INPUT_RECORD_SEPARATOR
+    while (<STDIN>) {
+        chomp;
+        wanted_just_one($_);
+    }
+    exit;
 }
 
 
@@ -125,7 +125,7 @@ sub is_perl_code {
 
     open my $pipe, '-|',
         #'file', '--brief', $filename
-        "head --bytes=1024 '$filename' | file --brief -"
+        "head --bytes=1024 './$filename' | file --brief -"
                 # ^^ 1024 bytes should be enough to read an entire pl2bat header
         or die $!;
     local $/ = undef;       # input record separator

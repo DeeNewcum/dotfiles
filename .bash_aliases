@@ -114,7 +114,7 @@ function sudoE_0excerpt() { sudo -E "$(which 0excerpt)" "$@"; }
 # it easier for the user to read the list. Hopefully this gets used for
 # diagnostic purposes only, and not as a way to use non-null versions of xargs
 # et al.
-alias 0print='perl -0 -l012 -p -e "1"'
+alias 0print='perl -0 -l012 -p -e "$|++; 1"'
 
 
 # The opposite of what '0print' does -- changes newlines back to nulls.
