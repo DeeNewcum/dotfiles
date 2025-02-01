@@ -16,6 +16,7 @@ my %prune_dirs = map {$_ => 1} qw(
         /boot
         /proc
         /sys
+        /run
         /tmp
         /lib
         /mnt
