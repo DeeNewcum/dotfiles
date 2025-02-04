@@ -350,6 +350,11 @@ function gvim {
 
 # Under CygWin, automatically set $DISPLAY if the local XWin Server is running
 if [ "$(uname -o)" = "Cygwin" ]; then
+	alias pip='python -m pip'
+	alias pip3='python -m pip'
+
+
+
     function Cygwin_auto_set_DISPLAY() {
         # Try setting $DISPLAY to something reasonable, and check if we get any sort of response.
         # See more at -- https://stackoverflow.com/questions/637005/how-to-check-if-x-server-is-running
