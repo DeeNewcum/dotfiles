@@ -85,12 +85,13 @@ function 0find()    { find $PWD "$@" -print0; }
 
 # This doesn't search the contents of the files, rather it searches through the
 # *names* of the files.
-function 0grep { tcgrep -P '\0' "$@"; }
-    # ^^ You can't change the line-delimeter in normal grep, but tcgrep lets
-    #    you do this.
-    #
-    # TODO: BROKEN. The above outputs with \n separators instead of \0.
-    #               See https://stackoverflow.com/questions/36066536/how-to-make-grep-separate-output-by-null-characters
+function 0grep {
+    if [ $# -eq 0 ]; then
+        echo "A regex must be specified." >&2 
+    else
+        perl -0 -nle 'BEGIN {$re = qr/$ARGV[0]/o; shift} print if $_ =~ $re' "$@";
+    fi
+}
 
 # Call just like `xargs -0 grep`, with all arguments passed through to grep.
 # Set it to the lowest scheduling priority to avoid impacting resources on
@@ -103,9 +104,6 @@ function sudo_0xgrep()   { sudo -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
 function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
     # ^^^ to be clear, these take null-separated records on INPUT, but if 
     #     the '-l' flag is used, the output is newline-separated
-
-# Just search the filenames.
-alias 0grep="tr '\00' '\n' | grep"
 
 function sudo_0excerpt() { sudo "$(which 0excerpt)" "$@"; }
 function sudoE_0excerpt() { sudo -E "$(which 0excerpt)" "$@"; }
