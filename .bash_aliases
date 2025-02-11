@@ -8,15 +8,15 @@ function where { type -pa "$@" | perl -nle 'print unless $seen{$_}++'; }
 alias rehash='hash -r'
 
 # A quick way to update my dotfiles from Github.
-function updot {
-    DOTFILES_DIR=$( dirname $( readlink ~/.lesskey ) )
-    (
-        cd $DOTFILES_DIR;
-        [ -d .git/ ] && git pull origin;
-        echo;
-        ./deedot
-    )
-}
+#function updot {
+#    DOTFILES_DIR=$( dirname $( readlink ~/.lesskey ) )
+#    (
+#        cd $DOTFILES_DIR;
+#        [ -d .git/ ] && git pull origin;
+#        echo;
+#        ./deedot
+#    )
+#}
 
 
 

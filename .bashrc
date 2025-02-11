@@ -237,7 +237,7 @@ fi
 
 
 # update both things -- do an automated 'git pull' followed by a ~/dotfiles/deedot
-function _deedot {
+function updot {
     if [ -e ~/dotfiles/ ]; then
         pushd ~/dotfiles/       > /dev/null
         git pull origin
