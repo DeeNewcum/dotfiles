@@ -12,12 +12,15 @@ PROMPT_HOSTNAME='\h'
 [ -e ~/.short_hostname_override ] && PROMPT_HOSTNAME="$(cat ~/.short_hostname_override)"
 XTERM_TITLE='\[\033]0;'$PROMPT_HOSTNAME'\007\]'
 [ "$IS_VIRTUAL_CONSOLE" ] && XTERM_TITLE=''         # don't use the Xterm title when at the Linux Virtual Console
-PS1=$XTERM_TITLE'\[\033[01;32m\]\u@'$PROMPT_HOSTNAME'\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+# The "fancy" version of my prompt.
+#PS1=$XTERM_TITLE'\[\033[01;32m\]\u@'$PROMPT_HOSTNAME'\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
     # Note: As suggested by:
     #           http://tldp.org/HOWTO/Bash-Prompt-HOWTO/xterm-title-bar-manipulations.html
     #       we should only update the Xterm title when we're SURE that the end-user's terminal
     #       supports this feature.  Currently, all of mine do, and also my $TERM is an unreliable
     #       way to check if the end-user's terminal does.  So, for now, I'm always sending this.
+# A less fancy prompt.
+PS1="\[\033[7m\]\u@$PROMPT_HOSTNAME:\w\\$\[\033[0m\] "
 
 
 # vi mode
