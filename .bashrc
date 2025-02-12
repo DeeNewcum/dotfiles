@@ -20,7 +20,7 @@ XTERM_TITLE='\[\033]0;'$PROMPT_HOSTNAME'\007\]'
     #       supports this feature.  Currently, all of mine do, and also my $TERM is an unreliable
     #       way to check if the end-user's terminal does.  So, for now, I'm always sending this.
 # A less fancy prompt.
-PS1="$XTERM_TITLE\[\033[7m\]\u@$PROMPT_HOSTNAME:\w\\$\[\033[0m\] "
+PS1="$XTERM_TITLE\[\033[7m\]\u@$PROMPT_HOSTNAME:\w \[\033[0m\] "
 
 
 # vi mode
