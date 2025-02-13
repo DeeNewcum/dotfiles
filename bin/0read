@@ -28,9 +28,11 @@ while (<>) {
     # 
     # Note that filenames CAN HAVE COLONS in them, and when that happens, that
     # will BREAK this heuristic code.
-    if ( m#^(/[^:]*):# ) {
+    if ( m# ^ ( / [^:]* ) (?: $ | : ) #x ) {
         $filename = $1;
     }
+
+    #print Dumper [$_, $filename];
 
     # TODO: Maybe attempt to parse the output format of 'lsof'?
     
