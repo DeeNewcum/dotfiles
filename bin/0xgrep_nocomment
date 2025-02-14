@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+# Functions like '0xgrep', but first it runs the code through:
+#   perltidy --delete-block-comments --delete-side-comments --delete-pod
+# to remove all comments and POD, so only code can be matched.
+#
+# Note: The list of filenames *must* be received via STDIN, and must be separated by null
+# characters. The arguments to 'tcgrep' must be passed in via our command line, and they will be
+# passed unmodified through to tcgrep.
+
+    use strict;
+    use warnings;
+    use English;
+
+    use IPC::Run3;
+    #use File::Temp;
+    use Data::Dumper;
+
+
+if (! @ARGV) {
+    exec 'tcgrep', '-h';
+    exit;
+}
+
+$INPUT_RECORD_SEPARATOR = chr(0);
+my @filenames = map {chomp;   $_} <STDIN>;
+
+
+$SIG{'INT'} = sub { exit; };     # Ctrl-C
+
+$INPUT_RECORD_SEPARATOR = "\n";
+foreach my $script_filename (@filenames) {
+    #print STDERR ">$script_filename<\n";
+
+    my ($perltidy_out, @tcgrep_out);
+
+    if (!-f $script_filename) {
+        print STDERR "File not found ---- $script_filename\n";
+        next;
+    }
+
+    run3 ['perltidy', '--delete-block-comments', '--delete-side-comments', '--delete-pod',
+                        $script_filename, '-st'], 
+        \undef, \$perltidy_out;
+
+    if (($? & 127) == 2) {        # the user did a Ctrl-C
+        exit;
+    }
+
+    run3 ['tcgrep', @ARGV, '-'],
+        \$perltidy_out, \@tcgrep_out;
+
+    if (($? & 127) == 2) {        # the user did a Ctrl-C
+        exit;
+    }
+
+    foreach my $line (@tcgrep_out) {
+        chomp $line;
+        print "$script_filename: $line\n";
+    }
+}
