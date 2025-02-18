@@ -17,6 +17,8 @@
     use Data::Dumper;
 
 
+my $HIGLIGHT_MATCHES_WITH_ANSI = 1;
+
 if (! @ARGV) {
     exec 'tcgrep', '-h';
     exit;
@@ -53,7 +55,13 @@ foreach my $script_filename (@filenames) {
 
     (($? & 127) == 2) and exit;     # the user did a Ctrl-C
 
-    run3 ['tcgrep', @TCGREP_ARGV, '-'],
+    my @cmdline = ('tcgrep', @TCGREP_ARGV, '-');
+    if ($HIGLIGHT_MATCHES_WITH_ANSI) {
+        # Insert this in the middle of the array.
+        splice(@cmdline, 1, 0,
+                '-H');
+    }
+    run3 [ @cmdline ],
         \$perltidy_out, \@tcgrep_out, undef;
         # ^STDIN          ^STDOUT     ^STDERR
 
