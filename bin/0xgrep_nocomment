@@ -21,6 +21,7 @@ if (! @ARGV) {
     exec 'tcgrep', '-h';
     exit;
 }
+my @TCGREP_ARGV = @ARGV;
 
 $INPUT_RECORD_SEPARATOR = chr(0);
 my @filenames = map {chomp;   $_} <STDIN>;
@@ -39,23 +40,44 @@ foreach my $script_filename (@filenames) {
         next;
     }
 
+    # Skip source files that don't, at a bare minimum, match the regexp before perltidy
+    # is run.
+    if (! speculative_check( $script_filename )) {
+        next;
+    }
+
     run3 ['perltidy', '--delete-block-comments', '--delete-side-comments', '--delete-pod',
-                        $script_filename, '-st'], 
-        \undef, \$perltidy_out;
+                        $script_filename, '-st', '-se'], 
+        \undef, \$perltidy_out, undef;
+        # ^STDIN      ^STDOUT     ^STDERR
 
-    if (($? & 127) == 2) {        # the user did a Ctrl-C
-        exit;
-    }
+    (($? & 127) == 2) and exit;     # the user did a Ctrl-C
 
-    run3 ['tcgrep', @ARGV, '-'],
-        \$perltidy_out, \@tcgrep_out;
+    run3 ['tcgrep', @TCGREP_ARGV, '-'],
+        \$perltidy_out, \@tcgrep_out, undef;
+        # ^STDIN          ^STDOUT     ^STDERR
 
-    if (($? & 127) == 2) {        # the user did a Ctrl-C
-        exit;
-    }
+    (($? & 127) == 2) and exit;     # the user did a Ctrl-C
 
     foreach my $line (@tcgrep_out) {
         chomp $line;
         print "$script_filename: $line\n";
     }
+}
+
+
+
+# Run 'tcpgrep' on the code before passing it to perltidy, just because perltidy is so expensive.
+sub speculative_check {
+    my ($original_filename) = @_;
+
+    run3 ['tcgrep', '-s', @TCGREP_ARGV, $original_filename],
+        \undef, \undef, undef;
+        # ^STDIN  ^STDOUT   ^STDERR
+
+    (($? & 127) == 2) and exit;     # the user did a Ctrl-C
+   
+    my $child_retval = $? >> 8;
+
+    return ($child_retval == 0);        # 0 => true, non-zero => false
 }
