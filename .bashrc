@@ -236,8 +236,19 @@ if [ -e /etc/system-release-cpe ]; then
 fi
 
 
+function _updot_just_github {
+    if [ -e ~/dotfiles/ ]; then
+        pushd ~/dotfiles/       > /dev/null
+        git pull origin
+        ./deedot
+        popd        > /dev/null
+    fi
+
+}
+
+
 # update both things -- do an automated 'git pull' followed by a ~/dotfiles/deedot
-function updot {
+function _updot_work {
     if [ -e ~/dotfiles/ ]; then
         pushd ~/dotfiles/       > /dev/null
         git pull origin
@@ -256,6 +267,10 @@ function updot {
         popd        > /dev/null
     fi
 }
+
+# Pick one, the power is in your hands.
+alias updot='_updot_work'
+#alias updot='_updot_just_github'
 
 
 ###################################################
