@@ -394,6 +394,14 @@ if [ "$(uname -o)" = "Cygwin" ]; then
 		#		search, however.
 	}
 
+	# View *all* the SQL queries that you've written inside SQL Workbench/J
+	function sqlworkbench {
+		 unzip -c \
+			$( cygpath -u "$USERPROFILE\\.sqlworkbench\\Default.wksp" ) \
+			'WbStatements*.txt' \
+			| vim -c 'set syntax=sql' -
+	}
+
 fi
 ########################## Cygwin-specific ##########################
 
