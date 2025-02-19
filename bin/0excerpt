@@ -69,6 +69,11 @@
         if (@modules_not_found) {
             print STDERR "The following module(s) are required but not installed:\n";
             print STDERR "\t", join(" ", @modules_not_found), "\n";
+            if ($^O eq 'cygwin') {
+                print STDERR "\n";
+                print STDERR "Within Cygwin, you may want to first install the packages:\n";
+                print STDERR "  perl-Clone perl-DateTime\n";
+            }
             exit 1;
         }
     }
@@ -116,10 +121,19 @@ EOF
 
 usage() unless (@ARGV >= 2);
 
-%::ARGV = (
-    zipfile => $ARGV[0],
-    regexp => $ARGV[1],
-);
+if ($ARGV[0] eq '--unpack') {
+    %::ARGV = (
+        zipfile => $ARGV[1],
+    );
+    unpack_mode();
+    exit;
+
+} else {
+    %::ARGV = (
+        zipfile => $ARGV[0],
+        regexp => $ARGV[1],
+    );
+}
 
 if (-t STDIN) {
     die "A list of file names to grep should be piped into this script.\n";
@@ -359,7 +373,7 @@ if (-f $ARGV{zipfile}) {
 # Loosen the permissions, because I often need to scp it elsewhere after this.
 chmod 0666, $ARGV{zipfile};
 
-## Show the output of 'scpp' so the user can easily copy the zip file.
+## Get the output of 'scpp' so the user can easily scp the file.
 open my $fh, '-|', 'scpp', $ARGV{zipfile}
     or die $!;
 my $scpp = <$fh>;
@@ -369,7 +383,7 @@ close $fh;
 my $zip_basename = File::Basename::basename( $ARGV{zipfile} );
 
 print "\n";
-print "scp $scpp .;   unzip -o $zip_basename\n";
+print "scp $scpp .;   rm *.html;   0excerpt --unpack $zip_basename\n";
 
 
 exit;
@@ -684,6 +698,41 @@ sub is_date_within_user_criteria {
 
     return 1;
 }
+
+
+################################################################################
+## unpack mode
+################################################################################
+sub unpack_mode {
+    system "unzip", "-o", $ARGV{zipfile};
+    die "hello?\n";
+    my $retval = ($? >> 8);
+    ($retval == 0) or exit 1;
+
+    my $firefox_path;
+    if ($^O eq 'cygwin') {
+        $firefox_path = readpipe("regtool get '\\HKEY_CLASSES_ROOT\\FirefoxHTML-308046B0AF4A39CB\\shell\\open\\command\\'");
+        chomp $firefox_path;
+        $firefox_path =~ s/^"([^"]*)".*/$1/;
+        #die "\$firefox_path    >>$firefox_path<<\n";
+
+        $firefox_path = readpipe_args( "cygpath", "-u", $firefox_path );
+        chomp $firefox_path;
+
+        my $URL = readpipe_args( "cygpath", "-m", $ENV{PWD} );
+        chomp $URL;
+        $URL = "file:///$URL";
+
+        system $firefox_path, $URL;
+    }
+
+    exit;
+}
+
+
+            #>> YOU REALLY SHOULD USE ONE OF THESE INSTEAD -- https://paperlined.org/dev/perl/modules/related_modules/capture_output_from_command.md
+        # like qx// or readpipe(), BUT it allows you to give explicitely delimited args, so you don't have to worry about escaping quotes
+        sub readpipe_args {open(my$f,'-|',@_)or die$!;my@o=<$f>;close$f;wantarray?@o:join("",@o)}
 
 
 ################################################################################
