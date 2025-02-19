@@ -90,7 +90,7 @@
     use Data::Dumper;
 
 # like grep's --before-context and --after-context
-sub NUM_CONTEXT_LINES { 50 }
+sub NUM_CONTEXT_LINES { 500 }
 
 
 ###########################################
@@ -383,7 +383,8 @@ close $fh;
 my $zip_basename = File::Basename::basename( $ARGV{zipfile} );
 
 print "\n";
-print "scp $scpp .;   rm -f *.html;   0excerpt --unpack $zip_basename\n";
+print "On the Cygwin side, consider cd'ing into a separate directory and running this:\n";
+print "    scp $scpp .;   rm -f *.html;   0excerpt --unpack $zip_basename\n";
 
 
 exit;
