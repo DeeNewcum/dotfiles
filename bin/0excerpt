@@ -383,7 +383,7 @@ close $fh;
 my $zip_basename = File::Basename::basename( $ARGV{zipfile} );
 
 print "\n";
-print "scp $scpp .;   rm *.html;   0excerpt --unpack $zip_basename\n";
+print "scp $scpp .;   rm -f *.html;   0excerpt --unpack $zip_basename\n";
 
 
 exit;
@@ -705,7 +705,6 @@ sub is_date_within_user_criteria {
 ################################################################################
 sub unpack_mode {
     system "unzip", "-o", $ARGV{zipfile};
-    die "hello?\n";
     my $retval = ($? >> 8);
     ($retval == 0) or exit 1;
 
