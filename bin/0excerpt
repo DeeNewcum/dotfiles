@@ -133,8 +133,12 @@ if (! -w $zipfile_dir || ! -x $zipfile_dir) {
     die "Permissions on the parent directory prevent renaming:  $ARGV{zipfile}\n";
 }
 # If we're not the owner of this directory, then check the sticky bit.
-if (! -o $zipfile_dir && -k $zipfile_dir) {
-    die "The sticky bit on the parent directory prevents renaming:  $ARGV{zipfile}\n";
+if (! -o $ARGV{zipfile} && ! -o $zipfile_dir && -k $zipfile_dir) {
+    print STDERR "The sticky bit on this file's parent directory (along with not owning the file\n",
+                 "and parent dir) prevents renaming:  $ARGV{zipfile}\n",
+                 "\n",
+                 "Consider running:     sudo chown \$USER $ARGV{zipfile}\n";
+    exit 1;
 }
 
 
@@ -327,22 +331,6 @@ if ($num_files_matched == 0) {
 # initialization
 my $zip = Archive::Zip->new();
 if (-f $ARGV{zipfile}) {
-    if (! -o $ARGV{zipfile} && $> != 0) {
-        # We don't own it. But we also can't chown it --
-        #       https://unix.stackexchange.com/a/27374/52831
-
-        # We can't chown it directly, at least.
-        #print "--------------- copying -----------------\n";
-        File::Copy::copy( $ARGV{zipfile}, "$ARGV{zipfile}.mine" )
-            or die "Copy failed: $!\n";
-        #print "--------------- deleting -----------------\n";
-        unlink( $ARGV{zipfile} )
-            or die "Can't delete $ARGV{zipfile}: $!\n";
-        #print "--------------- moving -----------------\n";
-        File::Copy::move( "$ARGV{zipfile}.mine", $ARGV{zipfile} )
-            or die "Move failed: $!\n";
-    }
-
     $zip->read($ARGV{zipfile})
         == AZ_OK or die "Error reading $ARGV{zipfile}\n";
 }
