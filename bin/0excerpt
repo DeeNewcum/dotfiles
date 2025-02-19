@@ -39,6 +39,7 @@
     use warnings;
 
     use File::Temp ();              # Perl core
+    use File::Basename ();          # Perl core
     use Getopt::Long ();            # Perl core
     use IO::Uncompress::Gunzip ();  # Perl core
     use POSIX ();                   # Perl core
@@ -330,6 +331,29 @@ if (-f $ARGV{zipfile}) {
     $zip->writeToFileNamed($ARGV{zipfile})
         == AZ_OK or die "Unable to write to $ARGV{zipfile}.\n";
 }
+
+
+
+
+################################################################################
+## A little wrapup
+################################################################################
+
+# Loosen the permissions, because I often need to scp it elsewhere after this.
+chmod 0666, $ARGV{zipfile};
+
+## Show the output of 'scpp' so the user can easily copy the zip file.
+open my $fh, '-|', 'scpp', $ARGV{zipfile}
+    or die $!;
+my $scpp = <$fh>;
+chomp $scpp;
+close $fh;
+
+my $zip_basename = File::Basename::basename( $ARGV{zipfile} );
+
+print "\n";
+print "scp $scpp .;   unzip -o $zip_basename\n";
+
 
 exit;
 
