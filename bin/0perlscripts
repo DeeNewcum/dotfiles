@@ -121,8 +121,8 @@ sub is_perl_code {
     # they won't function properly. Also, disabling this heuristic check slows
     # this script wayyy down.
     # (TODO: why does it slow this script down so much?)
-    #return 0
-    #    if (! -x $filename && $filename !~ /\.t$/);
+    return 0
+        if (! -x $filename && $filename !~ /\.t$/);
 
     open my $pipe, '-|',
         #'file', '--brief', $filename
