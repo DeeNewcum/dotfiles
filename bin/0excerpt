@@ -757,13 +757,17 @@ BEGIN {
         my $seconds_so_far    = time() - $^T;
         my $seconds_total     = ($seconds_so_far / $total_bytes_read) * $total_bytes_to_read;
         my $seconds_remaining = $seconds_total - $seconds_so_far;
+        
+        my $bytes_read_remaining = ($total_bytes_to_read - $total_bytes_read);
+        my $mb_read_remaining = commify( int( $bytes_read_remaining / 1000000 ) );
 
         clear_line_move_to_col1();
-        printf "Scanning file %d of %d  (%0.1f%% complete, %d minutes left)   ",
+        printf "Scanning file %d of %d  (%0.1f%% complete,  %d minutes left,  %s MB left to read)   ",
             $num_files_scanned,
             scalar(@local_log_files),
             100 * $total_bytes_read / $total_bytes_to_read,
-            $seconds_remaining / 60;
+            $seconds_remaining / 60,
+            $mb_read_remaining;
     }
 }
 
