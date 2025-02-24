@@ -119,6 +119,10 @@ alias 0print='perl -0 -l012 -p -e "$|++; 1"'
 # See also:  the Perl script '0read'
 alias 0unprint='tr "\n" "\000"'
 
+
+# Show line-count and byte-count.
+alias 0wc='xargs --no-run-if-empty -0 -- wc -l -c'
+
 ################################################################################
 
 
