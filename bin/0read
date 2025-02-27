@@ -11,17 +11,13 @@
 
     use Data::Dumper;
 
-if (-t STDIN) {
-    print STDERR "This script is expecting some text to be piped to input.\n";
-    exit;
-}
 
 my %seen;
 
 while (<>) {
     chomp;
 
-    my $filename = '';
+    my $filename = $_;
 
     # Try to parse the output of 'grep' when the text includes both the filename
     # and the lines that match it.
@@ -29,7 +25,9 @@ while (<>) {
     # Note that filenames CAN HAVE COLONS in them, and when that happens, that
     # will BREAK this heuristic code.
     if ( m# ^ ( / [^:]* ) (?: $ | : ) #x ) {
-        $filename = $1;
+        if (-e $1 && ! -e $filename) {
+            $filename = $1;
+        }
     }
 
     #print Dumper [$_, $filename];
