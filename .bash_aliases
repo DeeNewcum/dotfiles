@@ -123,6 +123,16 @@ alias 0unprint='tr "\n" "\000"'
 # Show line-count and byte-count.
 alias 0wc='xargs --no-run-if-empty -0 -- wc -l -c'
 
+
+# Opens the list of files sent to STDIN, using Vim. All arguments are passed directly to Vim.
+function 0vim {
+    # The /dev/tty thing works around the "vim: input is not from a terminal" error.
+    # See https://unix.stackexchange.com/a/44428/52831
+    cat - | xargs -0 -- sh -c 'vim "$@" < /dev/tty' vim "$@"
+                                                      # ^^^^ These are the arguments passed to '0vim'.
+                                 # ^^^^ These are the arguments passed from 'xargs' to 'sh'.
+}
+
 ################################################################################
 
 
