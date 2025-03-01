@@ -133,6 +133,12 @@ function 0vim {
                                  # ^^^^ These are the arguments passed from 'xargs' to 'sh'.
 }
 
+
+# Just like '0vim', but for less.
+function 0less {
+    cat - | xargs -0 -- sh -c 'less "$@" < /dev/tty' less "$@"
+}
+
 ################################################################################
 
 
