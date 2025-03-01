@@ -380,31 +380,31 @@ function parents() {
 ########################## Cygwin-specific ##########################
 if [ "$(uname -o)" = "Cygwin" ]; then
 
-	# Search for an application directory underneath C:\Program Files\
-	# and C:\Program Files (x86)\. The -maxdepth here is important.
-	#
-	# The arguments are passed directly to 'find', so some example calls:
-	#
-	#		program_files -iname '*securecrt*'
-	#		program_files -ipath '*securecrt*' -type d
-	#
-	function program_files {
-		find '/cygdrive/c/Program Files/' '/cygdrive/c/Program Files (x86)/' \
-			-maxdepth 2		\
-			"$@" -print0 | xargs -0 -- ls -ldF --color=always
+    # Search for an application directory underneath C:\Program Files\
+    # and C:\Program Files (x86)\. The -maxdepth here is important.
+    #
+    # The arguments are passed directly to 'find', so some example calls:
+    #
+    #       program_files -iname '*securecrt*'
+    #       program_files -ipath '*securecrt*' -type d
+    #
+    function program_files {
+        find '/cygdrive/c/Program Files/' '/cygdrive/c/Program Files (x86)/' \
+            -maxdepth 2     \
+            "$@" -print0 | xargs -0 -- ls -ldF --color=always
 
-		# Note: Normally -maxdepth should be set to 2, but once in a while
-		#		you might want to expand it to 3. This really slows down the
-		#		search, however.
-	}
+        # Note: Normally -maxdepth should be set to 2, but once in a while
+        #       you might want to expand it to 3. This really slows down the
+        #       search, however.
+    }
 
-	# View *all* the SQL queries that you've written inside SQL Workbench/J
-	function sqlworkbench {
-		 unzip -c \
-			$( cygpath -u "$USERPROFILE\\.sqlworkbench\\Default.wksp" ) \
-			'WbStatements*.txt' \
-			| vim -c 'set syntax=sql' -
-	}
+    # View *all* the SQL queries that you've written inside SQL Workbench/J
+    function sqlworkbench {
+         unzip -c \
+            $( cygpath -u "$USERPROFILE\\.sqlworkbench\\Default.wksp" ) \
+            'WbStatements*.txt' \
+            | vim -c 'set syntax=sql' -
+    }
 
 fi
 ########################## Cygwin-specific ##########################
