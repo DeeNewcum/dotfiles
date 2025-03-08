@@ -115,6 +115,12 @@ function sudoE_0excerpt() { sudo -E "$(which 0excerpt)" "$@"; }
 alias 0print='perl -0 -l012 -p -e "$|++; 1"'
 
 
+# List which files have been modified most recently.
+function 0recentfiles {
+    perl -0e 'print join chr(0), splice @{[  sort {-M $b <=> -M $a} map {chomp; $_} <>  ]}, -40' \
+        | xargs -0 ls --color -UlrdF 2>/dev/null
+}
+
 # The opposite of what '0print' does -- changes newlines back to nulls.
 # See also:  the Perl script '0read'
 alias 0unprint='tr "\n" "\000"'
