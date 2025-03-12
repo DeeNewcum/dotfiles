@@ -19,6 +19,8 @@ while (<>) {
 
     my $filename = $_;
 
+    next if /^\s*#/;        # skip comments
+
     # Try to parse the output of 'grep' when the text includes both the filename
     # and the lines that match it.
     # 
