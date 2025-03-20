@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+# The files that are written by the "END ... values %INC" Perl code end up
+# containing lots of duplicates. This removes all duplicates from one of those
+# files.
+
+    use strict;
+    use warnings;
+
+    use List::Util qw( uniqstr );
+
+    use Data::Dumper;
+
+if (! @ARGV) {
+    die "Please specify a filename.\n";
+}
+
+my $filename = shift @ARGV;
+
+open my $fh, '<', $filename
+    or die "Unable to open $filename: $!\n";
+
+my @lines = map { chomp; $_ } <$fh>;
+close $fh;
+
+@lines = uniqstr @lines;
+@lines = sort @lines;
+
+#print Dumper \@lines;
+
+
+open $fh, '>', $filename
+    or die "Unable to open $filename: $!\n";
+
+print $fh join("\n", @lines), "\n";
+
+

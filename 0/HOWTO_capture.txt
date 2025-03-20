@@ -1,0 +1,9 @@
+Put something like this in your main script:
+
+
+END {
+    if (open my $fh, '>>', '/home/newcum/0/APP_NAME') {
+        print $fh join("\n", values %INC), "\n";
+        close $fh;
+    }
+}
