@@ -74,6 +74,34 @@ if [ -z "$DISPLAY" ]; then
 fi
 
 
+
+
+# Quick-login -- Normally, after login, a script (or the user) would run just the alias 'q'. Which
+# one of these it gets mapped to is up to the parent .bashrc.
+function exec_screen {
+    if command -v screen   2>&1 >/dev/null;   then
+        # rejoin an existing session, if possible
+        screen -U -dr main || screen -U -S main
+        exit
+    else
+        >&2 echo "Error:  GNU Screen isn't installed here"
+    fi
+}
+
+function exec_tmux {
+    if command -v tmux   2>&1 >/dev/null;   then
+        # rejoin an existing session, if possible
+        exec tmux new -AD -s main
+    else
+        >&2 echo "Error:  tmux isn't installed here"
+    fi
+}
+
+# It's expected that the parent .bashrc overwrites this alias.
+alias q="echo 'No quick-login option has been chosen yet.'"
+
+
+
 ###################################################
 #################  COLOR  #########################
 ###################################################
@@ -324,7 +352,7 @@ mkdir -p ~/apps/build/
 
 # PerlBrew and local::lib
 ROOTS_HOME="$( eval echo ~root )"
-if [ "$HOME" != "$ROOTS_HOME" ]; then		# don't use local::lib for root
+if [ "$HOME" != "$ROOTS_HOME" ]; then       # don't use local::lib for root
     [ -d ~/perl5 ]                     && export PERL_CPANM_OPT="--local-lib=~/perl5"
     [ -d ~/perl5/bin ]                 && export PATH=~/perl5/bin:$PATH
     [ -f ~/perl5/lib/perl5/local/lib.pm ] && perl -le 'exit 1 unless $^V ge v5.8.1' && eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
@@ -368,8 +396,8 @@ function gvim {
 
 # Under CygWin, automatically set $DISPLAY if the local XWin Server is running
 if [ "$(uname -o)" = "Cygwin" ]; then
-	alias pip='python -m pip'
-	alias pip3='python -m pip'
+    alias pip='python -m pip'
+    alias pip3='python -m pip'
 
 
 
