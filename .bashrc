@@ -97,8 +97,18 @@ function exec_tmux {
     fi
 }
 
-# It's expected that the parent .bashrc overwrites this alias.
-alias q="echo 'No quick-login option has been chosen yet.'"
+function q_not_set {
+    cat <<EOF
+No quick-login option has been chosen yet. Add one of these to your .bashrc:
+
+    alias q=exec_tmux
+    alias q=exec_screen
+EOF
+}
+
+
+# It's expected that the parent .bashrc will overwrite this alias.
+alias q=q_not_set
 
 
 
