@@ -1,0 +1,7 @@
+# the list of languages you can use here is at:
+# https://github.com/github-linguist/linguist/blob/main/lib/linguist/languages.yml
+
+.bashrc_cygwin      linguist-language=Shell
+.sudo_bashrc        linguist-language=Shell
+.sudo_vimrc         linguist-language=vim
+.perldb.subst       linguist-language=Perl
