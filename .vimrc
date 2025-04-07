@@ -1,6 +1,6 @@
+    " Use ,S here to have a rough simulation of folds:
+    "       /^"\s*==.*
 
-" to view by section, press ,S  :
-"    set foldmethod=expr | set foldexpr=(getline(v:lnum)=~'\v^\s*"==')?'>1':'=' | set foldlevel=0 | call matchadd('DiffAdd', '\v^\s*"==.*') | 1
 
 
     "###
@@ -12,7 +12,11 @@
     "###        http://blog.sanctum.geek.nz/gracefully-degrading-vimrc/
 
 
-"==== basic settings ====
+
+        " VVV  TODO: Consider getting folds to work on these sorts of headers:
+        "      https://vim.fandom.com/wiki/Syntax_folding_of_Vim_scripts
+
+"======== basic settings ========
 
 set nocompatible encoding=utf8 nobackup                         " sane defaults
 set ignorecase hlsearch incsearch nowrapscan                    " search settings
@@ -42,6 +46,9 @@ silent! call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
 if $LOGNAME != "root"       " modeline can compromise security
     set modeline
 endif
+
+
+"======== diffs and syntax coloring ========
 
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
 set t_Co=256
@@ -200,8 +207,8 @@ command! CC        !perl -c % 2>&1 | head -20
 command! Q         qa!
 cmap     wQ        w \| qa!
 
-" ========================= http://vimbits.com/ ===================
-" ========================= vvvvvvvvvvvvvvvvvvv ===================
+"======== http://vimbits.com/ ========
+" vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 " Located in another file, but you REALLY MUST swap the capslock and escape keys, it saves SOOO much time.
 "       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_XWindows
@@ -246,8 +253,7 @@ nnoremap <leader>t :call TogglePlainText()<cr>
 
 nnoremap <leader>z :call ShowSynStack()<cr>
 
-" ========================= ^^^^^^^^^^^^^^^^^^^ ===================
-" ========================= http://vimbits.com/ ===================
+"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 " toggle between plain-(t)ext mode and programming mode
@@ -339,6 +345,16 @@ autocmd BufWrite *.pl silent !chmod a+x %
 autocmd BufWrite *.py silent !chmod a+x %
 
 
+"======== GUI (both in Windows and Linux) ========
+
+if has("win32")
+    source $VIMRUNTIME/mswin.vim
+
+    " I really dislike that mswin.vim overwrites Ctrl-F, which I use often, and not for
+    " searching-within-a-file.
+    "       https://github.com/vim/vim/issues/1457
+    unmap <C-F>
+endif
 
 
 " make Ctrl-Up and Ctrl-Down modify the font size    (unfortunately, ctrl-plus and ctrl-minus can't be bound)
@@ -451,8 +467,7 @@ endif
 
 
 
-" ======================== persistence ======================
-
+"======== persistence ========
 
 " If we're doing a diff, we DON'T want any fancy colors or settings.
 " We want the colors to be EXACTLY as specified in the 'if &diff' section above.
@@ -484,6 +499,7 @@ else
 endif
 
 
+            " TODO: Is this functionality duplicated with the above section labelled ==== persistence ==== ?
 " http://vimbits.com/bits/242
 " Only available in Vim 7.3+
 if exists("+undofile")
@@ -510,14 +526,6 @@ function! NoSemicolon()
 endfunction
 
 
-if has("win32")
-    source $VIMRUNTIME/mswin.vim
-
-    " I really dislike that mswin.vim overwrites Ctrl-F, which I use often, and not for
-    " searching-within-a-file.
-    "       https://github.com/vim/vim/issues/1457
-    unmap <C-F>
-endif
 
 
 " https://superuser.com/questions/457911/in-vim-background-color-changes-on-scrolling
