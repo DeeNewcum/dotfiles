@@ -466,6 +466,10 @@ if has("gui_running")
 endif
 
 
+if has("win32") && has("gui_running")
+    set guifont=Lucida_Console:h11:cANSI:qDRAFT
+endif
+
 
 "======== persistence ========
 
