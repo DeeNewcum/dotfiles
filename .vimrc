@@ -1,4 +1,8 @@
 
+" to view by section, press ,S  :
+"    set foldmethod=expr | set foldexpr=(getline(v:lnum)=~'\v^\s*"==')?'>1':'=' | set foldlevel=0 | call matchadd('DiffAdd', '\v^\s*"==.*') | 1
+
+
     "###
     "###  TODO: read http://learnvimscriptthehardway.stevelosh.com/
     "###
@@ -7,6 +11,8 @@
     "###  Vim -- old and new -- see:
     "###        http://blog.sanctum.geek.nz/gracefully-degrading-vimrc/
 
+
+"==== basic settings ====
 
 set nocompatible encoding=utf8 nobackup                         " sane defaults
 set ignorecase hlsearch incsearch nowrapscan                    " search settings
@@ -40,6 +46,8 @@ endif
 " the colors from diff-highlights really clash with the colors from syntax-hilights, so turn the latter off
 set t_Co=256
 if &diff
+
+    "==== diff-only settings ====
     syntax off
     colorscheme evening
     " This event list is almost certainly overkill.  Things that are known to be definitely needed:
