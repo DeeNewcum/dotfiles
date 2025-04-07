@@ -225,9 +225,8 @@ vnoremap <F1> <ESC>
 nnoremap <leader>s :setl spell!<CR>|
 
 " ,S = take the line under the cursor, and run it as a vim command
-" ,x = take what's in the main buffer, and execute it as VimScript
-nnoremap <leader>S ^vg_y:execute @@<CR>
-nnoremap <leader>x :exec getreg('*')<CR>        
+nnoremap <leader>S ^vg_y:@"<CR>
+vnoremap <leader>S y:@"<CR>         " when the specific text is already selected
 
 " ,l  = lock in the current-search pattern
 " ,L  = clear all locked-in search patterns
