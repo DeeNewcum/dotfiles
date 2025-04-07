@@ -240,8 +240,8 @@ vnoremap <F1> <ESC>
 nnoremap <leader>s :setl spell!<CR>|
 
 " ,S = take the line under the cursor, and run it as a vim command
-nnoremap <leader>S ^vg_y:@"<CR>
-vnoremap <leader>S y:@"<CR>         " when the specific text is already selected
+nnoremap <leader>S ^vg_y:@"<CR>     " Default to using the entire line.
+vnoremap <leader>S y:@"<CR>         " It also works if you use visual/select mode to highlight specific text first.
 
 " ,l  = lock in the current-search pattern
 " ,L  = clear all locked-in search patterns
