@@ -130,7 +130,7 @@ fi
 if type -p dircolors >/dev/null; then
     eval "$(dircolors -b)"
 
-    function @tree { tree -C -F "$@" | less -rF; }
+    function @tree { tree -C -F "$@" | less -RF; }
 fi
 
 # man pages

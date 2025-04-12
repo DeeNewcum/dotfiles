@@ -99,7 +99,7 @@ function 0grep {
 #function 0xgrep()   { nice -n 19 xargs -0 grep "$@"; }
 # Actually, use 'tcpgrep' (Tom Christiansen's rewrite of grep) instead of the
 # system grep, since that automatically greps inside .gz files and such.
-function 0xgrep()   { nice -n 19 xargs -0 tcgrep "$@"; }
+function 0xgrep()   { nice -n 19 xargs -0 tcgrep -H "$@"; }
 function sudo_0xgrep()   { sudo -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
 function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
     # ^^^ to be clear, these take null-separated records on INPUT, but if 
@@ -487,7 +487,7 @@ alias logfiles='inotifywaitstats /var/log/'
 function @ {
     # is grc available?
     if type -p grc > /dev/null; then
-        grc --colour=on "$@" | less -rF 
+        grc --colour=on "$@" | less -RF 
     else
         "$@" | less -F
     fi
@@ -499,7 +499,7 @@ alias @lsof='@ lsof'
 # filter out all of the non-regular files
 function @lsof_regularfiles {
     if type -p grcat > /dev/null; then
-        lsof "$@" | lsof_regular_files | grcat conf.lsof | less -rF
+        lsof "$@" | lsof_regular_files | grcat conf.lsof | less -RF
     else
         lsof "$@" | lsof_regular_files | less -F
     fi
@@ -511,7 +511,7 @@ function @top {
 }
 
 function @tree {
-    tree -C "$@" | less -raw
+    tree -C "$@" | less -R
 }
 ########################## colorizer filters ##########################
 
