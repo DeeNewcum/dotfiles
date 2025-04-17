@@ -85,7 +85,10 @@ foreach my $file (@ARGV) {
         $path = qq[\\''$path'\\'];
     }
     print "$username\@$host:$path\n";
-    print "scp://$username\@$host//$path\n\n";
-            # ^^^^ outputs a string that works with Vim for remote-editing
-            #       http://vim.wikia.com/wiki/Editing_remote_files_via_scp_in_vim
+    
+    if (-T $abs) {      # The user won't need to do remote-Vim-editing unless this is a text file.
+        print "scp://$username\@$host//$path\n\n";
+                # ^^^^ outputs a string that works with Vim for remote-editing
+                #       http://vim.wikia.com/wiki/Editing_remote_files_via_scp_in_vim
+    }
 }
