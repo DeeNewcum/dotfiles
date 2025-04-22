@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+
+# A more user-friendly version of:
+#       tail -f /var/log/httpd/ssl_error_log
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+
+############################################
+## Figure out which files we want to monitor
+############################################
+my $log_dir = "/var/log/httpd/";
+if (! -d $log_dir) {
+    die "Directory ($log_dir) not found or unreadable.\n";
+}
+
+my @files_monitored = 
+        grep { -r }
+        glob "$log_dir/*error_log";
+#die Dumper \@files_monitored;
+if (! @files_monitored) {
+    die "No Apache log files found, or all are inaccessible.\n";
+}
+
+
+#################################
+## Process command-line arguments
+#################################
+if (! @ARGV) {
+    die "$0:  A search string must be specified.\n";
+}
+my $search_string = shift @ARGV;
+
+
+##################
+## Main event loop
+##################
+open my $fh_tail, '-|',
+        'tail', '-f', '-q', @files_monitored
+    or die $!;
+
+while (<$fh_tail>) {
+    chomp;
+    my $parsed = parse_error_log($_);
+    #print "$_\n", Dumper($parsed), "\n";
+    if ($_ =~ /$search_string/o) {
+        print "$parsed->{log_message}\n";
+    }
+}
+
+
+
+
+# TODO: Is there an existing module that does this parsing okay?
+#
+# Input arguments:  One text line.
+# Returns:  A hash-ref.
+sub parse_error_log {
+    my ($line) = @_;
+    my %parsed;
+
+    chomp $line;
+
+    if ($line =~ s/^\[([^\]]*)\] //) {
+        $parsed{timestamp} = $1;
+    } else {
+        return \%parsed;
+    }
+
+    if ($line =~ s/^\[([^\]]*)\] //) {
+        my ($module, $level) = split ':', $1;
+        $parsed{level_module} = $module;
+        $parsed{level}        = $level;
+    } else {
+        return \%parsed;
+    }
+
+    if ($line =~ s/^\[(pid [^\]]*)\] //) {
+        $parsed{pid} = $1;
+    } else {
+        return \%parsed;
+    }
+
+    if ($line =~ s/^\[client ([^\]]*)\] //) {
+        $parsed{client} = $1;
+    } else {
+        return \%parsed;
+    }
+
+    if ($parsed{level_module} eq 'cgid') {
+        $line =~ s/: (\S+)$//;
+        $parsed{cgi_script} = $1;
+    }
+
+    $line =~ s/^\s*//;
+    if ($line =~ /\S/) {
+        $parsed{log_message} = $line;
+    }
+
+    return \%parsed;
+}
