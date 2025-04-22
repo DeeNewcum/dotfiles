@@ -22,7 +22,7 @@ my @files_monitored =
         glob "$log_dir/*error_log";
 #die Dumper \@files_monitored;
 if (! @files_monitored) {
-    die "No Apache log files found, or all are inaccessible.\n";
+    die "No Apache log files found, or you don't have permissions to read them.\n";
 }
 
 
