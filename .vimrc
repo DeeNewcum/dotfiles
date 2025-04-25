@@ -551,6 +551,11 @@ augroup BufNewFileFromTemplate
 augroup END
 
 
+" the first time opening a .md, don't fold anything
+autocmd   BufNewFile   *.md   let &foldlevel = max(map(range(1, line('$')), 'foldlevel(v:val)'))
+                              " ^^^ Sets the fold level to max. Copied from https://superuser.com/a/567391/117795
+
+
 " don't wrap lines in HTML files
 autocmd   BufEnter   *.html,*.md   call PlainText_Enable()
 
