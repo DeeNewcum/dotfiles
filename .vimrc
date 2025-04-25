@@ -135,7 +135,7 @@ function! Dee_colorscheme_overrides()
     " easier to see.
     hi Visual   term=standout ctermfg=15 ctermbg=4 guifg=White guibg=Red
 
-    " needed for visual consistency with TogglePlainText()
+    " needed for visual consistency with PlainText_Toggle()
     if &t_Co == 256 || has('gui_running')
         hi! NonText ctermbg=242 guibg=DarkGrey
     else
@@ -168,31 +168,53 @@ call Dee_colorscheme_overrides()
 
 "======== (unorganized) ========
 
+" ,t = toggle between plain-(t)ext mode and programming mode
+nnoremap <leader>t :call PlainText_Toggle()<cr>
+
+
 " toggle between plain-(t)ext mode and programming mode
-function TogglePlainText()
+function PlainText_Toggle()
     if &textwidth==0 && &wrap==1
-        " programming mode
-        set textwidth=100
-        if exists('+colorcolumn')
-            set colorcolumn=+1        " highlight column after 'textwidth'
-        else
-            match ErrorMsg "\%>79v.\+"      " before Vim 7.3, we have to do something different
-        endif
-        set list listchars=tab:##
-        set nowrap
+        call PlainText_Disable()
         echom "programming mode enabled"
     else
-        " text mode
-        set textwidth=0
-        call clearmatches()     " I use matches on Vims that are too old to support tw
-        silent!   set colorcolumn=
-        set nolist
-        set wrap
-        set linebreak               " indicate lines that are wrapped
-        let &showbreak = '  '       " indicate lines that are wrapped
-        set expandtab
+        call PlainText_Enable()
         echom "plain-text mode enabled"
     endif
+endfunction
+
+
+function PlainText_Enable()
+    set textwidth=0
+    call clearmatches()     " I use matches on Vims that are too old to support tw
+    silent!   set colorcolumn=
+    set nolist
+    set wrap
+    set linebreak               " indicate lines that are wrapped
+    let &showbreak = '  '       " indicate lines that are wrapped
+    set expandtab
+
+    call PlainText_Both()
+endfunction
+
+
+" also known as "enable programming mode"
+function PlainText_Disable()
+    set textwidth=100
+    if exists('+colorcolumn')
+        set colorcolumn=+1        " highlight column after 'textwidth'
+    else
+        match ErrorMsg "\%>79v.\+"      " before Vim 7.3, we have to do something different
+    endif
+    set list listchars=tab:##
+    set nowrap
+
+    call PlainText_Both()
+endfunction
+
+
+" TODO: Does this have to exist?
+function PlainText_Both()
     " indicate lines that are wrapped
     if &t_Co == 256 || has('gui_running')
         hi! NonText ctermbg=242 guibg=DarkGrey
@@ -339,9 +361,6 @@ vnoremap <leader>S y:@"<CR>         " It also works if you use visual/select mod
 " ,L  = clear all locked-in search patterns
 nnoremap <leader>l :call matchadd('Visual', @/)<cr>
 nnoremap <leader>L :call clearmatches()<cr>
-
-" ,t = toggle between plain-(t)ext mode and programming mode
-nnoremap <leader>t :call TogglePlainText()<cr>
 
 nnoremap <leader>z :call ShowSynStack()<cr>
 
