@@ -43,7 +43,7 @@ set guioptions+=b                                               " add horizontal
 let $STDIN_OWNERS_HOME = ($STDIN_OWNERS_HOME != "") ? $STDIN_OWNERS_HOME : $HOME
 silent! call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
 
-if $LOGNAME != "root"       " modeline can compromise security
+if $LOGNAME != "root"       " set modeline, as long as we're not root, since it could compromise security
     set modeline
 endif
 
@@ -302,22 +302,6 @@ function! ShowSynStack()
 endfunction
 
 
-" Originally from http://www.noah.org/engineering/dotfiles/.vimrc
-" License unclear.
-"
-" Automatically load templates for new files. Silent if the template for the
-" extension does not exist. Virtually all template plugins I have seen for Vim
-" are too complicated. This just loads what extension matches in
-" $VIMHOME/templates/. For example the contents of html.tmpl would be loaded
-" for new html documents.
-function _BufNewFileFromTemplate()
-    " BUG -- For some reason, when ~/.vim/templates/md.tmpl is read in, the :read command stops at
-    "        the line that starts with a hash.
-    silent! 0read $HOME/.vim/templates/%:e.tmpl
-    normal! G"_dd1G
-    match Todo /TODO/
-endfunction
-
 
 
 
@@ -494,7 +478,7 @@ if has("win32") && has("gui_running")
 endif
 
 
-"======== persistence ========
+"======== persistence  (views, sessions, and viminfo)  ========
 
 " If we're doing a diff, we DON'T want any fancy colors or settings.
 " We want the colors to be EXACTLY as specified in the 'if &diff' section above.
@@ -530,31 +514,46 @@ endif
 " http://vimbits.com/bits/242
 " Only available in Vim 7.3+
 if exists("+undofile")
-  " undofile - This allows you to use undos after exiting and restarting
-  " This, like swap and backups, uses .vim-undo first, then ~/.vim/undo
-  " :help undo-persistence
-  " This is only present in 7.3+
-  if isdirectory($HOME . '/.vim/undo') == 0
-    :silent !mkdir -p ~/.vim/undo > /dev/null 2>&1
-  endif
-  set undodir=./.vim-undo//
-  set undodir+=~/.vim/undo//
-  set undofile
+    " undofile - This allows you to use undos after exiting and restarting
+    " This, like swap and backups, uses .vim-undo first, then ~/.vim/undo
+    " :help undo-persistence
+    " This is only present in 7.3+
+    if isdirectory($HOME . '/.vim/undo') == 0
+        :silent !mkdir -p ~/.vim/undo > /dev/null 2>&1
+    endif
+    set undodir=./.vim-undo//
+    set undodir+=~/.vim/undo//
+    set undofile
 endif
+
 
 
 "======== filetype-specific tweaks ========
 
-augroup BufNewFileFromTemplate
-    autocmd!
-    autocmd BufNewFile * :call _BufNewFileFromTemplate()
-augroup END
+
+" Originally from http://www.noah.org/engineering/dotfiles/.vimrc
+" License unclear.
+"
+" Automatically load templates for new files. Silent if the template for the
+" extension does not exist. Virtually all template plugins I have seen for Vim
+" are too complicated. This just loads what extension matches in
+" $VIMHOME/templates/. For example the contents of html.tmpl would be loaded
+" for new html documents.
+function _BufNewFileFromTemplate()
+    " BUG -- For some reason, when ~/.vim/templates/md.tmpl is read in, the :read command stops at
+    "        the line that starts with a hash.
+    silent! 0read $HOME/.vim/templates/%:e.tmpl
+    normal! G"_dd1G
+    match Todo /TODO/
+endfunction
+
+
+autocmd   BufNewFile   *   :call _BufNewFileFromTemplate()
 
 
 " the first time opening a .md, don't fold anything
 autocmd   BufNewFile   *.md   let &foldlevel = max(map(range(1, line('$')), 'foldlevel(v:val)'))
                               " ^^^ Sets the fold level to max. Copied from https://superuser.com/a/567391/117795
-
 
 " don't wrap lines in HTML files
 autocmd   BufEnter   *.html,*.md   call PlainText_Enable()
