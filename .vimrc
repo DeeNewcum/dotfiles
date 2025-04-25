@@ -124,9 +124,6 @@ else
     endif
 endif
 
-" Tweaks to the syntax, that should OVERRIDE any new colorscheme or filetype settings.
-autocmd ColorScheme * call Dee_colorscheme_overrides()
-
                 " This gets run whenever the colorscheme changes.
 function! Dee_colorscheme_overrides()
     " =========================================================================
@@ -161,100 +158,15 @@ function! Dee_colorscheme_overrides()
     " =========================================================================
 endfunction
 
+" Tweaks to the syntax, that should OVERRIDE any new colorscheme or filetype settings.
+autocmd ColorScheme * call Dee_colorscheme_overrides()
+
 " If the colorscheme never changes, we still want to apply these changes once.
 call Dee_colorscheme_overrides()
 
-" Features that don't work well over a slow terminal.  TODO: have a way to disable them when needed.
-"           http://vimdoc.sourceforge.net/htmldoc/term.html#slow-fast-terminal
-"           https://www.reddit.com/r/vim/comments/4hz0u2/sensible_horizontal_scrolling_howto_make_vim/#d2tqjg5
-" if not is_slow()              <-- pseudocode, TODO: replace me with a user setting like :slow
-    set sidescroll=1 nowrap sidescrolloff=10    " scroll sideways like every other normal editor
-" endif
-
-" we don't enable spell-checking here...  rather, it gets enabled on a per-filetype basis
-" in the ~/.vim/ftplugin/ files   (see :help ftplugin-overrule)
-function! Enable_Spell_Check()
-    if has("spell") && !&diff
-        set spell                                                   " enable spell-checking
-    endif
-endfunction
 
 
-set notitle     " don't change the xterm title -- the one set by ~/.bashrc is the one I prefer
-
-
-
-" don't wrap lines in HTML files
-autocmd BufEnter *.html set textwidth=0
-autocmd BufEnter *.md set textwidth=0
-autocmd BufEnter *.creole set textwidth=0
-
-
-" take care of forgetting to use sudo with :w
-cmap w!! w !sudo tee % > /dev/null
-
-
-"   :CC     do a syntax-check on the current Perl program
-"   :PP     run the current Perl program
-command! PP        !PATH=.:$PATH %
-command! PPL       !PATH=.:$PATH % | less
-command! CC        !perl -c % 2>&1 | head -20
-    " TODO: use  "python -m py_compile %"   for Python scripts
-    "       and  "ruby -c %"   for Ruby scripts
-    "       or just use this?   https://github.com/tomtom/checksyntax_vim
-
-" :Q    forcibly quit everything, and don't worry about saving changes
-command! Q         qa!
-cmap     wQ        w \| qa!
-
-"======== http://vimbits.com/ ========
-" vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-" Located in another file, but you REALLY MUST swap the capslock and escape keys, it saves SOOO much time.
-"       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_XWindows
-"       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_Windows
-
-" swap the : and ; keys
-" This helps TWO ways: 1) no more held-down shift key problems (eg. :Q), and 2) you use the command-line WAYYYY more
-"           http://vim.wikia.com/wiki/Map_semicolon_to_colon
-nnoremap ; :| nnoremap : ;
-vnoremap ; :| vnoremap : ;
-
-" reselect visual block after indent/outdent
-vnoremap < <gv
-vnoremap > >gv
-
-" use + and - to increment/decrement
-nnoremap + <C-a>| nnoremap - <C-x>
-
-" scroll the viewpoint faster
-nnoremap <C-e> 5<C-e> 
-nnoremap <C-y> 5<C-y>
-
-" make F1 act as escape so you don't have to worry about it
-inoremap <F1> <ESC>
-nnoremap <F1> <ESC>
-vnoremap <F1> <ESC>
-
-" ,s = toggle spell-check
-nnoremap <leader>s :setl spell!<CR>|
-
-" ,S = take the line under the cursor, and run it as a vim command
-nnoremap <leader>S ^vg_y:@"<CR>     " Default to using the entire line.
-vnoremap <leader>S y:@"<CR>         " It also works if you use visual/select mode to highlight specific text first.
-
-" ,l  = lock in the current-search pattern
-" ,L  = clear all locked-in search patterns
-nnoremap <leader>l :call matchadd('Visual', @/)<cr>
-nnoremap <leader>L :call clearmatches()<cr>
-
-" ,t = toggle between plain-(t)ext mode and programming mode
-nnoremap <leader>t :call TogglePlainText()<cr>
-
-nnoremap <leader>z :call ShowSynStack()<cr>
-
-"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+"======== (unorganized) ========
 
 " toggle between plain-(t)ext mode and programming mode
 function TogglePlainText()
@@ -288,6 +200,55 @@ function TogglePlainText()
         hi! NonText ctermbg=7 ctermfg=0 guibg=DarkGrey
     endif
 endfunction
+
+
+" Prevent saving if the filename has a semicolon in it.
+"       (the semicolon/colon swap above causes me to often save files named ";w" and such)
+autocmd BufWriteCmd *;* call NoSemicolon()
+function! NoSemicolon()
+  echohl WarningMsg | echo "The filename can't contain a semicolon." | echohl None
+endfunction
+
+
+" https://superuser.com/questions/457911/in-vim-background-color-changes-on-scrolling
+if &term =~ '256color'
+    " Disable Background Color Erase (BCE) so that color schemes
+    " work properly when Vim is used inside tmux and GNU screen.
+    set t_ut=
+endif
+
+
+" Use whole "words" when opening URLs.
+" This avoids cutting off parameters (after '?') and anchors (after '#'). 
+" See http://vi.stackexchange.com/q/2801/1631
+let g:netrw_gx="<cWORD>"
+
+
+" Features that don't work well over a slow terminal.  TODO: have a way to disable them when needed.
+"           http://vimdoc.sourceforge.net/htmldoc/term.html#slow-fast-terminal
+"           https://www.reddit.com/r/vim/comments/4hz0u2/sensible_horizontal_scrolling_howto_make_vim/#d2tqjg5
+" if not is_slow()              <-- pseudocode, TODO: replace me with a user setting like :slow
+    set sidescroll=1 nowrap sidescrolloff=10    " scroll sideways like every other normal editor
+" endif
+
+" we don't enable spell-checking here...  rather, it gets enabled on a per-filetype basis
+" in the ~/.vim/ftplugin/ files   (see :help ftplugin-overrule)
+function! Enable_Spell_Check()
+    if has("spell") && !&diff
+        set spell                                                   " enable spell-checking
+    endif
+endfunction
+
+
+set notitle     " don't change the xterm title -- the one set by ~/.bashrc is the one I prefer
+
+" take care of forgetting to use sudo with :w
+cmap w!! w !sudo tee % > /dev/null
+
+
+" :Q    forcibly quit everything, and don't worry about saving changes
+command! Q         qa!
+cmap     wQ        w \| qa!
 
 
 " Show the hierarchy of the synstack() -- the hierarchy of syntax IDs -- and the highlight groups
@@ -336,13 +297,56 @@ function _BufNewFileFromTemplate()
 endfunction
 
 
-augroup BufNewFileFromTemplate
-    autocmd!
-    autocmd BufNewFile * :call _BufNewFileFromTemplate()
-augroup END
 
-autocmd BufWrite *.pl silent !chmod a+x %
-autocmd BufWrite *.py silent !chmod a+x %
+
+"======== http://vimbits.com/ ========
+" vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+" Located in another file, but you REALLY MUST swap the capslock and escape keys, it saves SOOO much time.
+"       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_XWindows
+"       http://vim.wikia.com/wiki/Map_caps_lock_to_escape_in_Windows
+
+" swap the : and ; keys
+" This helps TWO ways: 1) no more held-down shift key problems (eg. :Q), and 2) you use the command-line WAYYYY more
+"           http://vim.wikia.com/wiki/Map_semicolon_to_colon
+nnoremap ; :| nnoremap : ;
+vnoremap ; :| vnoremap : ;
+
+" reselect visual block after indent/outdent
+vnoremap < <gv
+vnoremap > >gv
+
+" use + and - to increment/decrement
+nnoremap + <C-a>| nnoremap - <C-x>
+
+" scroll the viewpoint faster
+nnoremap <C-e> 5<C-e> 
+nnoremap <C-y> 5<C-y>
+
+" make F1 act as escape so you don't have to worry about it
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
+
+" ,s = toggle spell-check
+nnoremap <leader>s :setl spell!<CR>|
+
+" ,S = take the line under the cursor, and run it as a vim command
+nnoremap <leader>S ^vg_y:@"<CR>     " Default to using the entire line.
+vnoremap <leader>S y:@"<CR>         " It also works if you use visual/select mode to highlight specific text first.
+
+" ,l  = lock in the current-search pattern
+" ,L  = clear all locked-in search patterns
+nnoremap <leader>l :call matchadd('Visual', @/)<cr>
+nnoremap <leader>L :call clearmatches()<cr>
+
+" ,t = toggle between plain-(t)ext mode and programming mode
+nnoremap <leader>t :call TogglePlainText()<cr>
+
+nnoremap <leader>z :call ShowSynStack()<cr>
+
+
+
 
 
 "======== GUI (both in Windows and Linux) ========
@@ -520,27 +524,38 @@ if exists("+undofile")
 endif
 
 
+"======== filetype-specific tweaks ========
+
+augroup BufNewFileFromTemplate
+    autocmd!
+    autocmd BufNewFile * :call _BufNewFileFromTemplate()
+augroup END
 
 
-" Prevent saving if the filename has a semicolon in it.
-"       (the semicolon/colon swap above causes me to often save files named ";w" and such)
-autocmd BufWriteCmd *;* call NoSemicolon()
-function! NoSemicolon()
-  echohl WarningMsg | echo "The filename can't contain a semicolon." | echohl None
-endfunction
+" don't wrap lines in HTML files
+autocmd BufEnter *.html set textwidth=0
+autocmd BufEnter *.md set textwidth=0
+autocmd BufEnter *.creole set textwidth=0
+
+
+autocmd BufWrite *.pl silent !chmod a+x %
+autocmd BufWrite *.py silent !chmod a+x %
+
+
+"   :CC     do a syntax-check on the current Perl program
+"   :PP     run the current Perl program
+command! PP        !PATH=.:$PATH %
+command! PPL       !PATH=.:$PATH % | less
+command! CC        !perl -c % 2>&1 | head -20
+    " TODO: use  "python -m py_compile %"   for Python scripts
+    "       and  "ruby -c %"   for Ruby scripts
+    "       or just use this?   https://github.com/tomtom/checksyntax_vim
 
 
 
 
-" https://superuser.com/questions/457911/in-vim-background-color-changes-on-scrolling
-if &term =~ '256color'
-    " Disable Background Color Erase (BCE) so that color schemes
-    " work properly when Vim is used inside tmux and GNU screen.
-    set t_ut=
-endif
 
 
-" Use whole "words" when opening URLs.
-" This avoids cutting off parameters (after '?') and anchors (after '#'). 
-" See http://vi.stackexchange.com/q/2801/1631
-let g:netrw_gx="<cWORD>"
+
+
+
