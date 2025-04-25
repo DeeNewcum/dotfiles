@@ -552,13 +552,10 @@ augroup END
 
 
 " don't wrap lines in HTML files
-autocmd BufEnter *.html set textwidth=0
-autocmd BufEnter *.md set textwidth=0
-autocmd BufEnter *.creole set textwidth=0
+autocmd   BufEnter   *.html,*.md   call PlainText_Enable()
 
 
-autocmd BufWrite *.pl silent !chmod a+x %
-autocmd BufWrite *.py silent !chmod a+x %
+autocmd   BufWrite   *.pl,*.py   silent !chmod a+x %
 
 
 "   :CC     do a syntax-check on the current Perl program
@@ -575,6 +572,9 @@ command! CC        !perl -c % 2>&1 | head -20
 
 
 
+"======== (unorganized) ========
+
+" ...
 
 
 
