@@ -19,11 +19,17 @@
     use Data::Dumper;
 
 
-my $is_just_filename = grep /^-j$/, @ARGV;
+#my $is_just_filename = grep /^-j$/, @ARGV;
+my $is_just_filename = 1;       # this seems like it should be the default, no?
+
+if (-t STDIN) {
+    die "You should pipe in the output of 'lsof -F'.\n";
+}
 
 
 my $accumulator = '';
 my $this_file = '';
+my %files_seen;
 while (<STDIN>) {
     my ($field, $val) = ($_ =~ /^(.)([^\n\r]*)/s);
 
@@ -65,7 +71,9 @@ sub process_entry {
     return if ($file !~ m#^/#);
 
     if ($is_just_filename) {
-        print "$file\n";
+        if (! $files_seen{$file}++) {
+            print "$file\n";
+        }
     } else {
         print $lines;
     }
