@@ -15,7 +15,7 @@
 ##       ssh interiot@webhost.com './make_backup -' > webhost.com_$(date +%Y%m%d).tgz
 
 
-HOSTNAME=laptop                                                                                                                                                 
+HOSTNAME=paperlined.org_v3
 TODAY=$(date +%Y%m%d)
 ## Let the user specify (via $1) where to store the tarball, otherwise use a sensible default.                                                                  
 TARBALL=${1:- $HOME/${HOSTNAME}_$TODAY.tgz } 
@@ -23,33 +23,38 @@ TARBALL=${1:- $HOME/${HOSTNAME}_$TODAY.tgz }
 
 ## CUSTOMIZE PER-HOST HERE. These are specific files/directories that 
 EXCLUDES=$(perl -x "$0" <<'EOF'
-    ~/public_html/photoblog/                    # temporarily added -- big directory
-    ~/public_html/trades/knots/pdf/             # temporarily added -- big directory
-    ~/public_html/games/pc/Spelunky/releases/   # temporarily added -- big directory
+    /var/www/paperlined.org/photoblog/                    # temporarily added -- big directory
+    /var/www/paperlined.org/trades/knots/pdf/             # temporarily added -- big directory
+    /var/www/paperlined.org/games/pc/Spelunky/releases/   # temporarily added -- big directory
 
-    ~/public_html/old/                  # anything in here that is valuable should have been moved elsewhere a while ago
-    ~/public_html/games/pc/Spelunky/releases/               # big, and I am not interested in it anymore
-    ~/public_html/dev/reference/clearcase_v5.0/             # big, not originated by me
-    ~/public_html/dev/reference/clearcase_v4.0/             # big, not originated by me
-    ~/public_html/games/pc/ADOM/ImprovedGuidebook/          # mirror / unimportant
-    ~/public_html/tmp/                  # temporary and not important for the backup
-    ~/public_html/games/pc/Spelunky/releases/spelunky_0_99_5.frozenregion.exe           # big / unnecessary / unimportant
-    ~/public_html/vehicle/bicycle/mp3/4x30_HITT.mp3                                     # big / unnecessary
-    ~/public_html/product_searches/for_motorcycle/CycleWorld_2004.pdf                   # big / unnecessary
-    ~/public_html/dev/oss/high_energy_slings/projectile_rope-end.xcf                    # big / unnecessary
-    ~/public_html/dev/oss/high_energy_slings/exploded_diagram.xcf                       # big / unnecessary
-    ~/public_html/external/mirror/31295019381234.pdf                                    # big / unnecessary
-    ~/public_html/apps/+isms/Learning_Good_Consent/learning_good_consent_screen.pdf     # big / unnecessary
+    /var/www/paperlined.org/old/                  # anything in here that is valuable should have been moved elsewhere a while ago
+    /var/www/paperlined.org/games/pc/Spelunky/releases/               # big, and I am not interested in it anymore
+    /var/www/paperlined.org/dev/reference/clearcase_v5.0/             # big, not originated by me
+    /var/www/paperlined.org/dev/reference/clearcase_v4.0/             # big, not originated by me
+    /var/www/paperlined.org/games/pc/ADOM/ImprovedGuidebook/          # mirror / unimportant
+    /var/www/paperlined.org/tmp/                  # temporary and not important for the backup
+    /var/www/paperlined.org/games/pc/Spelunky/releases/spelunky_0_99_5.frozenregion.exe           # big / unnecessary / unimportant
+    /var/www/paperlined.org/vehicle/bicycle/mp3/4x30_HITT.mp3                                     # big / unnecessary
+    /var/www/paperlined.org/product_searches/for_motorcycle/CycleWorld_2004.pdf                   # big / unnecessary
+    /var/www/paperlined.org/dev/oss/high_energy_slings/projectile_rope-end.xcf                    # big / unnecessary
+    /var/www/paperlined.org/dev/oss/high_energy_slings/exploded_diagram.xcf                       # big / unnecessary
+    /var/www/paperlined.org/external/mirror/31295019381234.pdf                                    # big / unnecessary
+    /var/www/paperlined.org/apps/+isms/Learning_Good_Consent/learning_good_consent_screen.pdf     # big / unnecessary
+    /var/www/paperlined.org/external/mirror/
+    /var/www/paperlined.org/sysadmin/boot/files/                                                  # big and very old
 
 EOF
 )
 
 
+# These are relative to $HOME.
 read -r -d '' INCLUDES << EOF
     public_html/
     make_backup
     .bash_aliases
     .ssh/config
+    backups_exogenous/paperlined_private/
+    /var/www/paperlined.org/
 EOF
 
 
