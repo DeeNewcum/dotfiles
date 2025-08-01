@@ -277,7 +277,7 @@ fi
 function _updot_just_github {
     if [ -e ~/dotfiles/ ]; then
         pushd ~/dotfiles/       > /dev/null
-        git pull origin
+        git pull --ff-only origin
         ./deedot
         popd        > /dev/null
     fi
@@ -289,7 +289,7 @@ function _updot_just_github {
 function _updot_work {
     if [ -e ~/dotfiles/ ]; then
         pushd ~/dotfiles/       > /dev/null
-        git pull origin
+        git pull --ff-only origin
         popd        > /dev/null
     fi
 
