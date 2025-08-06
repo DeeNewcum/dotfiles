@@ -6,6 +6,11 @@
 " Quit when a syntax file was already loaded.
 if exists('b:current_syntax') |   finish |   endif
 
+setlocal foldmethod=syntax
+
+" make fold=syntax work
+syn region Query start=/\v^    -\> prepare for DBD::/ end=/\v^    \<- finish/ fold contains=ALL
+
 syn match bindValue         "\vbind :\S+ \<\=\= \zs'[^']*"
 syn match fetchRow          "\v<fetch[\^a-z_]*"
 syn match query             "\v\cdbd_st_prepare'd sql \S+$"        nextgroup=queryReadOnly, queryReadWrite
