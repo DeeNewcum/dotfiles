@@ -494,7 +494,7 @@ function @ {
     fi
 }
 
-alias @psauxf='@ ps -auxf'
+alias @psauxf='@ ps auxf'
 alias @lsof='@ lsof'
 
 # filter out all of the non-regular files
