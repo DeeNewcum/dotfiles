@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+
+# This does something like CGI::Capture.
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+    use URI::Encode;
+
+
+######## process command-line args ########
+sub die_usage {
+    my $error_string = <<"EOF";
+Usage:  $0 <CGI_capture_filename> -- <script_name> [arg1] [arg2]
+
+CGI_capture_filename:
+        You'll want to capture it using something like this:
+            print Data::Dumper->Dump( [ \\%ENV, \$cgi->{param} ],
+                     [ '*ENV', '\$ENV{QUERY_STRING}' ] );   
+
+Use /bin/printenv for <script_name> if you want to verify that everything is
+working as desired.
+EOF
+
+    if ($_[0]) {
+        $error_string = "$_[0]\n\n" . $error_string;
+    }
+
+    die $error_string;
+}
+
+
+@ARGV > 0
+    or die_usage();
+
+my $CGI_capture_filename = shift @ARGV;
+
+-f $CGI_capture_filename
+    or die_usage("File '$CGI_capture_filename' doesn't exist.");
+
+$ARGV[0] eq '--'
+    or die_usage();
+
+shift;
+
+@ARGV > 0
+    or die_usage();
+
+my @cgi_script_args = @ARGV;
+
+-f $cgi_script_args[0]
+    or die_usage("File '$cgi_script_args[0]' doesn't exist");
+
+
+######## read in the CGI-capture file ########
+open my $fh, '<', $CGI_capture_filename
+    or die $!;
+
+my $CGI_capture = do $CGI_capture_filename;
+
+if ($@) {
+    die "$CGI_capture_filename returned:\n\n$@";
+}
+
+if (ref( $ENV{QUERY_STRING} ) eq 'HASH') {
+    my $querystr = '';
+    while (my ($key, $val) = each %{ $ENV{QUERY_STRING} }) {
+        # a quirk of using $cgi->{param}
+        if (ref( $val ) eq 'ARRAY' && scalar( @$val ) == 1) {
+            $val = $val->[0];
+        }
+
+        $querystr .= '&'    if ($querystr);
+        $querystr .= "$key=";
+        $querystr .= URI::Encode::uri_encode( $val );
+    }
+    $ENV{QUERY_STRING} = $querystr;
+}
+
+
+######## run the CGI script ########
+
+exec { $cgi_script_args[0] } @cgi_script_args;
