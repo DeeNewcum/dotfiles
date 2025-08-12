@@ -73,10 +73,10 @@ if (ref( $ENV{QUERY_STRING} ) eq 'HASH') {
         }
 
         $querystr .= '&'    if ($querystr);
-        $querystr .= "$key=";
-        $querystr .= $uri->encode( $val );
+        $querystr .= $uri->encode($key) . "=" . $uri->encode( $val );
     }
     $ENV{QUERY_STRING} = $querystr;
+    $ENV{REQUEST_METHOD} = 'GET';       # otherwise it won't read the values from $QUERY_STRING
 }
 
 
