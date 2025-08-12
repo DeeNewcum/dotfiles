@@ -64,6 +64,7 @@ if ($@) {
 }
 
 if (ref( $ENV{QUERY_STRING} ) eq 'HASH') {
+    my $uri = URI::Encode->new( { encode_reserved => 1 } );
     my $querystr = '';
     while (my ($key, $val) = each %{ $ENV{QUERY_STRING} }) {
         # a quirk of using $cgi->{param}
@@ -73,7 +74,7 @@ if (ref( $ENV{QUERY_STRING} ) eq 'HASH') {
 
         $querystr .= '&'    if ($querystr);
         $querystr .= "$key=";
-        $querystr .= URI::Encode::uri_encode( $val );
+        $querystr .= $uri->encode( $val );
     }
     $ENV{QUERY_STRING} = $querystr;
 }
