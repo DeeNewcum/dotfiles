@@ -67,13 +67,16 @@ if (ref( $ENV{QUERY_STRING} ) eq 'HASH') {
     my $uri = URI::Encode->new( { encode_reserved => 1 } );
     my $querystr = '';
     while (my ($key, $val) = each %{ $ENV{QUERY_STRING} }) {
-        # a quirk of using $cgi->{param}
-        if (ref( $val ) eq 'ARRAY' && scalar( @$val ) == 1) {
-            $val = $val->[0];
-        }
+        if (ref( $val ) eq 'ARRAY') {       # a quirk of using $cgi->{param}
+            foreach my $v (@$val) {
+                $querystr .= '&'    if ($querystr);
+                $querystr .= $uri->encode($key) . "=" . $uri->encode( $v );
+            }
 
-        $querystr .= '&'    if ($querystr);
-        $querystr .= $uri->encode($key) . "=" . $uri->encode( $val );
+        } else {
+            $querystr .= '&'    if ($querystr);
+            $querystr .= $uri->encode($key) . "=" . $uri->encode( $val );
+        }
     }
     $ENV{QUERY_STRING} = $querystr;
     $ENV{REQUEST_METHOD} = 'GET';       # otherwise it won't read the values from $QUERY_STRING
