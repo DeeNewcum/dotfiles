@@ -1,5 +1,8 @@
 use Term::ANSIColor;
 
+parse_options('arrayDepth= hashdepth=');
+    
+
 sub afterinit {
     # An example of how to stuff basic debug commands into the type-ahead buffer.
     #push @DB::typeahead, "b 4", "b 6"; }
