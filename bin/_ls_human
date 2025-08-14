@@ -16,7 +16,7 @@ use constant BLOCK_SIZE => 512;
 
 
 if (-t STDIN) {
-    die "$0 is intended to have the output of 'ls -h' piped into it.\n";
+    die "$0 is intended to have the output of 'ls -l' piped into it.\n";
 }
 
 while (<STDIN>) {
