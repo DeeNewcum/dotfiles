@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+# Pipe the output of 'ls -l' into this (possibly after filtering it through 'sort -n'), and this
+# will slightly modify each line, to give the size in a human-readable format (as if the
+# -h human readable flag had been used in the first place).
+#
+# The purpose of this is to be able to sort by size AND still be able to display in human-readable
+# sizes.
+
+    use strict;
+    use warnings;
+
+    use Data::Dumper;
+
+use constant BLOCK_SIZE => 512;
+
+
+if (-t STDIN) {
+    die "$0 is intended to have the output of 'ls -h' piped into it.\n";
+}
+
+while (<STDIN>) {
+    if (s/^\s*(\d+) /  sprintf "%8s ", human_readable_bytes($1 * BLOCK_SIZE) /e) {
+        # They ran ls with -s.
+        s/^(\s*(?:\S+\s*){5})\s+(\d+)/ $1 . sprintf "%8s ", human_readable_bytes($2) /e;
+
+    } else {
+        # They ran without -s.
+        s/^((?:\S+\s*){4})\s+(\d+)/ $1 . sprintf "%8s ", human_readable_bytes($2) /e;
+    }
+    print;
+}
+
+
+
+sub human_readable_bytes {
+    my $bytes = shift;
+
+    if ($bytes !~ /^\d+$/) {
+        # It isn't numeric.
+        return $bytes;
+    } elsif ($bytes == 0) {
+        return "0";
+    } elsif ($bytes < 1024) {
+        return $bytes;
+    } elsif ($bytes < 10 * 1024) {
+        return sprintf "%2.1fK", $bytes / 1024;
+    } elsif ($bytes < 1024*1024) {
+        return sprintf "%dK",    $bytes / 1024;
+    } elsif ($bytes < 10*1024*1024) {
+        return sprintf "%2.1fM", $bytes / (1024*1024);
+    } elsif ($bytes < 1024*1024*1024) {
+        return sprintf "%dM",    $bytes / (1024*1024);
+    } elsif ($bytes < 10*1024*1024*1024) {
+        return sprintf "%2.1fG", $bytes / (1024*1024*1024);
+    } elsif ($bytes < 1024*1024*1024*1024) {
+        return sprintf "%dG",    $bytes / (1024*1024*1024);
+    } else {
+        return $bytes;
+    }
+}

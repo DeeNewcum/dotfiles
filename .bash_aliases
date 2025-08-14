@@ -37,9 +37,16 @@ if [ "`uname`" != "SunOS" ]; then
     function vimgrep() { vim $( grep -l "$@" * ) -c "call cursor(1,1)" -c "/${@: -1}"; }
 
     ## identify excessively large files
-    function largefiles() { find ${1:-~} -type f -print0 | xargs -0 ls -l | sort -n -k 5 | tail -100 | perl -ple 's/^(?:\S+\s+){4}//; s/$ENV{HOME}/~/; $_=reverse;s/(\d\d\d)(?=\d)(?!\d*\.)(?=[\d,]*$)/$1,/g;$_=reverse'; }
+    function largefiles() { find ${1:-~} -type f -print0  | xargs -0 ls -l -s | sort -n | tail -100 | _ls_human; }
     function largedirs() { du -k ${1:-~} "${@:2}" | sort -n | tail -100 | _du_human; }
     function largeindividualdirs() { du -Sk ${1:-~} "${@:2}" | sort -n | tail -1000 | _du_human; }
+
+        # ^^^ It's better to use the *allocated* size of a file, rather than the normal reported
+        #     size. To accomplish this, use this flag:
+        #  
+        #           ls        -s
+        #       
+        #           du      Displays the 'allocated' size by default.
 
     ## The above functions don't work very well when you run them on the root-dir, because 
     ## they navigate down /proc/ and others. The below functions fix this.
