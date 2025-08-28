@@ -47,6 +47,12 @@ if $LOGNAME != "root"       " set modeline, as long as we're not root, since it 
     set modeline
 endif
 
+set backup
+let &backupdir=$STDIN_OWNERS_HOME . "/.vim/backup"
+call mkdir(&backupdir, "p", 0700)
+" keep a lot of backups   (This is a direct copy from the official manual for 'backupext')
+autocmd BufWritePre * let &backupext = '-' . strftime("%Y%b%d%X") . '~'
+
 
 "======== diffs and syntax coloring ========
 
