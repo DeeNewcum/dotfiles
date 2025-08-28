@@ -40,18 +40,26 @@ set guioptions-=T                                               " remove toolbar
 set guioptions+=b                                               " add horizontal scrollbar
 
 
-let $STDIN_OWNERS_HOME = ($STDIN_OWNERS_HOME != "") ? $STDIN_OWNERS_HOME : $HOME
-silent! call pathogen#infect($STDIN_OWNERS_HOME . "/.vim/bundle")
+" get the first variable that's defined:  $STDIN_OWNERS_HOME, cygwin_home, or $HOME
+let _HOME_ = ($STDIN_OWNERS_HOME != "") ? $STDIN_OWNERS_HOME :
+            \ get(g:, 'cygwin_home',
+            \ $HOME )
+silent! call pathogen#infect(_HOME_ . "/.vim/bundle")
 
 if $LOGNAME != "root"       " set modeline, as long as we're not root, since it could compromise security
     set modeline
 endif
 
-set backup
-let &backupdir=$STDIN_OWNERS_HOME . "/.vim/backup"
-call mkdir(&backupdir, "p", 0700)
-" keep a lot of backups   (This is a direct copy from the official manual for 'backupext')
-autocmd BufWritePre * let &backupext = '-' . strftime("%Y%b%d%X") . '~'
+" There's almost certainly a better way to do this.
+let _slash_ = has('win32') ? "\\" : "/"
+
+if ! has('win32')       " This doesn't work well under Windows yet.
+    set backup
+    let &backupdir=_HOME_ . _slash_ . ".vim" . _slash_ . "backup"
+    call mkdir(&backupdir, "p")
+    " keep a lot of backups   (This is a direct copy from the official manual for 'backupext')
+    autocmd BufWritePre * let &backupext = '-' . strftime("%Y%b%d%X") . '~'
+endif
 
 
 "======== diffs and syntax coloring ========
