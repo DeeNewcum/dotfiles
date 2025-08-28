@@ -135,7 +135,10 @@ alias 0unprint='tr "\n" "\000"'
 
 
 function 0dotfiles {
-    0textfiles /mnt/global/newcum/universal_dotfiles/ /mnt/global/newcum/UIC_dotfiles/ ~/dotfiles/
+    0textfiles  /mnt/global/newcum/universal_dotfiles/ \
+                /mnt/global/newcum/UIC_dotfiles/ \
+                ~/dotfiles/ \
+                ~/copied_everywhere/   ~/will_copy_everywhere/
 }
 
 function 0aliases {
