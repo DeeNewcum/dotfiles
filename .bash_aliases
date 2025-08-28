@@ -134,6 +134,15 @@ function 0recentfiles {
 alias 0unprint='tr "\n" "\000"'
 
 
+function 0dotfiles {
+    0textfiles /mnt/global/newcum/universal_dotfiles/ /mnt/global/newcum/UIC_dotfiles/ ~/dotfiles/
+}
+
+function 0aliases {
+    0dotfiles | 0grep bash_aliases
+}
+
+
 # Show line-count and byte-count.
 alias 0wc='xargs --no-run-if-empty -0 -- wc -l -c'
 

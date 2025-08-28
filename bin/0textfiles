@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+# Try to automagically identify *all* Perl scripts on the local server.
+#
+# This outputs a list of filenames in the format of 'find -print0' and
+# 'xargs -0'.
+
+use strict;
+use warnings;
+
+use File::Find;
+use Data::Dumper;
+
+
+my %prune_dirs = map {$_ => 1} qw(
+        /boot
+        /proc
+        /sys
+        /run
+        /tmp
+        /lib
+        /mnt
+        /var/lib/yum
+        /usr/src/kernels
+        /var/spool
+        /usr/share/man
+        /home/.deleted
+    );
+
+
+# 'nice' ourselves to the lowest scheduling priority, since we do use a lot of
+# resources, and are often running on production servers
+setpriority(0, $$, 19);
+
+
+#wanted_just_one("/usr/local/csomenu-test/XYR-Csomenu/blib/lib/XYR/Csomenu/Auth.pm");
+
+
+my @start_dirs = ( "/" );
+
+# Users can specify the starting dirs as command-line arguments.
+if (@ARGV) {
+    @start_dirs = ();
+    foreach (@ARGV) {
+        if (! -e $_) {
+            #die "File or directory doesn't exist:  $_\n";
+            #warn "File or directory doesn't exist:  $_\n";
+        } else {
+            push @start_dirs, $_;
+        }
+    }
+
+# Users can also pipe a list of FILES (not directories) into STDIN.
+} elsif (! -t STDIN) {
+    $/ = "\0";      # $INPUT_RECORD_SEPARATOR
+    while (<STDIN>) {
+        chomp;
+        wanted_just_one($_);
+    }
+    exit;
+}
+
+
+find( \&wanted, @start_dirs );
+
+
+
+# run wanted() on a single filename
+sub wanted_just_one {
+    my ($filename) = @_;
+
+    $File::Find::name = $filename;
+    (local $_ = $filename) =~ s#^.*/##;
+    ($File::Find::dir = $filename) =~ s#/[^/]*$##;
+
+    chdir $File::Find::dir;
+
+    #print Dumper [ $File::Find::name, $_, $File::Find::dir ];
+
+    wanted();
+}
+
+
+sub wanted {
+    # There are three inputs:
+    #       $File::Find::dir    the current directory name
+    #       $_                  the current filename within that directory
+    #       $File::Find::name   the complete pathname to the file
+
+    if ($prune_dirs{ $File::Find::name }
+            || $File::Find::name =~
+                    m#/(?: \.cpan | \.cpanm | \.git | \.vim | \.svn )$#x
+        )
+    {
+        $File::Find::prune = 1;
+    }
+
+    if (-f                      # is a file
+        && -s $_ < 100 * 1024   # Massive text files are almost never
+                                #     something we want. They're usually some
+                                #     code-generated dump of something not
+                                #     useful.
+        && -T                   # text, not binary
+    ) {
+        print $File::Find::name, chr(0);
+    }
+}
