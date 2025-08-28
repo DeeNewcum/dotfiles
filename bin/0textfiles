@@ -13,6 +13,7 @@ use Data::Dumper;
 
 
 my %prune_dirs = map {$_ => 1} qw(
+        /dev
         /boot
         /proc
         /sys
@@ -61,6 +62,7 @@ if (@ARGV) {
     exit;
 }
 
+my $routine_debug = 0;
 
 find( \&wanted, @start_dirs );
 
@@ -87,6 +89,18 @@ sub wanted {
     #       $File::Find::dir    the current directory name
     #       $_                  the current filename within that directory
     #       $File::Find::name   the complete pathname to the file
+
+    # After running for 2 minutes, print out a "just in case we're stuck"
+    # debug output every 10 seconds.
+    # (since sometimes the find() can get stuck down a directory that we didn't
+    # intend)
+    my $tm = time();
+    if ($tm - $^T > 2 * 60) {
+        if ($tm - $routine_debug > 10) {
+            $routine_debug = $tm;
+            print STDERR "Are we stuck?   $File::Find::name\n";
+        }
+    }
 
     if ($prune_dirs{ $File::Find::name }
             || $File::Find::name =~
