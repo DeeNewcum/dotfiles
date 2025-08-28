@@ -49,6 +49,7 @@ if (@ARGV) {
             push @start_dirs, $_;
         }
     }
+    @start_dirs         or exit;        # no directories found
 
 # Users can also pipe a list of FILES (not directories) into STDIN.
 } elsif (! -t STDIN) {

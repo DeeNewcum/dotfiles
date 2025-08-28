@@ -40,12 +40,16 @@ my @start_dirs = ( "/" );
 
 # Users can specify the starting dirs as command-line arguments.
 if (@ARGV) {
-    @start_dirs = @ARGV;
-    foreach (@start_dirs) {
+    @start_dirs = ();
+    foreach (@ARGV) {
         if (! -e $_) {
-            die "File or directory doesn't exist:  $_\n";
+            #die "File or directory doesn't exist:  $_\n";
+            #warn "File or directory doesn't exist:  $_\n";
+        } else {
+            push @start_dirs, $_;
         }
     }
+    @start_dirs         or exit;        # no directories found
 
 # Users can also pipe a list of FILES (not directories) into STDIN.
 } elsif (! -t STDIN) {
