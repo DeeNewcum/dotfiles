@@ -53,13 +53,14 @@ endif
 " There's almost certainly a better way to do this.
 let _slash_ = has('win32') ? "\\" : "/"
 
-if ! has('win32')       " This doesn't work well under Windows yet.
-    set backup
-    let &backupdir=_HOME_ . _slash_ . ".vim" . _slash_ . "backup"
-    call mkdir(&backupdir, "p")
-    " keep a lot of backups   (This is a direct copy from the official manual for 'backupext')
-    autocmd BufWritePre * let &backupext = '-' . strftime("%Y%b%d%X") . '~'
-endif
+"if ! has('win32')       " This doesn't work well under Windows yet.
+"            " vv  This is disabled for now. It was causing more problems than it was worth.
+"    set backup
+"    let &backupdir=_HOME_ . _slash_ . ".vim" . _slash_ . "backup"
+"    call mkdir(&backupdir, "p")
+"    " keep a lot of backups   (This is a direct copy from the official manual for 'backupext')
+"    autocmd BufWritePre * let &backupext = '-' . strftime("%Y%b%d%X") . '~'
+"endif
 
 
 "======== diffs and syntax coloring ========
