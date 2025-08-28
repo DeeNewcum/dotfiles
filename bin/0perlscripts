@@ -33,7 +33,7 @@ my %prune_dirs = map {$_ => 1} qw(
 setpriority(0, $$, 19);
 
 
-#wanted_just_one("/usr/local/csomenu-test/XYR-Csomenu/blib/lib/XYR/Csomenu/Auth.pm");
+#test_one("/usr/local/csomenu-test/XYR-Csomenu/blib/lib/XYR/Csomenu/Auth.pm");
 
 
 my @start_dirs = ( "/" );
@@ -56,18 +56,19 @@ if (@ARGV) {
     $/ = "\0";      # $INPUT_RECORD_SEPARATOR
     while (<STDIN>) {
         chomp;
-        wanted_just_one($_);
+        test_one($_);
     }
     exit;
 }
 
+my $routine_debug = 0;
 
 find( \&wanted, @start_dirs );
 
 
 
 # run wanted() on a single filename
-sub wanted_just_one {
+sub test_one {
     my ($filename) = @_;
 
     $File::Find::name = $filename;
@@ -87,6 +88,17 @@ sub wanted {
     #       $File::Find::dir    the current directory name
     #       $_                  the current filename within that directory
     #       $File::Find::name   the complete pathname to the file
+
+	# After running for 10 minutes, print out a "just in case we're stuck"
+	# debug output every 20 seconds.
+	# (since sometimes the find() can get stuck down a directory that we didn't
+	# intend)
+	if (time - $^T > 10 * 60) {
+		if (time - $routine_debug > 20) {
+			$routine_debug = time;
+			print STDERR "Are we stuck?   $File::Find::name\n";
+		}
+	}
 
     if ($prune_dirs{ $File::Find::name }
             || $File::Find::name =~
