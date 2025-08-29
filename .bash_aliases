@@ -1,5 +1,5 @@
 ##  easily edit & reload aliases
-alias rl='. ~/.bash_aliases'
+alias rl='source ${STDIN_OWNERS_HOME:-~}/.bash_aliases'
 alias ea='${EDITOR:-vi} ~/.bash_aliases; rl'
 
 
