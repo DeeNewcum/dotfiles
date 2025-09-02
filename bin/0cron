@@ -23,7 +23,8 @@ my %seen;
 ########################################################
 if (-e '/var/log/cron') {
 
-    open my $fh, '<', '/var/log/cron'       or die $!;
+    open my $fh, '<', '/var/log/cron'
+            or die "Can't open /var/log/cron: $!\n";
 
     while (<$fh>) {
         chomp;
