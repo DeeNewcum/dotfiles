@@ -35,17 +35,7 @@ if (-e '/var/log/cron') {
             #p @cmd;
 
             if ($cmd[0] =~ m#^/# && (-f $cmd[0] || -l $cmd[0])) {
-                if (-l $cmd[0]) {
-                    my $target = readlink( $cmd[0] );
-                    next unless (-f $target);
-                }
-
-                if (-T $cmd[0]) {
-                    my $filename = $cmd[0];
-                    if (! $seen{$filename}++) {
-                        print "$filename\0";
-                    }
-                }
+                process_command( $cmd[0] );
             }
         }
     }
@@ -55,4 +45,22 @@ if (-e '/var/log/cron') {
 
     die "No cron logs found.\n";
 
+}
+
+
+
+sub process_command {
+    my ($command) = @_;
+
+    if (-l $command) {
+        my $symlink_target = readlink( $command );
+        return unless (-f $symlink_target);
+        return if ($seen{$symlink_target}++);
+    }
+
+    if (-T $command) {
+        if (! $seen{$command}++) {
+            print "$command\0";
+        }
+    }
 }
