@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+# List all scripts that have been run from cron lately.
+#
+# This works by scanning the cron-run-logs, typically contained in something
+# like:
+#       /var/log/syslog     (grep for 'cron')
+#       /var/log/cron
+#       /var/log/messages   (grep for 'cron')
+#       journalctl
+
+    use strict;
+    use warnings;
+
+    use Text::ParseWords;
+
+    use Data::Printer;
+
+
+my %seen;
+
+# There are several different places that cron executions can be logged.
+########################################################
+if (-e '/var/log/cron') {
+
+    open my $fh, '<', '/var/log/cron'       or die $!;
+
+    while (<$fh>) {
+        chomp;
+        if (s/^.*: \([^\s\)]*\) CMD \(//) {
+            s/\)$//;
+            #print ">> $_\n";
+
+            my @cmd = Text::ParseWords::shellwords( $_ );
+            #p @cmd;
+
+            if ($cmd[0] =~ m#^/# && (-f $cmd[0] || -l $cmd[0])) {
+                if (-l $cmd[0]) {
+                    my $target = readlink( $cmd[0] );
+                    next unless (-f $target);
+                }
+
+                if (-T $cmd[0]) {
+                    my $filename = $cmd[0];
+                    if (! $seen{$filename}++) {
+                        print "$filename\0";
+                    }
+                }
+            }
+        }
+    }
+
+########################################################
+} else {
+
+    die "No cron logs found.\n";
+
+}
