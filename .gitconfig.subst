@@ -32,6 +32,11 @@
     # don't use the pager if it's less than one screen
     pager=less -F -X
 
+[merge]
+    # Prevent creation of a new merge commit when pulling, if there's a merge conflict.
+    # https://graphite.dev/guides/git-config-ff-only
+    ff = only
+
 [alias]
     # git log, but more attractive and useful
     #
