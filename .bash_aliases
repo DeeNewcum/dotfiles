@@ -545,3 +545,14 @@ function @tree {
 /etc_() { sudo find /etc -type f -iname "*$1*"         | xargs -r ls -ld -rt --color=auto -F; }
 /var/log_() { sudo find /var/log -type f -iname "*$1*" | xargs -r ls -ld -rt --color=auto -F; }
 ########################## find files when visiting a new server ##########################
+
+
+if type cpan 2>/dev/null >/dev/null; then
+    # Useful for when running on AWS burstable instances, otherwise you might
+    # run out of CPU credits.
+    function cpan_notest() {
+        cpan -T "$@";
+    }
+fi
+
+
