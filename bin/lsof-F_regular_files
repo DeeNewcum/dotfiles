@@ -31,6 +31,12 @@ my $accumulator = '';
 my $this_file = '';
 my %files_seen;
 while (<STDIN>) {
+    # Sanity check:  Detect when the user runs lsof without the -F flag.
+    if (/^[gikpsuR].*[^\d\n\r]/) {         # g, i, k, p, s, u, and R are always followed by a number
+        #print STDERR ">>$_";       # debug only
+        die "lsof-F_regular_files ERROR:  lsof must be run with the -F flag.\n";
+    }
+
     my ($field, $val) = ($_ =~ /^(.)([^\n\r]*)/s);
 
     if ($field eq 'a') {
