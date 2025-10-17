@@ -48,7 +48,7 @@ if ($ARGV{install}) {
         # files to not symlink
         return if ($_ eq '.');
         return if ($_ eq 'deedot');
-        return if /(?:^|\/)README.(?:creole|md)$/;
+        return if /(?:^|\/)(?:README|INSTALL).(?:creole|md)$/;
         return if /\.swp$/;
         
         if (-d $_) {
@@ -323,6 +323,8 @@ sub copy_symlink {
     my $to   = "$ENV{HOME}/$file";
     my $from = "$FindBin::Bin/$file";
 
+    # for symlinks, readlink() + symlink() is equivalent to what
+    # File::Copy::copy() would normally do
     my $readlink_from = readlink($from);
 
     if (!-e $to) {
