@@ -8,8 +8,8 @@ If you're on Cygwin, do this:
 # Using the normal Cygwin installer, double-check that the 'wget' package is installed.
 
 # If apt-cyg isn't installed yet:
-wget -O /tmp/apt-cyg https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg
-install /tmp/apt-cyg /bin
+wget -O /bin/apt-cyg https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg
+chmod +x /bin/apt-cyg
 
 # If cpanm isn't installed yet:
 cpan install App::cpanminus
@@ -18,7 +18,7 @@ cpan install App::cpanminus
 apt-cyg install perl-libwww-perl perl-Module-Build perl-Readonly perl-Params-Util perl-TermReadKey
 ```
 
-Then, on all systems:
+Then, run this on all systems:
 
 ```
 cpanm LWP::UserAgent Term::ReadKey Module::Build CGI Data::Dumper::Simple Perl::Metrics::Simple
