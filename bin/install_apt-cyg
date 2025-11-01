@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# Installs apt-cyg from https://github.com/transcode-open/apt-cyg
+#
+#
+# If this script malfunctions, then manually run these commands:
+#
+#       wget -O /bin/apt-cyg https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg
+#       chmod +x /bin/apt-cyg
+
+
+# Are we currently running under Cygwin?
+if [[ "$(uname)" != CYGWIN_* ]]; then
+    echo "ERROR: apt-cyg can only be installed on Cygwin."
+    exit 1
+fi
+
+
+# Is apt-cyg available anywhere in $PATH?
+if type -p apt-cyg > /dev/null; then
+    echo "apt-cyg is already installed."
+    exit 1
+fi
+
+
+# Is wget available anywhere in $PATH?
+if ! type -p wget > /dev/null; then
+    echo "ERROR: wget must first be installed through the normal Cygwin installer."
+    exit 1
+fi
+
+
+
+wget -O /bin/apt-cyg https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg
+
+if [ -e /bin/apt-cyg ]; then
+    chmod +x /bin/apt-cyg
+
+    echo
+    echo "apt-cyg installed successfully."
+else
+
+    echo
+    echo "ERROR: apt-cyg failed to install."
+fi
