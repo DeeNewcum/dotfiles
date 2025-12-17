@@ -53,6 +53,9 @@ endif
 " There's almost certainly a better way to do this.
 let _slash_ = has('win32') ? "\\" : "/"
 
+" for https://github.com/machakann/vim-highlightedyank
+let g:highlightedyank_highlight_duration = 500
+
 "if ! has('win32')       " This doesn't work well under Windows yet.
 "            " vv  This is disabled for now. It was causing more problems than it was worth.
 "    set backup
