@@ -25,7 +25,7 @@ fi
 
 # Is wget available anywhere in $PATH?
 if ! type -p wget > /dev/null; then
-    echo "ERROR: wget must first be installed through the normal Cygwin installer."
+    echo "ERROR: You must manually install 'wget' using the standard Cygwin installer."
     exit 1
 fi
 
