@@ -17,10 +17,17 @@ cpan install App::cpanminus
 apt-cyg install perl-libwww-perl perl-Module-Build perl-Readonly perl-Params-Util perl-TermReadKey
 ```
 
-Then, run this on all systems:
+If you're on some other Unix system, run these instead:
 
 ```
-cpanm LWP::UserAgent Term::ReadKey Module::Build CGI Data::Dumper::Simple Perl::Metrics::Simple
+cpanm LWP Module::Build Readonly Params::Util Term::ReadKey
+```
+
+
+Then, run this, regardless of what system you're on:
+
+```
+cpanm CGI Data::Dumper::Simple Log::Dispatch LWP::UserAgent Module::Build Perl::Metrics::Simple Term::ReadKey
 ```
 
 
