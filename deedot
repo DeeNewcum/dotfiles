@@ -10,18 +10,27 @@
     use strict;
     use warnings;
 
+    # An improved version of 'use FindBin'.
     use Cwd 'abs_path';
     use File::Basename;
-    # an improved version of 'use FindBin'
     BEGIN {$FindBin::Bin = dirname( abs_path $0 );}
 
-    use File::Find;
-    use Getopt::Long;
-
+    #use Carp::Always;              # uncomment this to get a full stack backtrace when errors hit
     use Data::Dumper;
     $Data::Dumper::Useqq++;
-    #use Devel::Comments;           # uncomment this during development to enable the ### debugging statements
-    #use Carp::Always;              # uncomment this to get a full stack backtrace when errors hit
+    use File::Find;
+    use Getopt::Long;
+    use Log::Dispatch;
+
+
+# Configure logging.
+# Log levels are, in order -- debug, info, notice, warning, error, critical, alert, emergency
+our $log = Log::Dispatch->new(
+    outputs => [
+        #[ 'File',   min_level => 'debug', filename => 'logfile' ],
+        #[ 'Screen', min_level => 'info' ],
+    ],
+);
 
 our %ARGV;
 process_cmdline();
@@ -36,39 +45,49 @@ chdir $FindBin::Bin;
 ###############
 if ($ARGV{install}) {
     # run through all files/directories under ~/dotfiles/
-    find { wanted => sub {
-        s/^\.\///;
+    find {
+        wanted => \&file_wanted,
+        no_chdir => 1,
+    }, ".";
+}
 
-        # directories to avoid altogether
-        if ($_ eq '.git') {
-            $File::Find::prune++;
-            return;
+
+sub file_wanted {
+    # There are three inputs:
+    #       $File::Find::dir    the current directory name
+    #       $_                  the current filename within that directory
+    #       $File::Find::name   the complete pathname to the file
+
+    s#^\./##;           # Make relative paths display more nicely.
+
+    # directories to avoid altogether
+    if ($_ eq '.git') {
+        $File::Find::prune++;
+        return;
+    }
+
+    # files to not symlink
+    return if ($_ eq '.');
+    return if ($_ eq 'deedot');
+    return if /(?:^|\/)(?:README|INSTALL).(?:creole|md)$/;
+    return if /\.swp$/;
+    
+    if (-d $_) {
+        # if it's a directory, create that path under $HOME
+        install_directory($_);
+
+    } elsif (-f $_) {
+        # if it's a file, symlink it to $HOME
+        if (/\.subst$/) {
+            install_text_substitution($_);
+        } else {
+            install_symlink($_);
         }
 
-        # files to not symlink
-        return if ($_ eq '.');
-        return if ($_ eq 'deedot');
-        return if /(?:^|\/)(?:README|INSTALL).(?:creole|md)$/;
-        return if /\.swp$/;
-        
-        if (-d $_) {
-            # if it's a directory, create that path under $HOME
-            install_directory($_);
-
-        } elsif (-f $_) {
-            # if it's a file, symlink it to $HOME
-            if (/\.subst$/) {
-                install_text_substitution($_);
-            } else {
-                install_symlink($_);
-            }
-
-        } elsif (-l $_) {
-            # if it's a symlink, copy it to $HOME
-            copy_symlink($_);
-        }
-
-    }, no_chdir=>1}, ".";
+    } elsif (-l $_) {
+        # if it's a symlink, copy it to $HOME
+        copy_symlink($_);
+    }
 }
 
 
@@ -142,7 +161,6 @@ sub install_directory {
     system "mkdir", "-p", "$ENV{HOME}/$dir";
 
     if (-d "$ENV{HOME}/$dir") {
-        #print "created   $dir\n";
         print "setup    ~/$dir\n";
     } else {
         print "ERROR: unable to create directory '$dir'\n";
@@ -156,9 +174,14 @@ sub install_symlink {
     my $to   = "$ENV{HOME}/$file";
     my $from = "$FindBin::Bin/$file";
 
+    $log->info( "======== install_symlink() ========\n" );
+
+    #$log->info( "Considering $from  ==>  $to\n" );
+    $log->info( "Considering $file\n" );
 
     if (! -e $to) {
         ## No file exists there.  Easy peasy, we'll drop our symlink there.
+        $log->info( "Action:  Create basic symlink\n" );
         symlink $from, $to;
         #print "creating symlink    $from     to    $to\n";
         print "setup    ~/$file\n";
@@ -170,6 +193,7 @@ sub install_symlink {
         if (readlink($to) eq $from) {
             ## There's an existing symlink that already points to the right place.
             ## There's no conflict, we don't need to do anything.
+            $log->info( "Action:  No action needed, symlink is already good.\n" );
             return;
         }
 
@@ -327,9 +351,9 @@ sub copy_symlink {
     # File::Copy::copy() would normally do
     my $readlink_from = readlink($from);
 
-    if (!-e $to) {
+    if (!-e $to && !-l $to) {
         symlink($readlink_from, $to)
-            or die "Unable to create symlink for '$file'.\n";
+            or die "ERROR: Unable to create symlink '$to'.\n";
     } elsif (-l $to) {
         # has this symlink already been installed correctly?
         my $readlink_to = readlink($to);
