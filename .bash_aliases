@@ -192,6 +192,7 @@ function vimu()      { vim   $(rurl "$1"); }
 function lessu()     { less  $(rurl "$1"); }
 function cdu()       { cdd   $(rurl "$1"); }
 function touchu()    { touch $(rurl "$1"); }
+function rmu()       { [ "$1" ] &&   rm -- $(rurl "$1"); }
 
 
 # gnome-open, kde-open, etc
