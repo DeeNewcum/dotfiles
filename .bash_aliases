@@ -449,6 +449,11 @@ if [ "$(uname -o)" = "Cygwin" ]; then
             | vim -c 'set syntax=sql' -
     }
 
+    # Just like 'cd', but the argument it accepts is a Windows-formatted path.
+    function cdwin {
+        OLDPWD=$( cygpath -u "$1" )      \cd -  >/dev/null
+    }
+
 fi
 ########################## Cygwin-specific ##########################
 
