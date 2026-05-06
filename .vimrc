@@ -364,7 +364,52 @@ vnoremap <leader>S y:@"<CR>         " It also works if you use visual/select mod
 nnoremap <leader>l :call matchadd('Visual', @/)<cr>
 nnoremap <leader>L :call clearmatches()<cr>
 
+nnoremap <leader>u :call Toggle_split_join__URL_parameters()<cr>
+
 nnoremap <leader>z :call ShowSynStack()<cr>
+
+
+
+    " This allows me to quickly remove URL parameters that I don't like. When doing this, my overall
+    " goal is to clean up and simplify the URL. The steps are: 1) Split the URL, 2) delete specific
+    " lines I don't want, 3) join the URL back together.
+    function! Toggle_split_join__URL_parameters()
+        let l:num_lines = line('$')
+        " Count the number of lines that start with a special symbol (question mark, ampersand,
+        " or hash mark), or that start with https://.
+        let l:num_lines_start_with_symbol = searchcount( #{ pattern: '\v^(&|\?|#|https?:)' } ).total
+        " Whenever a special symbol (question mark, ampersand, or hash mark) occurs NOT at the
+        " beginning of a line.
+        let l:num_symbols_in_middle_of_line = searchcount( #{ pattern: '.[&?#]' } ).total
+
+        " Debugging.
+        "echo l:num_symbols_in_middle_of_line
+
+        if l:num_lines == 1 && l:num_lines_start_with_symbol <= 1
+            " ======== Split the URL ========
+            %s/\v([&?#])/\r\1/g
+            echo "URL parameters split."
+
+            " Mini syntax highlighting.
+            " (use a hard-coded match ID, so we can overwrite just that specific match regex later)
+            silent! call matchdelete(99991)
+            call matchadd('Title', '\v^(https?:)@![&?#]\zs[^=?&#]*', 10, 99991)
+
+        elseif l:num_lines_start_with_symbol > 1 && l:num_symbols_in_middle_of_line == 0
+            " ======== Join the URL ========
+            %s/\n//
+            echo "URL parameters joined."
+
+            " Mini syntax highlighting.
+            silent! call matchdelete(99991)
+            call matchadd('Title', '[&?#]\zs[^=?&#]*', 10, 99991)
+        else
+            " ======== Error ========
+            echo "ERROR: In order to work properly, I need a single line containing just a URL."
+
+        endif
+
+    endfunction
 
 
 
