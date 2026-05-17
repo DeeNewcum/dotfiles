@@ -385,8 +385,12 @@ nnoremap <leader>z :call ShowSynStack()<cr>
         " Debugging.
         "echo l:num_symbols_in_middle_of_line
 
+        " ==== Toggle between the two states ====
         if l:num_lines == 1 && l:num_lines_start_with_symbol <= 1
+
             " ======== Split the URL ========
+            call PlainText_Enable()     " set textwidth=0  wrap
+            
             %s/\v([&?#])/\r\1/g
             echo "URL parameters split."
 
@@ -396,16 +400,21 @@ nnoremap <leader>z :call ShowSynStack()<cr>
             call matchadd('Title', '\v^(https?:)@![&?#]\zs[^=?&#]*', 10, 99991)
 
         elseif l:num_lines_start_with_symbol > 1 && l:num_symbols_in_middle_of_line == 0
+
             " ======== Join the URL ========
+            call PlainText_Enable()     " set textwidth=0  wrap
+            
             %s/\n//
             echo "URL parameters joined."
 
             " Mini syntax highlighting.
             silent! call matchdelete(99991)
             call matchadd('Title', '[&?#]\zs[^=?&#]*', 10, 99991)
+
         else
             " ======== Error ========
             echo "ERROR: In order to work properly, I need a single line containing just a URL."
+            return
 
         endif
 
