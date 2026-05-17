@@ -385,7 +385,7 @@ nnoremap <leader>z :call ShowSynStack()<cr>
         " Debugging.
         "echo l:num_symbols_in_middle_of_line
         
-        let matchid_base = 99990
+        let l:matchid_base = 99990
 
 
         " ==== Toggle between the two states ====
@@ -398,8 +398,8 @@ nnoremap <leader>z :call ShowSynStack()<cr>
             echo "URL parameters split."
 
             " Syntax highlight:  Parameter names.
-            silent! call matchdelete(matchid_base + 1)
-            call matchadd('Title', '\v^(https?:)@![&?#]\zs[^=?&#]*', 10, matchid_base + 1)
+            silent! call matchdelete(l:matchid_base + 1)
+            call matchadd('Title', '\v^(https?:)@![&?#]\zs[^=?&#]*', 10, l:matchid_base + 1)
 
         elseif l:num_lines_start_with_symbol > 1 && l:num_symbols_in_middle_of_line == 0
 
@@ -410,8 +410,8 @@ nnoremap <leader>z :call ShowSynStack()<cr>
             echo "URL parameters joined."
 
             " Syntax highlight:  Parameter names.
-            silent! call matchdelete(matchid_base + 1)
-            call matchadd('Title', '[&?#]\zs[^=?&#]*', 10, matchid_base + 1)
+            silent! call matchdelete(l:matchid_base + 1)
+            call matchadd('Title', '[&?#]\zs[^=?&#]*', 10, l:matchid_base + 1)
 
         else
             " ======== Error ========
@@ -424,13 +424,13 @@ nnoremap <leader>z :call ShowSynStack()<cr>
         " https://github.com/itchyny/vim-highlighturl
 
         " Syntax highlight:  Percent-encoding.
-        silent! call matchdelete(matchid_base + 2)
-        call matchadd('MoreMsg', '%[0-9a-fA-F][0-9a-fA-F]', 10, matchid_base + 2)
+        silent! call matchdelete(l:matchid_base + 2)
+        call matchadd('MoreMsg', '%[0-9a-fA-F][0-9a-fA-F]', 10, l:matchid_base + 2)
 
         " Syntax highlight:  Click-tracking params.
-        silent! call matchdelete(matchid_base + 3)
+        silent! call matchdelete(l:matchid_base + 3)
         call matchadd('ErrorMsg', '\v(gclid|gclsrc|wbraid|gbraid|dclid|gad_source|utm_source|utm_medium|utm_campaign|utm_term|utm_content|utm_id|_ga|_gl|fbclid|fb_action_ids|fb_action_types|msclkid|ttclid|twclid|li_fat_id|epik|mc_cid|mc_eid|_hsenc|_hsmi|mkt_tok|ck_subscriber_id|srsltid)',
-                \ 10, matchid_base + 3)
+                \ 10, l:matchid_base + 3)
     endfunction
 
 
