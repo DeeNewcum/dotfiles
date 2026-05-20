@@ -193,17 +193,22 @@ function lessu()     { less  $(rurl "$1"); }
 function cdu()       { cdd   $(rurl "$1"); }
 function touchu()    { touch $(rurl "$1"); }
 function rmu()       { [ "$1" ] &&   rm -- $(rurl "$1"); }
+function pushdu()    { pushd .;  cdu "$1"; }
 
 # You don't have to specify the directory in the second argument. For example, this works:
 #    mvu  https://paperlined.org/apps/vim/highlighting.html  highlighting_123.html
-function mvu()       {
+function mvu() {
     # Make the move be relative to the target directory.
-    pushd .   > /dev/null
-    cdu "$1"
-    # Do the move
+    pushdu "$1"         > /dev/null
     mv $(rurl "$1") "$2"
-    # Revert to the original directory
-    popd  >/dev/null
+    popd                >/dev/null
+}
+
+# Run 'vidir' in the directory of the specified URL.
+function vidiru() {
+    pushdu "$1"         > /dev/null
+    vidir "$PWD"
+    popd                >/dev/null
 }
 
 
