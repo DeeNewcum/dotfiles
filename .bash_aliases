@@ -194,6 +194,18 @@ function cdu()       { cdd   $(rurl "$1"); }
 function touchu()    { touch $(rurl "$1"); }
 function rmu()       { [ "$1" ] &&   rm -- $(rurl "$1"); }
 
+# You don't have to specify the directory in the second argument. For example, this works:
+#    mvu  https://paperlined.org/apps/vim/highlighting.html  highlighting_123.html
+function mvu()       {
+    # Make the move be relative to the target directory.
+    pushd .   > /dev/null
+    cdu "$1"
+    # Do the move
+    mv $(rurl "$1") "$2"
+    # Revert to the original directory
+    popd  >/dev/null
+}
+
 
 # gnome-open, kde-open, etc
 function go() { xdg-open "$@"; }
