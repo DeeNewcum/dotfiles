@@ -187,12 +187,14 @@ alias vimwhich=vimw
 alias lesswhich=lessw
 alias cdwhich=cdw
 
-# combinations of 'rurl' with other programs
+# Combinations of 'rurl' with other programs.
 function vimu()      { vim   $(rurl "$1"); }
 function lessu()     { less  $(rurl "$1"); }
 function cdu()       { cdd   $(rurl "$1"); }
 function touchu()    { touch $(rurl "$1"); }
 function rmu()       { [ "$1" ] &&   rm -- $(rurl "$1"); }
+    # Use a single file to just rename that, or a directory name to rename everything in that dir.
+function vidiru()    { vidir $(rurl "$1"); }
 function pushdu()    { pushd .;  cdu "$1"; }
 
 # You don't have to specify the directory in the second argument. For example, this works:
@@ -203,14 +205,6 @@ function mvu() {
     mv $(rurl "$1") "$2"
     popd                >/dev/null
 }
-
-# Run 'vidir' in the directory of the specified URL.
-function vidiru() {
-    pushdu "$1"         > /dev/null
-    vidir "$PWD"
-    popd                >/dev/null
-}
-
 
 # gnome-open, kde-open, etc
 function go() { xdg-open "$@"; }
