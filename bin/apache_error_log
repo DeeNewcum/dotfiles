@@ -6,23 +6,28 @@
 use strict;
 use warnings;
 
+use English;
+
 use Data::Dumper;
 
 
 ############################################
 ## Figure out which files we want to monitor
 ############################################
-my $log_dir = "/var/log/httpd/";
+my @log_dirs = ("/var/log/httpd/", "/var/log/apache2/");
+my ($log_dir) = grep { -d } @log_dirs;
 if (! -d $log_dir) {
-    die "Directory ($log_dir) not found or unreadable.\n";
+    die "Log directories (" . join(", ", @log_dirs) . ") not found or are unreadable.\n";
 }
+#die "\$log_dir = $log_dir\n";
 
 my @files_monitored = 
-        grep { -r }
-        glob "$log_dir/*error_log";
+        grep { -r && -T }
+            map { glob $_ }
+                ("$log_dir/*error_log", "$log_dir/error.log*");
 #die Dumper \@files_monitored;
 if (! @files_monitored) {
-    die "No Apache log files found, or you don't have permissions to read them.\n";
+    die "No Apache log files found under $log_dir, or you don't have permissions to read them.\n";
 }
 
 
@@ -30,7 +35,7 @@ if (! @files_monitored) {
 ## Process command-line arguments
 #################################
 if (! @ARGV) {
-    die "$0:  A search string must be specified.\n";
+    die "$0:  A search string must be specified. I suggest using the name of the script you're debugging.\n";
 }
 my $search_string = shift @ARGV;
 
@@ -47,7 +52,9 @@ while (<$fh_tail>) {
     my $parsed = parse_error_log($_);
     #print "$_\n", Dumper($parsed), "\n";
     if ($_ =~ /$search_string/o) {
-        print "$parsed->{log_message}\n";
+        printf "%5d  %s\n",
+            $INPUT_LINE_NUMBER,
+            $parsed->{log_message};
     }
 }
 
