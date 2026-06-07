@@ -7,6 +7,7 @@ use strict;
 use warnings;
 
 use English;
+use Term::ANSIColor;
 
 use Data::Dumper;
 
@@ -30,14 +31,17 @@ if (! @files_monitored) {
     die "No Apache log files found under $log_dir, or you don't have permissions to read them.\n";
 }
 
+# Show the most-recently-updated file matches last.
+@files_monitored = sort { -M $b <=> -M $a } @files_monitored;
+
 
 #################################
 ## Process command-line arguments
 #################################
 if (! @ARGV) {
-    die "$0:  A search string must be specified. I suggest using the name of the script you're debugging.\n";
+    die "$0:  A regex must be specified. I suggest using the name of the script you're debugging, or perhaps just 'wsgi'.\n";
 }
-my $search_string = shift @ARGV;
+my $regex = shift @ARGV;
 
 
 ##################
@@ -49,10 +53,15 @@ open my $fh_tail, '-|',
 
 while (<$fh_tail>) {
     chomp;
-    my $parsed = parse_error_log($_);
+    my $orig_line = $_;
+    my $parsed = parse_Apache_error_log($_);
     #print "$_\n", Dumper($parsed), "\n";
-    if ($_ =~ /$search_string/o) {
-        print "$parsed->{log_message}\n";
+    if ($orig_line =~ /$regex/o) {
+        # Hilight regex matches using Term::ANSIColor.
+        my $display = $parsed->{log_message};
+        $display =~ s/($regex)/ colored($1, "white on_red") /oge;
+
+        print "$display\n";
     }
 }
 
@@ -63,7 +72,7 @@ while (<$fh_tail>) {
 #
 # Input arguments:  One text line.
 # Returns:  A hash-ref.
-sub parse_error_log {
+sub parse_Apache_error_log {
     my ($line) = @_;
     my %parsed;
 
