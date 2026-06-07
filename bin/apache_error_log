@@ -52,9 +52,7 @@ while (<$fh_tail>) {
     my $parsed = parse_error_log($_);
     #print "$_\n", Dumper($parsed), "\n";
     if ($_ =~ /$search_string/o) {
-        printf "%5d  %s\n",
-            $INPUT_LINE_NUMBER,
-            $parsed->{log_message};
+        print "$parsed->{log_message}\n";
     }
 }
 
