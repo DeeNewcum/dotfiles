@@ -443,9 +443,20 @@ if [ "$(uname -o)" = "Cygwin" ]; then
     #       program_files -ipath '*securecrt*' -type d
     #
     function program_files {
+        if [ $# -eq 0 ]; then
+            >&2  echo "ERROR: Must give some search arguments. Arguments are passed directly to"
+            >&2  echo "find(1)."
+            >&2  echo
+            >&2  echo "Example:"
+            >&2  echo "    program_files -iname '*procexp*.exe'"
+            return 1
+        fi
+
         find '/cygdrive/c/Program Files/' '/cygdrive/c/Program Files (x86)/' \
             -maxdepth 2     \
-            "$@" -print0 | xargs -0 -- ls -ldF --color=always
+            "$@"            \
+            -print0         \
+                | xargs -0 --no-run-if-empty -- ls -ldF --color=always
 
         # Note: Normally -maxdepth should be set to 2, but once in a while
         #       you might want to expand it to 3. This really slows down the
