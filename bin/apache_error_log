@@ -51,14 +51,22 @@ open my $fh_tail, '-|',
         'tail', '-f', '-q', @files_monitored
     or die $!;
 
+my $last_pid = '';
 while (<$fh_tail>) {
     chomp;
     my $orig_line = $_;
     my $parsed = parse_Apache_error_log($_);
     #print "$_\n", Dumper($parsed), "\n";
     if ($orig_line =~ /$regex/o) {
+        # $parsed->{pid} can be the pid+tid, which usually makes it unique to each HTTP request.
+        if ($parsed->{pid} ne $last_pid) {
+            print "\n";         # Add a separator in appropriate places, to indicate separate "runs"
+                                # of the script.
+            $last_pid = $parsed->{pid};
+        }
+
         # Hilight regex matches using Term::ANSIColor.
-        my $display = $parsed->{log_message};
+        my $display = $parsed->{log_message}  // '';
         $display =~ s/($regex)/ colored($1, "white on_red") /oge;
 
         print "$display\n";
