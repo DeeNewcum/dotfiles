@@ -107,9 +107,9 @@ function 0grep {
 #function 0xgrep()   { nice -n 19 xargs -0 grep "$@"; }
 # Actually, use 'tcpgrep' (Tom Christiansen's rewrite of grep) instead of the
 # system grep, since that automatically greps inside .gz files and such.
-function 0xgrep()   { nice -n 19 xargs -0 tcgrep -H "$@"; }
-function sudo_0xgrep()   { sudo -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
-function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 "$(which tcgrep)" "$@"; }
+function 0xgrep()   { nice -n 19 xargs -0 tcgrep_filtered -H "$@"; }
+function sudo_0xgrep()   { sudo -- nice -n 19 xargs -0 "$(which tcgrep_filtered)" "$@"; }
+function sudoE_0xgrep()   { sudo -E -- nice -n 19 xargs -0 "$(which tcgrep_filtered)" "$@"; }
     # ^^^ to be clear, these take null-separated records on INPUT, but if 
     #     the '-l' flag is used, the output is newline-separated
 

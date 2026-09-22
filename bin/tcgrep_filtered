@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+# Filter STDERR for the error message:
+#       charnames: some short character names may clash in [GREEK, LATIN], for example GAMMA
+
+$SIG{__WARN__} = sub {
+    my $message = shift;
+    if ($message !~ /charnames: some short character names may clash in/) {
+        warn $message;
+    }
+};
+
+my $tcgrep = `which tcgrep`;
+chomp $tcgrep;
+
+$0 = $tcgrep;
+do $tcgrep;
+die $@ if $@;
+die $! if $!;
