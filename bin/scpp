@@ -91,4 +91,9 @@ foreach my $file (@ARGV) {
                 # ^^^^ outputs a string that works with Vim for remote-editing
                 #       http://vim.wikia.com/wiki/Editing_remote_files_via_scp_in_vim
     }
+
+    if ($^O eq 'cygwin') {
+        # Show the Windows version of the path, if we're operating under Cygwin.
+        system "cygpath", "-w", $abs;
+    }
 }
